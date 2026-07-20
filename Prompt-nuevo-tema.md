@@ -10,23 +10,23 @@ Usa este archivo como plantilla y guía cada vez que quieras agregar un nuevo te
 
 ## Cómo decidir el enfoque (no me preguntes esto, decidilo vos)
 
-No te voy a dar subtemas, nivel, categoría ni tono. Actuá como un
+No te voy a dar subtemas, nivel, categoría ni tono. Actúa como un
 profesor experto que diseña el mejor recorrido posible para alguien
 que llega a este tema sin contexto previo:
 
 - Elegí el nivel de entrada más razonable para arrancar desde cero,
-  pero sin subestimar al lector: empezá simple y subí la complejidad
+  pero sin subestimar al lector: empezá simple y sube la complejidad
   a medida que avanza la página.
-- Decidí vos qué subtemas importan y en qué orden tiene sentido
+- Decide tú qué subtemas importan y en qué orden tiene sentido
   presentarlos (de fundamentos a aplicaciones, cronológico, o como
   mejor se entienda ese tema en particular).
-- Elegí una categoría razonable para clasificarlo y un slug en
+- Elige una categoría razonable para clasificarlo y un slug en
   minúsculas con guiones a partir del título.
 - Tono: directo, claro, sin relleno corporativo. Ni muy académico ni
-  muy casual.
+  muy casual. Usa castellano neutro.
 
-Si tenés dudas genuinas sobre el alcance (ej. el tema es ambiguo o
-podría interpretarse de dos formas muy distintas), preguntame antes de
+Si tienes dudas genuinas sobre el alcance (ej. el tema es ambiguo o
+podría interpretarse de dos formas muy distintas), pregúntame antes de
 generar. Para todo lo demás, decidí vos y avanzá.
 
 ---
@@ -89,7 +89,3 @@ Cuando se solicite un nuevo tema:
      "fecha": "[YYYY-MM-DD]"
    }
    ```
-
-Cuando termines, decime en pocas líneas: (1) qué nivel, categoría y
-subtemas elegiste y por qué, y (2) si tuviste que crear las variables
-`--diagram-1` a `--diagram-6` por primera vez o ya existían.

@@ -70,5 +70,21 @@ window.temasData = [
     "resumen": "Los 23 patrones del Gang of Four explicados con analogías cotidianas: creacionales, estructurales y de comportamiento.",
     "fecha": "2026-07-20",
     "orden": 9
+  },
+  {
+    "slug": "cookies-localstorage-sessionstorage",
+    "titulo": "Cookies, Local Storage y Session Storage",
+    "categoria": "Web Development",
+    "resumen": "Los tres mecanismos de almacenamiento del lado del cliente: cómo funcionan, cuándo usarlos y por qué las cookies son consideradas peligrosas.",
+    "fecha": "2026-07-20",
+    "orden": 10
+  },
+  {
+    "slug": "prompts-ia",
+    "titulo": "Prompts para IA",
+    "categoria": "Inteligencia Artificial",
+    "resumen": "Cómo escribir instrucciones efectivas para modelos de IA: zero-shot, few-shot, chain-of-thought, role prompting y las técnicas que realmente funcionan.",
+    "fecha": "2026-07-20",
+    "orden": 11
   }
 ];

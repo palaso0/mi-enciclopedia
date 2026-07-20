@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookies, Local Storage y Session Storage — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .storage-diagram {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+
+    .storage-box {
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      text-align: center;
+      background: var(--color-surface);
+      transition: transform var(--transition-normal);
+    }
+
+    .storage-box:hover {
+      transform: translateY(-2px);
+    }
+
+    .storage-box h4 {
+      margin: 0 0 var(--space-2);
+      font-size: 1rem;
+      color: var(--color-accent);
+    }
+
+    .storage-box p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .storage-box.cookie { border-color: var(--diagram-1); }
+    .storage-box.cookie h4 { color: var(--diagram-1); }
+    .storage-box.local { border-color: var(--diagram-2); }
+    .storage-box.local h4 { color: var(--diagram-2); }
+    .storage-box.session { border-color: var(--diagram-3); }
+    .storage-box.session h4 { color: var(--diagram-3); }
+
+    .lifecycle-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+      flex-wrap: wrap;
+    }
+
+    .lifecycle-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-1) var(--space-2);
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .lifecycle-arrow {
+      color: var(--color-text-muted);
+      font-size: 1.2rem;
+    }
+
+    .danger-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .danger-list li {
+      position: relative;
+      padding-left: 1.8rem;
+      margin-bottom: var(--space-2);
+      line-height: 1.6;
+    }
+
+    .danger-list li::before {
+      content: "!";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      background: var(--diagram-1);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--color-border);
+      margin-bottom: 1px;
+    }
+
+    .comparison-row > div {
+      background: var(--color-surface);
+      padding: var(--space-2);
+      font-size: 0.85rem;
+    }
+
+    .comparison-row.header > div {
+      font-weight: bold;
+      text-align: center;
+      background: var(--color-bg);
+    }
+
+    .comparison-row > div:first-child {
+      font-weight: 600;
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+    }
+
+    .code-label {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.1rem 0.4rem;
+      margin-bottom: var(--space-1);
+      color: var(--color-accent);
+    }
+
+    @media (max-width: 600px) {
+      .storage-diagram {
+        grid-template-columns: 1fr;
+      }
+      .comparison-row {
+        grid-template-columns: 1fr;
+      }
+      .comparison-row > div:first-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Web Development</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Cookies, Local Storage y Session Storage</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> Tu navegador es un cajón con tres compartimentos diferentes para guardar datos. Cada uno tiene reglas distintas sobre quién puede abrirlo, cuándo se vacía y qué tan peligroso es si alguien más accede a él.</p>
+    </div>
+
+    <h2>1. El problema que resuelven</h2>
+    <p>HTTP es un protocolo sin memoria. Cada petición que haces a un servidor es como si fuera la primera vez que te ven. No recuerdan quién eres, qué hiciste antes ni qué preferencias tenías.</p>
+    <p>Las cookies, local storage y session storage existen para darle <strong>memoria al navegador</strong>. Son mecanismos de almacenamiento del lado del cliente que permiten persistir datos entre peticiones.</p>
+
+    <div class="storage-diagram reveal-element">
+      <div class="storage-box cookie">
+        <h4>Cookies</h4>
+        <p>Pequeños textos que el servidor pide al navegador que guarde. Se envían automáticamente con cada petición HTTP al mismo dominio.</p>
+      </div>
+      <div class="storage-box local">
+        <h4>Local Storage</h4>
+        <p>Almacén key-value que persiste indefinidamente. Solo accesible por JavaScript en el navegador. Nunca se envía al servidor automáticamente.</p>
+      </div>
+      <div class="storage-box session">
+        <h4>Session Storage</h4>
+        <p>Igual que local storage pero se borra automáticamente cuando cierras la pestaña. Un almacén efímero por pestaña.</p>
+      </div>
+    </div>
+
+    <h2>2. Cookies: el mecanismo antiguo y problemático</h2>
+    <p>Las cookies nacieron en 1994 en Netscape. La idea era simple: el servidor envía un encabezado <code>Set-Cookie</code> con la respuesta HTTP, y el navegador guarda ese dato. A partir de ahí, el navegador <strong>adjunta automáticamente</strong> ese cookie en cada petición subsiguiente al mismo dominio.</p>
+
+    <p>Imagínalo como un ticket de entrada a un evento. El organizador te da un ticket (cookie) y cada vez que pasas por una puerta (petición HTTP), lo muestras. No tienes que decir quién eres cada vez: el ticket lo hace por ti.</p>
+
+    <pre class="code-block reveal-element"><code class="language-bash">
+# El servidor envía una cookie en la respuesta HTTP
+HTTP/1.1 200 OK
+Set-Cookie: usuario_id=12345; Path=/; HttpOnly; Secure; SameSite=Strict
+
+# El navegador la envía automáticamente en siguientes peticiones
+GET /api/perfil HTTP/1.1
+Cookie: usuario_id=12345
+    </code></pre>
+
+    <h3>2.1 Tipos de cookies</h3>
+
+    <p><strong>Cookies de sesión:</strong> No tienen fecha de expiración. El navegador las borra cuando cierras toda la ventana (no solo la pestaña).</p>
+    <p><strong>Cookies persistentes:</strong> Tienen un <code>Max-Age</code> o <code>Expires</code>. Sobreviven al cierre del navegador.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Establecer una cookie desde JavaScript
+document.cookie = "tema=oscuro; max-age=31536000; path=/";
+
+// Esto NO sobreescribe las demás cookies, solo agrega o modifica una
+// Para borrar una cookie, ponle max-age en 0:
+document.cookie = "tema=oscuro; max-age=0; path=/";
+    </code></pre>
+
+    <h3>2.2 Atributos de seguridad</h3>
+
+    <p>Estos atributos son la única defensa que tienes contra el mal uso de las cookies:</p>
+
+    <ul>
+      <li><code>HttpOnly</code> — JavaScript no puede leer esta cookie (<code>document.cookie</code> la ignora). Protege contra ataques XSS.</li>
+      <li><code>Secure</code> — Solo se envía por conexiones HTTPS. Nunca por HTTP.</li>
+      <li><code>SameSite=Strict|Lax|None</code> — Controla si la cookie se envía en peticiones cruzadas (cross-site). Es la defensa principal contra CSRF.</li>
+      <li><code>Path</code> — Define a qué rutas del sitio aplica la cookie.</li>
+      <li><code>Domain</code> — Define en qué dominios se envía la cookie.</li>
+    </ul>
+
+    <h2>3. Local Storage: el almacén permanente</h2>
+    <p>Local storage es parte de la API <code>Web Storage</code> que apareció con HTML5. Es un par de clave-valor que vive en el navegador, es accesible solo por JavaScript del mismo origen, y <strong>nunca se envía al servidor</strong>.</p>
+
+    <p>La diferencia clave con las cookies: local storage es un almacén privado entre tú y tu navegador. El servidor no lo ve a menos que explicitamente lo leas y lo envíes en una petición.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Guardar datos
+localStorage.setItem("preferencias", JSON.stringify({
+  tema: "oscuro",
+  idioma: "es",
+  notificaciones: false
+}));
+
+// Leer datos
+const prefs = JSON.parse(localStorage.getItem("preferencias"));
+
+// Eliminar un valor
+localStorage.removeItem("preferencias");
+
+// Vaciar todo
+localStorage.clear();
+
+// Acceder por índice (menos común)
+const clave = localStorage.key(0);
+    </code></pre>
+
+    <p><strong>Capacidad:</strong> ~5-10 MB por dominio (varía entre navegadores). Mucho más que las cookies (4 KB por cookie).</p>
+
+    <h3>3.1 Lifecycle</h3>
+    <div class="lifecycle-flow reveal-element">
+      <span class="lifecycle-step">setItem()</span>
+      <span class="lifecycle-arrow">&rarr;</span>
+      <span class="lifecycle-step">Persiste en disco</span>
+      <span class="lifecycle-arrow">&rarr;</span>
+      <span class="lifecycle-step">Disponible siempre</span>
+      <span class="lifecycle-arrow">&rarr;</span>
+      <span class="lifecycle-step">Hasta que lo borres</span>
+    </div>
+
+    <p>Local storage no expira. Si el usuario limpia los datos del navegador o se borran explícitamente, se pierde. No hay mecanismo de expiración automático.</p>
+
+    <h2>4. Session Storage: el almacén efímero</h2>
+    <p>Session storage funciona casi igual que local storage, pero con una restricción: <strong>se borra cuando cierras la pestaña</strong>. Cada pestaña tiene su propio session storage, aislado de las demás.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Funciona igual que localStorage
+sessionStorage.setItem("carrito", JSON.stringify([
+  { id: 1, cantidad: 2 },
+  { id: 3, cantidad: 1 }
+]));
+
+// Pero se pierde al cerrar la pestaña
+const carrito = JSON.parse(sessionStorage.getItem("carrito"));
+    </code></pre>
+
+    <p>Es útil para datos temporales de una sesión de usuario que no necesitan persistir: formularios multi-paso, estado transitorio de una compra, datos de una encuesta.</p>
+
+    <h2>5. Comparación directa</h2>
+
+    <div class="reveal-element">
+      <div class="comparison-row header">
+        <div>Característica</div>
+        <div style="color: var(--diagram-1)">Cookies</div>
+        <div style="color: var(--diagram-2)">Local Storage</div>
+        <div style="color: var(--diagram-3)">Session Storage</div>
+      </div>
+      <div class="comparison-row">
+        <div>Capacidad</div>
+        <div>~4 KB por cookie</div>
+        <div>~5-10 MB</div>
+        <div>~5-10 MB</div>
+      </div>
+      <div class="comparison-row">
+        <div>Envío automático al servidor</div>
+        <div>Sí, en cada petición</div>
+        <div>No</div>
+        <div>No</div>
+      </div>
+      <div class="comparison-row">
+        <div>Accesible por JS</div>
+        <div>Sí (si no tiene HttpOnly)</div>
+        <div>Sí</div>
+        <div>Sí</div>
+      </div>
+      <div class="comparison-row">
+        <div>Persistencia</div>
+        <div>Según Max-Age/Expires</div>
+        <div>Indefinida</div>
+        <div>Hasta cerrar pestaña</div>
+      </div>
+      <div class="comparison-row">
+        <div>Alcance</div>
+        <div>Por dominio + path</div>
+        <div>Por origen (dominio + puerto)</div>
+        <div>Por pestaña + origen</div>
+      </div>
+      <div class="comparison-row">
+        <div>Se envía en peticiones cruzadas</div>
+        <div>Sí (según SameSite)</div>
+        <div>No</div>
+        <div>No</div>
+      </div>
+      <div class="comparison-row">
+        <div>Creado por</div>
+        <div>Servidor (Set-Cookie) o JS</div>
+        <div>Solo JS</div>
+        <div>Solo JS</div>
+      </div>
+    </div>
+
+    <h2>6. Por qué las cookies son peligrosas</h2>
+
+    <p>Las cookies no son inherentemente malas, pero tienen un diseño que las hace vulnerables a varios ataques. La razón principal es que <strong>se envían automáticamente</strong> sin que el usuario lo sepa ni lo autorice explícitamente.</p>
+
+    <ul class="danger-list reveal-element">
+      <li><strong>Cross-Site Scripting (XSS):</strong> Si un atacante inyecta JavaScript malicioso en tu sitio (por ejemplo, a través de un comentario no sanitizado), puede leer todas las cookies que no tengan el atributo <code>HttpOnly</code>. Con ellas puede secuestrar la sesión del usuario.</li>
+
+      <li><strong>Cross-Site Request Forgery (CSRF):</strong> Un sitio malicioso puede hacer peticiones a tu bank.com mientras el usuario tiene una sesión activa. El navegador adjunta la cookie automáticamente porque la petición va al mismo dominio. El banco no puede distinguir entre una petición legítima y una forzada.</li>
+
+      <li><strong>Tracking / Vigilancia:</strong> Los cookies de terceros (third-party cookies) permiten que un dominio como <code>tracker.com</code> te siga por toda la web. Cada página que visitas que tiene un script de tracker.com envía la cookie, creando un perfil de tu comportamiento.</li>
+
+      <li><strong>Robo de sesión:</strong> Si interceptan la cookie (por ejemplo, en una red WiFi pública sin HTTPS), pueden suplantar al usuario completamente. El cookie es el ticket de entrada: quien lo tiene, entra.</li>
+
+      <li><strong>Datos sin cifrar:</strong> Las cookies se almacenan en texto plano en el disco del usuario. Cualquier programa con acceso al sistema de archivos puede leerlas.</li>
+    </ul>
+
+    <h3>6.1 Local storage es "más seguro" pero no es infalible</h3>
+
+    <p>Local storage no se envía automáticamente al servidor, lo que elimina los ataques CSRF. Pero sigue siendo vulnerable a XSS: si un atacante inyecta JavaScript en tu página, puede leer todo lo que guardaste en local storage.</p>
+
+    <p>La diferencia es sutil pero importante: con cookies el servidor puede aplicar atributos de seguridad (<code>HttpOnly</code>, <code>SameSite</code>). Con local storage, la única defensa es prevenir que el JavaScript malicioso se ejecute en primer lugar.</p>
+
+    <h2>7. ¿Cuándo usar cada uno?</h2>
+
+    <div class="callout reveal-element">
+      <p><strong>Regla simple:</strong> Si el servidor necesita el dato, usa cookies. Si solo lo necesita el navegador, usa local storage o session storage.</p>
+    </div>
+
+    <p><strong>Cookies:</strong> Autenticación de sesión, preferencias que el servidor debe conocer (idioma, moneda), tokens de seguridad (CSRF tokens).</p>
+    <p><strong>Local Storage:</strong> Preferencias de UI (tema oscuro, sidebar colapsada), caché de datos offline, estado de una aplicación SPA que no sale del navegador.</p>
+    <p><strong>Session Storage:</strong> Datos temporales de formularios, estado intermedio de un proceso multi-paso, datos que no deben compartirse entre pestañas.</p>
+
+    <h2>8. Alternativas modernas</h2>
+
+    <p>Los navegadores están migrando hacia modelos más seguros:</p>
+
+    <ul>
+      <li><strong>HttpOnly + Secure + SameSite cookies</strong> — La defensa estándar para autenticación. La mayoría de frameworks web las configuran así por defecto.</li>
+      <li><strong>API Storage</strong> — No confundir con Web Storage. Es una API más moderna que soporta estructuras de datos más complejas y operaciones asíncronas.</li>
+      <li><strong>IndexedDB</strong> — Base de datos completa en el navegador. Mucho más potente que localStorage para cantidades grandes de datos.</li>
+      <li><strong>Cache API + Service Workers</strong> — Para cachear respuestas HTTP y funcionar offline. Es el modelo que usan las Progressive Web Apps (PWAs).</li>
+    </ul>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// IndexedDB: base de datos en el navegador
+const request = indexedDB.open("MiBaseDatos", 1);
+
+request.onupgradeneeded = (e) => {
+  const db = e.target.result;
+  const store = db.createObjectStore("productos", { keyPath: "id" });
+  store.createIndex("nombre", "nombre", { unique: false });
+};
+
+request.onsuccess = (e) => {
+  const db = e.target.result;
+  const tx = db.transaction("productos", "readwrite");
+  tx.objectStore("productos").add({ id: 1, nombre: "Laptop", precio: 999 });
+};
+    </code></pre>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

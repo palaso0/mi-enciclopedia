@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompts para IA — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .prompt-example {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+
+    .prompt-side {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .prompt-side.bad {
+      border-color: var(--diagram-1);
+    }
+
+    .prompt-side.good {
+      border-color: var(--diagram-6);
+    }
+
+    .prompt-side h4 {
+      margin: 0 0 var(--space-2);
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+
+    .prompt-side.bad h4 {
+      color: var(--diagram-1);
+    }
+
+    .prompt-side.good h4 {
+      color: var(--diagram-6);
+    }
+
+    .prompt-side p {
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .technique-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .technique-card h4 {
+      margin: 0 0 var(--space-1);
+      color: var(--color-accent);
+    }
+
+    .technique-card .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.1rem 0.4rem;
+      margin-bottom: var(--space-2);
+      color: var(--color-text-muted);
+    }
+
+    .anatomy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+
+    .anatomy-item {
+      padding: var(--space-2);
+      border-left: 3px solid var(--diagram-2);
+      background: var(--color-surface);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .anatomy-item h5 {
+      margin: 0 0 var(--space-1);
+      font-size: 0.85rem;
+      color: var(--diagram-2);
+    }
+
+    .anatomy-item p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .flow-step .num {
+      flex-shrink: 0;
+      width: 1.6rem;
+      height: 1.6rem;
+      background: var(--diagram-3);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: var(--font-mono);
+    }
+
+    .flow-step .text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding-top: 0.1rem;
+    }
+
+    @media (max-width: 600px) {
+      .prompt-example,
+      .anatomy-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Inteligencia Artificial</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Prompts para IA</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> Un prompt es el texto que le das a una IA para que haga algo. No es magia, son instrucciones. Cuanto mejor las escribas, mejor será el resultado.</p>
+    </div>
+
+    <h2>1. Qué es un prompt</h2>
+    <p>Un prompt es simplemente <strong>el texto que le escribes a una IA</strong>. Cuando abres ChatGPT y escribes algo, eso es un prompt. No hay nada misterioso: es una instrucción en lenguaje natural.</p>
+
+    <p>La diferencia entre un prompt bueno y uno malo es la diferencia entre decirle a alguien "haz comida" y decirle "prepara una pasta al pesto con pollo a la plancha, sin lácteos". La IA puede hacer cualquier cosa, pero necesita que le digas qué.</p>
+
+    <h2>2. Anatomía de un buen prompt</h2>
+
+    <div class="anatomy-grid reveal-element">
+      <div class="anatomy-item">
+        <h5>Contexto</h5>
+        <p>Dale a la IA información de fondo. Quién eres, qué necesitas, para qué es.</p>
+      </div>
+      <div class="anatomy-item">
+        <h5>Tarea</h5>
+        <p>Dile explícitamente qué quieres que haga. Resumir, crear, analizar, traducir, etc.</p>
+      </div>
+      <div class="anatomy-item">
+        <h5>Formato</h5>
+        <p>¿Quieres una lista, un párrafo, código, una tabla? Pídelo.</p>
+      </div>
+      <div class="anatomy-item">
+        <h5>Restricciones</h5>
+        <p>Límites: tono formal, máximo 200 palabras, sin jerga técnica, etc.</p>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Prompt genérico (malo)
+"Resumime esto"
+
+// Prompt completo (bueno)
+"Soy estudiante de derecho. Necesito un resumen de este artículo
+sobre contratos digitales. Que sea de 3 párrafos máximo, usando
+lenguaje claro sin tecnicismos. Al final, pon los 3 puntos
+más importantes en una lista."
+    </code></pre>
+
+    <h2>3. Tipos de prompts</h2>
+
+    <div class="technique-card reveal-element">
+      <h4>Zero-shot</h4>
+      <span class="tag">sin ejemplos</span>
+      <p>Le das la tarea directamente sin mostrar ejemplos. Es el tipo más básico.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Clasifica esta reseña como positiva, negativa o neutra:
+'El producto llegó roto y nadie me respondió el reclamo'"
+      </code></pre>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>Few-shot</h4>
+      <span class="tag">con ejemplos</span>
+      <p>Le muestras uno o más ejemplos de cómo quieres la respuesta. La IA aprende el patrón y lo replica.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Clasifica reseñas como positivas, negativas o neutras.
+
+Ejemplo 1: '¡Amo este producto!' → Positiva
+Ejemplo 2: 'No funciona para nada' → Negativa
+Ejemplo 3: 'Es okay, nada especial' → Neutra
+
+Ahora clasifica: 'El producto llegó roto y nadie me respondió'"
+      </code></pre>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>Chain-of-Thought (CoT)</h4>
+      <span class="tag">razonamiento paso a paso</span>
+      <p>Pides que la IA razone antes de dar la respuesta final. Mejora mucho los resultados en problemas de lógica o matemática.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Piensa paso a paso antes de responder:
+
+Si tengo 3 camisas y 4 pantalones, ¿cuántos outfits
+distintos puedo armar?"
+      </code></pre>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>Role Prompting</h4>
+      <span class="tag">asignar un rol</span>
+      <p>Le asignas un rol o personalidad a la IA. Esto cambia el tono, vocabulario y profundidad de las respuestas.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Eres un profesor de física. Explica la relatividad
+a un niño de 10 años. Usa analogías cotidianas,
+nada de fórmulas."
+      </code></pre>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>ReAct (Reasoning + Acting)</h4>
+      <span class="tag">razonar y actuar</span>
+      <p>La IA alterna entre razonar y ejecutar acciones (como buscar información o usar herramientas). Es la base de los agentes de IA.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Piensa paso a paso. Si necesitas información que no tienes,
+di qué buscarías y por qué. Después continúa con el razonamiento."
+      </code></pre>
+    </div>
+
+    <h2>4. Técnicas avanzadas</h2>
+
+    <div class="technique-card reveal-element">
+      <h4>Prompt de system</h4>
+      <span class="tag">instrucción permanente</span>
+      <p>En APIs como OpenAI, el "system prompt" es una instrucción que siempre está presente. Define el comportamiento base de la IA antes de que el usuario escriba algo.</p>
+      <pre class="code-block"><code class="language-javascript">
+// System prompt
+"Eres un asistente técnico. Responde siempre en español,
+usa ejemplos de código, y si no sabes algo, dilo."
+
+// User prompt
+"¿Cómo hago un fetch en JavaScript?"
+      </code></pre>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>Prompt chaining</h4>
+      <span class="tag">varios prompts encadenados</span>
+      <p>Divides una tarea compleja en pasos. Cada paso usa el resultado del anterior como input.</p>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <span class="num">1</span>
+          <span class="text">"Resume este artículo de 2000 palabras en 5 puntos clave"</span>
+        </div>
+        <div class="flow-step">
+          <span class="num">2</span>
+          <span class="text">"Toma estos 5 puntos y explica cada uno con un ejemplo cotidiano"</span>
+        </div>
+        <div class="flow-step">
+          <span class="num">3</span>
+          <span class="text">"Convierte eso en una presentación de diapositivas con títulos y subtítulos"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="technique-card reveal-element">
+      <h4>Delimitadores</h4>
+      <span class="tag">separar instrucciones de datos</span>
+      <p>Usas caracteres especiales para decirle a la IA dónde termina tu instrucción y empiezan los datos. Evita que la IA confunda contenido con instrucciones.</p>
+      <pre class="code-block"><code class="language-javascript">
+"Traduce el siguiente texto al inglés. Usa triple comilla
+como delimitador:
+
+'''La inteligencia artificial está transformando todas
+las industrias, desde la medicina hasta la agricultura.'''"
+      </code></pre>
+    </div>
+
+    <h2>5. Errores comunes</h2>
+
+    <div class="prompt-example reveal-element">
+      <div class="prompt-side bad">
+        <h4>MAL: Ambiguo</h4>
+        <p>"Explicame esto"</p>
+        <p style="margin-top: var(--space-1); font-size: 0.8rem; color: var(--color-text-muted)">¿Qué es "esto"? ¿Para quién? ¿A qué nivel de profundidad?</p>
+      </div>
+      <div class="prompt-side good">
+        <h4>BIEN: Específico</h4>
+        <p>"Explicame cómo funciona un transformador en lenguaje simple, para alguien que sabe programar pero no sabe de machine learning"</p>
+      </div>
+    </div>
+
+    <div class="prompt-example reveal-element">
+      <div class="prompt-side bad">
+        <h4>MAL: Sobrecargado</h4>
+        <p>"Hazme un resumen, después tradúcelo, después hazlo más corto, después ponlo en formato de lista, y agrégame un ejemplo"</p>
+        <p style="margin-top: var(--space-1); font-size: 0.8rem; color: var(--color-text-muted)">Demasiado en un solo prompt. La calidad baja.</p>
+      </div>
+      <div class="prompt-side good">
+        <h4>BIEN: Encadenado</h4>
+        <p>Paso 1: "Resume esto en 3 párrafos"<br>Paso 2: "Traduce el resumen al inglés"<br>Paso 3: "Convierte esto en una lista de viñetas"</p>
+      </div>
+    </div>
+
+    <div class="prompt-example reveal-element">
+      <div class="prompt-side bad">
+        <h4>MAL: Sin contexto</h4>
+        <p>"Escribe un email profesional"</p>
+        <p style="margin-top: var(--space-1); font-size: 0.8rem; color: var(--color-text-muted)">¿Para quién? ¿Sobre qué? ¿Qué tono?</p>
+      </div>
+      <div class="prompt-side good">
+        <h4>BIEN: Con todo el contexto</h4>
+        <p>"Escribe un email formal para un cliente que se quejó por un retraso en la entrega. Explica que hubo un problema logístico, que ya se resolvió, y que el pedido llega mañana. Tono profesional pero empático."</p>
+      </div>
+    </div>
+
+    <h2>6. Template de prompt</h2>
+
+    <p>Si no sabes por dónde empezar, usa esta estructura como base:</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+[SOS / CONTEXTO]
+Eres un profesor de matemáticas con 20 años de experiencia.
+
+[TAREA]
+Explícame qué es una derivada.
+
+[FORMATO]
+Usa una analogía cotidiana primero, después la definición
+técnica, y al final un ejemplo resuelto.
+
+[RESTRICCIONES]
+Que sea comprensible para un estudiante de 16 años
+que nunca vio cálculo. Máximo 300 palabras.
+    </code></pre>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla de oro:</strong> Si la IA te da una respuesta mala, el 90% de las veces el problema es el prompt, no la IA. Antes de cambiar de herramienta, mejora la instrucción.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
