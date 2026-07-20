@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testing: Unit, Integration, E2E y Regresión — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .test-pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+
+    .pyramid-level {
+      text-align: center;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      margin-bottom: 2px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .pyramid-level.e2e {
+      width: 40%;
+      background: var(--diagram-1);
+    }
+
+    .pyramid-level.integration {
+      width: 65%;
+      background: var(--diagram-5);
+    }
+
+    .pyramid-level.unit {
+      width: 90%;
+      background: var(--diagram-6);
+    }
+
+    .pyramid-label {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+
+    .test-type-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .test-type-card h3 {
+      margin: 0 0 var(--space-2);
+    }
+
+    .test-type-card p {
+      margin: 0 0 var(--space-2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .test-type-card .pros {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .test-type-card .pros span {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+    }
+
+    .test-type-card .pros .fast {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .test-type-card .pros .slow {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .test-type-card .pros .cheap {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .test-type-card .pros .expensive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .test-type-card .pros .reliable {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .test-type-card .pros .brittle {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Software Engineering</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Testing: Unit, Integration, E2E y Regresión</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> Los tests son código que verifica que tu código funciona. Unit tests prueban piezas aisladas, integration tests prueban cómo se juntan, E2E tests simulan un usuario real. Todos son necesarios, pero en diferentes proporciones.</p>
+    </div>
+
+    <h2>1. La pirámide de testing</h2>
+
+    <p>La pirámide de testing te dice cuántos tests de cada tipo deberías tener. La base (más tests) son los unit, la punta (menos tests) son los E2E.</p>
+
+    <div class="test-pyramid reveal-element">
+      <div class="pyramid-level e2e">E2E</div>
+      <span class="pyramid-label">Pocos: lentos, frágiles, costosos</span>
+      <div class="pyramid-level integration">Integration</div>
+      <span class="pyramid-label">Algunos: prueban la integración real</span>
+      <div class="pyramid-level unit">Unit</div>
+      <span class="pyramid-label">Muchos: rápidos, baratos, confiables</span>
+    </div>
+
+    <h2>2. Unit Tests</h2>
+
+    <div class="test-type-card reveal-element">
+      <h3 style="color: var(--diagram-6)">Unit Tests</h3>
+      <p>Prueban <strong>una función o módulo de forma aislada</strong>. No dependen de base de datos, red ni otros servicios. Si tu función tiene dependencias, se mockean.</p>
+      <div class="pros">
+        <span class="fast">rápidos</span>
+        <span class="cheap">baratos</span>
+        <span class="reliable">confiables</span>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Función a testear
+function sumar(a, b) {
+  return a + b;
+}
+
+// Unit test (con Jest/Vitest)
+test("sumar dos números positivos", () => {
+  expect(sumar(2, 3)).toBe(5);
+});
+
+test("sumar con negativos", () => {
+  expect(sumar(-1, -3)).toBe(-4);
+});
+
+test("sumar con cero", () => {
+  expect(sumar(5, 0)).toBe(5);
+});
+    </code></pre>
+
+    <h3>Cuándo usar mocks</h3>
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Función que depende de una API externa
+async function obtenerUsuario(id) {
+  const res = await fetch(`/api/usuarios/${id}`);
+  return res.json();
+}
+
+// Test con mock: no hacemos petición real
+test("obtenerUsuario retorna los datos", async () => {
+  global.fetch = jest.fn().mockResolvedValue({
+    json: () => Promise.resolve({ id: 1, nombre: "Ana" })
+  });
+
+  const usuario = await obtenerUsuario(1);
+  expect(usuario.nombre).toBe("Ana");
+  expect(fetch).toHaveBeenCalledWith("/api/usuarios/1");
+});
+    </code></pre>
+
+    <h2>3. Integration Tests</h2>
+
+    <div class="test-type-card reveal-element">
+      <h3 style="color: var(--diagram-5)">Integration Tests</h3>
+      <p>Prueban <strong>cómo funcionan varias piezas juntas</strong>. Por ejemplo: un endpoint de API que consulta la base de datos, procesa los datos y retorna una respuesta.</p>
+      <div class="pros">
+        <span class="reliable">más realistas</span>
+        <span class="slow">más lentos</span>
+        <span class="expensive">más costosos</span>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Integration test de un endpoint (con Supertest)
+const request = require("supertest");
+const app = require("../app");
+const db = require("../db");
+
+beforeAll(async () => {
+  await db.migrate.latest();
+  await db.seed.run();
+});
+
+afterAll(async () => {
+  await db.destroy();
+});
+
+test("GET /api/usuarios retorna la lista", async () => {
+  const res = await request(app).get("/api/usuarios");
+  expect(res.status).toBe(200);
+  expect(res.body.length).toBeGreaterThan(0);
+});
+
+test("POST /api/usuarios crea un usuario", async () => {
+  const res = await request(app)
+    .post("/api/usuarios")
+    .send({ nombre: "Carlos", email: "carlos@test.com" });
+  expect(res.status).toBe(201);
+  expect(res.body.nombre).toBe("Carlos");
+});
+    </code></pre>
+
+    <h2>4. End-to-End (E2E) Tests</h2>
+
+    <div class="test-type-card reveal-element">
+      <h3 style="color: var(--diagram-1)">End-to-End Tests</h3>
+      <p>Simulan <strong>un usuario real usando la aplicación</strong>. Abran un navegador, hacen clic, escriben, navegan. Prueban el sistema completo de punta a punta.</p>
+      <div class="pros">
+        <span class="reliable">máxima confianza</span>
+        <span class="slow">muy lentos</span>
+        <span class="expensive">muy costosos</span>
+        <span class="brittle">frágiles</span>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// E2E test con Playwright
+const { test, expect } = require("@playwright/test");
+
+test("login funciona correctamente", async ({ page }) => {
+  await page.goto("https://tu-sitio.com/login");
+
+  await page.fill('[data-testid="email"]', "usuario@test.com");
+  await page.fill('[data-testid="password"]', "123456");
+  await page.click('[data-testid="boton-login"]');
+
+  await expect(page).toHaveURL("/dashboard");
+  await expect(page.locator("h1")).toContainText("Bienvenido");
+});
+
+test("carrito de compras funciona", async ({ page }) => {
+  await page.goto("https://tu-sitio.com/productos");
+  await page.click('[data-testid="agregar-producto-1"]');
+  await page.click('[data-testid="ver-carrito"]');
+
+  await expect(page.locator(".carrito-item")).toHaveCount(1);
+  await expect(page.locator(".total")).toContainText("$999");
+});
+    </code></pre>
+
+    <h2>5. Tests de Regresión</h2>
+
+    <div class="test-type-card reveal-element">
+      <h3 style="color: var(--diagram-3)">Tests de Regresión</h3>
+      <p>No son un tipo de test separado, sino el <strong>propósito</strong> de todos los tests. Son tests que verifican que un bug que se corrigió no vuelva a aparecer.</p>
+      <p>Si encontrás un bug, escribís un test que lo reproduzca. Cuando lo arreglás, el test pasa. Si el bug vuelve en el futuro, el test falla.</p>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Bug: la función no manejaba strings vacíos
+function formatearNombre(nombre) {
+  if (!nombre) return "Sin nombre";
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+}
+
+// Test de regresión: este test evita que el bug vuelva
+test("regresión: formatearNombre con string vacío", () => {
+  expect(formatearNombre("")).toBe("Sin nombre");
+  expect(formatearNombre(null)).toBe("Sin nombre");
+  expect(formatearNombre(undefined)).toBe("Sin nombre");
+});
+    </code></pre>
+
+    <h2>6. Métricas de testing</h2>
+
+    <ul>
+      <li><strong>Cobertura de código:</strong> Qué porcentaje de tu código está cubierto por tests. No es la única métrica, pero es un buen indicador.</li>
+      <li><strong>Cobertura de ramas:</strong> Qué porcentaje de las ramas del código (if/else, switch) se ejecutaron en los tests.</li>
+      <li><strong>Mutación testing:</strong> Cambiá tu código a propósito (mutaciones) y verificá que los tests fallen. Si un test no detecta la mutación, no está sirviendo.</li>
+    </ul>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Cobertura en Jest/Vitest
+// npx jest --coverage
+//
+// Statements   : 85% ( 170/200 )
+// Branches     : 78% ( 50/64 )
+// Functions    : 90% ( 18/20 )
+// Lines        : 85% ( 165/194 )
+    </code></pre>
+
+    <h2>7. Anti-patrones en testing</h2>
+
+    <ul>
+      <li><strong>Tests que dependen de otros tests:</strong> Cada test debe poder ejecutarse independientemente.</li>
+      <li><strong>Tests frágiles:</strong> Si un test falla porque cambiaste el color de un botón, no es un buen test.</li>
+      <li><strong>Tests lentos en development:</strong> Los tests unitarios deben correr en milisegundos. Si tardan mucho, los desarrolladores no los corren.</li>
+      <li><strong>Testear implementación en vez de comportamiento:</strong> No testees que se llamó cierta función, testees que el resultado sea el esperado.</li>
+      <li><strong>Cobertura del 100% como meta:</strong> No todo el código vale la pena testearlo. Enfocá los tests en la lógica crítica.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla práctica:</strong> Empezá con unit tests para la lógica de negocio. Agregá integration tests para los endpoints y servicios críticos. Usá E2E tests para los flujos principales del usuario. No intentés testear todo: enfocá los esfuerzos donde generan más valor.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

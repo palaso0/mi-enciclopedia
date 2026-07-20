@@ -86,5 +86,45 @@ window.temasData = [
     "resumen": "Cómo escribir instrucciones efectivas para modelos de IA: zero-shot, few-shot, chain-of-thought, role prompting y las técnicas que realmente funcionan.",
     "fecha": "2026-07-20",
     "orden": 11
+  },
+  {
+    "slug": "complejidad-big-o",
+    "titulo": "Complejidad Temporal y Espacial (Big O)",
+    "categoria": "Computer Science",
+    "resumen": "Cómo medir y analizar la eficiencia de algoritmos: notación Big O, complejidad temporal vs espacial, y por qué importa escalar bien.",
+    "fecha": "2026-07-20",
+    "orden": 12
+  },
+  {
+    "slug": "seguridad-web",
+    "titulo": "Seguridad Web: XSS, CSRF, CSP y CORS",
+    "categoria": "Web Development",
+    "resumen": "Los cuatro pilares de la seguridad web: ataques XSS y CSRF, y mecanismos de defensa CSP y CORS.",
+    "fecha": "2026-07-20",
+    "orden": 13
+  },
+  {
+    "slug": "cicd",
+    "titulo": "CI/CD: Integración y Despliegue Continuo",
+    "categoria": "DevOps",
+    "resumen": "Pipelines de integración y despliegue continuo: cómo automatizar el build, test y deploy de tu aplicación.",
+    "fecha": "2026-07-20",
+    "orden": 14
+  },
+  {
+    "slug": "testing",
+    "titulo": "Testing: Unit, Integration, E2E y Regresión",
+    "categoria": "Software Engineering",
+    "resumen": "La pirámide de testing: unit tests, integration tests, end-to-end tests y tests de regresión con ejemplos prácticos.",
+    "fecha": "2026-07-20",
+    "orden": 15
+  },
+  {
+    "slug": "mlops",
+    "titulo": "MLOps: Machine Learning Operations",
+    "categoria": "Machine Learning",
+    "resumen": "Cómo llevar modelos de ML a producción: versionado de datos y modelos, experiment tracking, serving y monitoreo de drift.",
+    "fecha": "2026-07-20",
+    "orden": 16
   }
 ];

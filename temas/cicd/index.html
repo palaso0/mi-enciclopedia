@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CI/CD: Integración y Despliegue Continuo — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+      flex-wrap: wrap;
+    }
+
+    .pipeline-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2);
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .pipeline-step h4 {
+      margin: 0;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+    }
+
+    .pipeline-step p {
+      margin: var(--space-1) 0 0;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .pipeline-step.active {
+      border-color: var(--diagram-6);
+      background: var(--diagram-6);
+      color: white;
+    }
+
+    .pipeline-step.active h4 {
+      color: white;
+    }
+
+    .pipeline-step.active p {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .pipeline-arrow {
+      color: var(--color-text-muted);
+      font-size: 1.2rem;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+
+    .tool-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .tool-card h4 {
+      margin: 0 0 var(--space-1);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--color-accent);
+    }
+
+    .tool-card p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .tool-card .tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.1rem 0.3rem;
+      margin-bottom: var(--space-1);
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">DevOps</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>CI/CD: Integración y Despliegue Continuo</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> CI es automáticamente testear y construir tu código cada vez que alguien hace un cambio. CD es automáticamente deployear ese código cuando todo funciona. El objetivo: deployear con confianza, rápido y seguido.</p>
+    </div>
+
+    <h2>1. El problema que resuelven</h2>
+
+    <p>Imaginá un equipo de 5 desarrolladores trabajando en la misma aplicación. Cada uno escribe código en su branch. Si no hay CI/CD, el día del deploy tenés que:</p>
+    <ul>
+      <li>Juntar todos los cambios manualmente</li>
+      <li>Resolver conflictos de merge</li>
+      <li>Correr tests (si los tenés)</li>
+      <li>Construir el proyecto</li>
+      <li>Subirlo al servidor</li>
+      <li>Cruzar los dedos para que no se rompa nada</li>
+    </ul>
+
+    <p>CI/CD automatiza todo esto. Cada vez que alguien hace push, el sistema automáticamente testea, construye y deployea.</p>
+
+    <h2>2. El pipeline típico</h2>
+
+    <div class="pipeline-flow reveal-element">
+      <div class="pipeline-step active">
+        <h4>Push</h4>
+        <p>Código al repo</p>
+      </div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step">
+        <h4>Build</h4>
+        <p>Compilar/empaquetar</p>
+      </div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step">
+        <h4>Test</h4>
+        <p>Tests automáticos</p>
+      </div>
+      <span class="pipeline-arrow">&rarr;</span>
+      <div class="pipeline-step">
+        <h4>Deploy</h4>
+        <p>Publicar en producción</p>
+      </div>
+    </div>
+
+    <p>Si algo falla en cualquier paso, el pipeline se detiene y notifica al equipo. Nada se publica si no funciona.</p>
+
+    <h2>3. CI: Integración Continua</h2>
+
+    <p>CI es la práctica de <strong>integrar el código de todos los desarrolladores frecuentemente</strong>. En vez de esperar semanas para juntar todo, cada push se integra y verifica automáticamente.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// .github/workflows/ci.yml (GitHub Actions)
+name: CI
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm test
+      - run: npm run build
+    </code></pre>
+
+    <p><strong>Lo que CI verifica en cada push:</strong></p>
+    <ul>
+      <li>El código compila sin errores</li>
+      <li>Los tests pasan</li>
+      <li>El lint no reporta problemas</li>
+      <li>La cobertura de tests no bajó</li>
+    </ul>
+
+    <h2>4. CD: Despliegue Continuo vs Entrega Continua</h2>
+
+    <p>Hay dos variantes de CD:</p>
+
+    <p><strong>Continuous Delivery (Entrega Continua):</strong> El código está siempre listo para deployear, pero alguien aprueba manualmente cuándo hacerlo.</p>
+    <p><strong>Continuous Deployment (Despliegue Continuo):</strong> Cada cambio que pasa los tests se deployea automáticamente a producción. Sin intervención humana.</p>
+
+    <div class="pipeline-flow reveal-element">
+      <div class="pipeline-step">
+        <h4>Delivery</h4>
+        <p>Automático hasta staging<br>Aprobación manual para prod</p>
+      </div>
+      <span class="pipeline-arrow">vs</span>
+      <div class="pipeline-step active">
+        <h4>Deployment</h4>
+        <p>Todo automático<br>Sin aprobación manual</p>
+      </div>
+    </div>
+
+    <h2>5. Herramientas populares</h2>
+
+    <div class="tool-grid reveal-element">
+      <div class="tool-card">
+        <span class="tag">Hospedado</span>
+        <h4>GitHub Actions</h4>
+        <p>Integrado con GitHub. YAML workflows. Generoso en el tier gratuito.</p>
+      </div>
+      <div class="tool-card">
+        <span class="tag">Hospedado</span>
+        <h4>GitLab CI</h4>
+        <p>Integrado con GitLab. Pipeline como código. Runner self-hosted.</p>
+      </div>
+      <div class="tool-card">
+        <span class="tag">Hospedado</span>
+        <h4>CircleCI</h4>
+        <p> rápido, configuración en YAML. Orb para reutilizar configs.</p>
+      </div>
+      <div class="tool-card">
+        <span class="tag">Self-hosted</span>
+        <h4>Jenkins</h4>
+        <p>El clásico. Opensource, flexible, pero más complejo de mantener.</p>
+      </div>
+      <div class="tool-card">
+        <span class="tag">Self-hosted</span>
+        <h4>ArgoCD</h4>
+        <p>GitOps para Kubernetes. Despliegue declarativo desde repositorios Git.</p>
+      </div>
+      <div class="tool-card">
+        <span class="tag">Self-hosted</span>
+        <h4>Drone</h4>
+        <p>Ligero, basado en containers. Configuración en YAML simple.</p>
+      </div>
+    </div>
+
+    <h2>6. Buenas prácticas</h2>
+
+    <ul>
+      <li><strong>El pipeline debe ser rápido:</strong> Si tarda 30 minutos, los desarrolladores no lo van a esperar. Objetivo: menos de 10 minutos.</li>
+      <li><strong>Fallá rápido:</strong> Poné los checks más baratos primero (lint, tests unitarios) antes de los costosos (build, deploy).</li>
+      <li><strong>No saltés tests:</strong> Si el pipeline falla, arreglá el código. No deshabilites el test para que pase.</li>
+      <li><strong>Versioná tu pipeline:</strong> El archivo de CI/CD debe estar en el repo, no configurado manualmente en la plataforma.</li>
+      <li><strong>Usá cache:</strong> Cacheá dependencias y artefactos entre runs para acelerar el pipeline.</li>
+      <li><strong>Variables de entorno:</strong> Secrets y configuración van en variables de entorno, nunca en el código.</li>
+    </ul>
+
+    <h2>7. Estrategias de deploy</h2>
+
+    <ul>
+      <li><strong>Rolling update:</strong> Reemplazás instancias viejas por nuevas gradualmente. Sin downtime.</li>
+      <li><strong>Blue-green:</strong> Tenés dos ambientes idénticos. Deployás al nuevo y redirigís el tráfico de golpe. Si algo falla, volvés al anterior.</li>
+      <li><strong>Canary:</strong> Deployás a un porcentaje pequeño de usuarios primero. Si no hay errores, expandís gradualmente.</li>
+      <li><strong>Feature flags:</strong> El código está desplegado pero desactivado. Lo activás con un switch sin necesidad de redeployear.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>La meta:</strong> Deployear debería ser aburrido. Si deployear te da ansiedad, tu pipeline necesita mejorar. El CI/CD existe para que puedas hacer cambios con confianza.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

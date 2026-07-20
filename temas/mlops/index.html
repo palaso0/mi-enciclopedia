@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLOps: Machine Learning Operations — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .mlops-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      margin: var(--space-4) 0;
+      flex-wrap: wrap;
+    }
+
+    .mlops-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2);
+      text-align: center;
+      min-width: 90px;
+      font-size: 0.8rem;
+    }
+
+    .mlops-step h4 {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .mlops-step p {
+      margin: var(--space-1) 0 0;
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+    }
+
+    .mlops-arrow {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    .concept-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .concept-card h3 {
+      margin: 0 0 var(--space-2);
+      color: var(--color-accent);
+    }
+
+    .concept-card p {
+      margin: 0 0 var(--space-2);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--color-border);
+      margin-bottom: 1px;
+    }
+
+    .comparison-row > div {
+      background: var(--color-surface);
+      padding: var(--space-2);
+      font-size: 0.85rem;
+    }
+
+    .comparison-row.header > div {
+      font-weight: bold;
+      text-align: center;
+      background: var(--color-bg);
+    }
+
+    .comparison-row > div:first-child {
+      font-weight: 600;
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Machine Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>MLOps: Machine Learning Operations</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> MLOps es la práctica de llevar un modelo de ML desde el laboratorio hasta producción de forma confiable, reproducible y monitoreada. Es DevOps aplicado a machine learning.</p>
+    </div>
+
+    <h2>1. El problema</h2>
+
+    <p>Un数据科学家entrena un modelo en su laptop, obtiene buenas métricas, y lo comparte con el equipo de ingeniería. Ahora empiezan los problemas:</p>
+
+    <ul>
+      <li>El modelo funciona en el notebook pero no en producción</li>
+      <li>Nadie sabe qué datos se usaron para entrenar</li>
+      <li>El modelo se degrada con el tiempo pero nadie lo detecta</li>
+      <li>Reentrenar toma días porque no hay pipeline automatizado</li>
+      <li>No hay forma de volver a una versión anterior si algo sale mal</li>
+    </ul>
+
+    <p>MLOps resuelve estos problemas con automatización, versionado y monitoreo.</p>
+
+    <h2>2. El pipeline de MLOps</h2>
+
+    <div class="mlops-pipeline reveal-element">
+      <div class="mlops-step">
+        <h4>Datos</h4>
+        <p>Recolección y versionado</p>
+      </div>
+      <span class="mlops-arrow">&rarr;</span>
+      <div class="mlops-step">
+        <h4>Preprocesamiento</h4>
+        <p>Limpieza y transformación</p>
+      </div>
+      <span class="mlops-arrow">&rarr;</span>
+      <div class="mlops-step">
+        <h4>Entrenamiento</h4>
+        <p>Modelo y hiperparámetros</p>
+      </div>
+      <span class="mlops-arrow">&rarr;</span>
+      <div class="mlops-step">
+        <h4>Evaluación</h4>
+        <p>Métricas y validación</p>
+      </div>
+      <span class="mlops-arrow">&rarr;</span>
+      <div class="mlops-step">
+        <h4>Deploy</h4>
+        <p>Servir el modelo</p>
+      </div>
+      <span class="mlops-arrow">&rarr;</span>
+      <div class="mlops-step">
+        <h4>Monitoreo</h4>
+        <p>Drift y performance</p>
+      </div>
+    </div>
+
+    <h2>3. Versionado de datos y modelos</h2>
+
+    <div class="concept-card reveal-element">
+      <h3>Data Versioning (DVC)</h3>
+      <p>Así como Git versiona código, DVC versiona datos y modelos. Cada experimento queda registrado con qué datos, qué código y qué resultados produjo.</p>
+      <pre class="code-block"><code class="language-bash">
+# Inicializar DVC en tu proyecto
+dvc init
+
+# Agregar un archivo de datos grande
+dvc add data/entrenamiento.csv
+
+# El archivo real va a un storage remoto (S3, GCS, etc.)
+# Git solo guarda el puntero (.dvc)
+git add data/entrenamiento.csv.dvc
+git commit -m "Agregar datos de entrenamiento v1"
+      </code></pre>
+    </div>
+
+    <div class="concept-card reveal-element">
+      <h3>Experiment Tracking</h3>
+      <p>Cada experimento queda registrado: qué hiperparámetros se usaron, qué métricas se obtuvieron, qué modelo se generó.</p>
+      <pre class="code-block"><code class="language-python">
+import mlflow
+
+mlflow.set_experiment("clasificacion-spam")
+
+with mlflow.start_run():
+    mlflow.log_param("modelo", "random_forest")
+    mlflow.log_param("n_estimators", 100)
+
+    # Entrenar modelo...
+    accuracy = 0.95
+
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.sklearn.log_model(modelo, "modelo")
+      </code></pre>
+    </div>
+
+    <h2>4. Serving: cómo servir un modelo</h2>
+
+    <div class="concept-card reveal-element">
+      <h3>Opciones de deploy</h3>
+      <div class="comparison-row header">
+        <div>Método</div>
+        <div>Cuándo usarlo</div>
+      </div>
+      <div class="comparison-row">
+        <div>REST API (Flask/FastAPI)</div>
+        <div>Control total, personalización, latencia baja</div>
+      </div>
+      <div class="comparison-row">
+        <div>MLflow Serving</div>
+        <div>Deploy rápido desde experimentos MLflow</div>
+      </div>
+      <div class="comparison-row">
+        <div>SageMaker / Vertex AI</div>
+        <div>Managed, escalable, integrado con cloud</div>
+      </div>
+      <div class="comparison-row">
+        <div>ONNX Runtime</div>
+        <div>Optimizado para inferencia, multi-framework</div>
+      </div>
+      <div class="comparison-row">
+        <div>TorchServe / Triton</div>
+        <div>Servir modelos PyTorch/TF en producción</div>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# FastAPI para servir un modelo
+from fastapi import FastAPI
+import joblib
+
+app = FastAPI()
+modelo = joblib.load("modelo.pkl")
+
+@app.post("/predecir")
+def predecir(datos: dict):
+    resultado = modelo.predict([datos["features"]])
+    return {"prediccion": resultado.tolist()}
+    </code></pre>
+
+    <h2>5. Monitoreo y drift</h2>
+
+    <div class="concept-card reveal-element">
+      <h3>Model Drift</h3>
+      <p>Un modelo que funcionaba bien ayer puede empezar a funcionar mal hoy. Los datos cambian, el comportamiento de los usuarios cambia, el mundo cambia. El monitoreo detecta cuándo el modelo ya no es confiable.</p>
+    </div>
+
+    <ul>
+      <li><strong>Data drift:</strong> La distribución de los datos de producción cambió respecto a los de entrenamiento.</li>
+      <li><strong>Concept drift:</strong> La relación entre variables y target cambió.</li>
+      <li><strong>Performance drift:</strong> Las métricas del modelo bajan (accuracy, F1, etc.).</li>
+    </ul>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Ejemplo de monitoreo de drift con Evidently
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset
+
+report = Report(metrics=[DataDriftPreset()])
+report.run(
+    reference_data=datos_entrenamiento,
+    current_data=datos_produccion
+)
+report.save_html("drift_report.html")
+    </code></pre>
+
+    <h2>6. MLOps vs DevOps</h2>
+
+    <div class="reveal-element">
+      <div class="comparison-row header">
+        <div>Aspecto</div>
+        <div>DevOps</div>
+      </div>
+      <div class="comparison-row">
+        <div>Artefacto principal</div>
+        <div>Código compilado / container</div>
+      </div>
+      <div class="comparison-row">
+        <div>Testing</div>
+        <div>Unit, integration, e2e</div>
+      </div>
+      <div class="comparison-row">
+        <div>Monitoreo</div>
+        <div>Latencia, errores, throughput</div>
+      </div>
+      <div class="comparison-row">
+        <div>Versionado</div>
+        <div>Git (código)</div>
+      </div>
+      <div class="comparison-row">
+        <div>Rollback</div>
+        <div>Volver a versión anterior del código</div>
+      </div>
+    </div>
+
+    <div class="reveal-element" style="margin-top: var(--space-2)">
+      <div class="comparison-row header">
+        <div>Aspecto</div>
+        <div>MLOps</div>
+      </div>
+      <div class="comparison-row">
+        <div>Artefacto principal</div>
+        <div>Modelo + datos + código</div>
+      </div>
+      <div class="comparison-row">
+        <div>Testing</div>
+        <div>Unit + validación de datos + métricas de modelo</div>
+      </div>
+      <div class="comparison-row">
+        <div>Monitoreo</div>
+        <div>Drift, fairness, latencia de inferencia</div>
+      </div>
+      <div class="comparison-row">
+        <div>Versionado</div>
+        <div>Git + DVC (código + datos + modelos)</div>
+      </div>
+      <div class="comparison-row">
+        <div>Rollback</div>
+        <div>Volver a versión anterior del modelo + datos</div>
+      </div>
+    </div>
+
+    <h2>7. Herramientas del ecosistema</h2>
+
+    <ul>
+      <li><strong>MLflow:</strong> Experiment tracking, model registry, deployment.</li>
+      <li><strong>DVC:</strong> Versionado de datos y pipelines de ML.</li>
+      <li><strong>Kubeflow:</strong> Pipelines de ML en Kubernetes.</li>
+      <li><strong>Weights & Biases:</strong> Tracking de experimentos y visualización.</li>
+      <li><strong>Evidently / Great Expectations:</strong> Validación de datos y monitoreo de drift.</li>
+      <li><strong>Feast:</strong> Feature store para servir features en producción.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>La meta de MLOps:</strong> Poder reproducir cualquier experimento, deployear un modelo nuevo en minutos (no semanas), y saber inmediatamente cuándo un modelo deja de funcionar.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

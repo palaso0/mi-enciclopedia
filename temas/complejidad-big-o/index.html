@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complejidad Temporal y Espacial (Big O) — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+
+  <style>
+    .complexity-chart {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+
+    .complexity-box {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+
+    .complexity-box h4 {
+      margin: 0 0 var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 1rem;
+    }
+
+    .complexity-box p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .complexity-box .notation {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: var(--space-1);
+    }
+
+    .complexity-box.o1 { border-left: 4px solid var(--diagram-6); }
+    .complexity-box.o1 .notation { color: var(--diagram-6); }
+    .complexity-box.on { border-left: 4px solid var(--diagram-2); }
+    .complexity-box.on .notation { color: var(--diagram-2); }
+    .complexity-box.on2 { border-left: 4px solid var(--diagram-5); }
+    .complexity-box.on2 .notation { color: var(--diagram-5); }
+    .complexity-box.o2n { border-left: 4px solid var(--diagram-1); }
+    .complexity-box.o2n .notation { color: var(--diagram-1); }
+    .complexity-box.ologn { border-left: 4px solid var(--diagram-3); }
+    .complexity-box.ologn .notation { color: var(--diagram-3); }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-3) 0;
+      font-size: 0.85rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: var(--space-2);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .comparison-table th {
+      background: var(--color-bg);
+      font-weight: 600;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .comparison-table tr:hover td {
+      background: var(--color-bg);
+    }
+
+    .scale-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-2) 0;
+    }
+
+    .scale-bar .bar {
+      height: 8px;
+      border-radius: 4px;
+      transition: width var(--transition-normal);
+    }
+
+    .scale-bar .label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      min-width: 80px;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .complexity-chart {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Computer Science</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Complejidad Temporal y Espacial (Big O)</h1>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> Big O es una forma de medir qué tan rápido crece el tiempo de ejecución o el consumo de memoria de un algoritmo a medida que crecen los datos de entrada. No te dice cuántos segundos tarda, sino cómo se comporta cuando le das más trabajo.</p>
+    </div>
+
+    <h2>1. Por qué importa</h2>
+    <p>Imaginá que tenés una lista de 100 números y querés encontrar el mayor. Podés recorrer toda la lista: eso son 100 operaciones. Si tuvieras 1.000 números, serían 1.000 operaciones. Si tuvieras 1.000.000, serían un millón.</p>
+
+    <p>Pero ¿qué pasa si tu algoritmo hace una comparación por cada par de números? Con 100 elementos serían 10.000 comparaciones. Con 1.000 elementos, un millón. Con un millón, un billón. El tiempo crece mucho más rápido que los datos.</p>
+
+    <p>Big O te permite predecir este comportamiento sin importar la computadora, el lenguaje o los datos específicos. Es una comparación pura de <strong>cómo escala</strong>.</p>
+
+    <h2>2. Notación Big O</h2>
+
+    <div class="complexity-chart reveal-element">
+      <div class="complexity-box o1">
+        <div class="notation">O(1)</div>
+        <h4>Constante</h4>
+        <p>Siempre tarda lo mismo, sin importar el tamaño de entrada. El mejor caso posible.</p>
+      </div>
+      <div class="complexity-box ologn">
+        <div class="notation">O(log n)</div>
+        <h4>Logarítmica</h4>
+        <p>Cada paso reduce el problema a la mitad. Muy eficiente para datos grandes.</p>
+      </div>
+      <div class="complexity-box on">
+        <div class="notation">O(n)</div>
+        <h4>Lineal</h4>
+        <p>Crece proporcionalmente con los datos. Si duplicás los datos, duplicás el tiempo.</p>
+      </div>
+      <div class="complexity-box on2">
+        <div class="notation">O(n²)</div>
+        <h4>Cuadrática</h4>
+        <p>Por cada elemento, recorre todos los demás. Se vuelve lento rápido.</p>
+      </div>
+      <div class="complexity-box o2n">
+        <div class="notation">O(2ⁿ)</div>
+        <h4>Exponencial</h4>
+        <p>Duplica el trabajo por cada elemento nuevo. Solo viable para entradas muy pequeñas.</p>
+      </div>
+    </div>
+
+    <h3>Visualización de crecimiento</h3>
+
+    <div class="reveal-element" style="margin: var(--space-4) 0;">
+      <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 500px; display: block; margin: 0 auto;">
+        <!-- Grid lines -->
+        <line x1="60" y1="20" x2="60" y2="280" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="60" y1="280" x2="480" y2="280" stroke="var(--color-border)" stroke-width="1"/>
+        <!-- Y axis labels -->
+        <text x="50" y="285" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-family="JetBrains Mono, monospace">0</text>
+        <text x="50" y="225" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-family="JetBrains Mono, monospace">n²</text>
+        <text x="50" y="165" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-family="JetBrains Mono, monospace">n</text>
+        <text x="50" y="105" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-family="JetBrains Mono, monospace">log n</text>
+        <text x="50" y="45" text-anchor="end" fill="var(--color-text-muted)" font-size="10" font-family="JetBrains Mono, monospace">1</text>
+        <!-- X axis label -->
+        <text x="270" y="310" text-anchor="middle" fill="var(--color-text-muted)" font-size="11" font-family="JetBrains Mono, monospace">tamaño de entrada (n)</text>
+        <!-- Y axis label -->
+        <text x="15" y="160" text-anchor="middle" fill="var(--color-text-muted)" font-size="11" font-family="JetBrains Mono, monospace" transform="rotate(-90, 15, 160)">operaciones</text>
+
+        <!-- O(1) - constant - green horizontal line -->
+        <line x1="60" y1="240" x2="470" y2="240" stroke="var(--diagram-6)" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- O(log n) - logarithmic - purple curve (flat growth) -->
+        <path d="M60,275 Q120,250 180,238 Q260,228 340,222 Q420,218 470,215" fill="none" stroke="var(--diagram-3)" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- O(n) - linear - blue diagonal line -->
+        <line x1="60" y1="280" x2="470" y2="80" stroke="var(--diagram-2)" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- O(n²) - quadratic - amber curve (steep growth) -->
+        <path d="M60,278 Q140,270 200,250 Q260,210 320,140 Q380,60 470,25" fill="none" stroke="var(--diagram-5)" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- O(2^n) - exponential - red curve (explosive) -->
+        <path d="M60,278 Q100,275 140,270 Q180,262 220,240 Q260,190 300,80 Q320,30 340,20" fill="none" stroke="var(--diagram-1)" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- Legend -->
+        <rect x="320" y="35" width="150" height="120" rx="6" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="335" y1="58" x2="360" y2="58" stroke="var(--diagram-6)" stroke-width="2.5"/>
+        <text x="368" y="62" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(1)</text>
+        <line x1="335" y1="80" x2="360" y2="80" stroke="var(--diagram-3)" stroke-width="2.5"/>
+        <text x="368" y="84" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(log n)</text>
+        <line x1="335" y1="102" x2="360" y2="102" stroke="var(--diagram-2)" stroke-width="2.5"/>
+        <text x="368" y="106" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n)</text>
+        <line x1="335" y1="124" x2="360" y2="124" stroke="var(--diagram-5)" stroke-width="2.5"/>
+        <text x="368" y="128" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n²)</text>
+        <line x1="335" y1="146" x2="360" y2="146" stroke="var(--diagram-1)" stroke-width="2.5"/>
+        <text x="368" y="150" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(2ⁿ)</text>
+      </svg>
+    </div>
+
+    <h2>3. Ejemplos prácticos con gráficos</h2>
+
+    <h3>O(1) — Acceso por índice</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start;" class="reveal-element">
+      <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+const arr = [10, 20, 30, 40, 50];
+const valor = arr[3]; // Siempre 1 operación
+      </code></pre>
+      <div style="text-align: center;">
+        <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" style="max-width: 220px;">
+          <text x="110" y="12" text-anchor="middle" fill="var(--color-text)" font-size="10" font-weight="bold" font-family="JetBrains Mono, monospace">O(1) = siempre 1</text>
+          <text x="110" y="24" text-anchor="middle" fill="var(--color-text-muted)" font-size="8" font-family="JetBrains Mono, monospace">n elementoss → 1 operación</text>
+          <!-- Grid -->
+          <line x1="15" y1="125" x2="210" y2="125" stroke="var(--color-border)" stroke-width="1"/>
+          <!-- Bars: all same height (1) -->
+          <rect x="20" y="55" width="30" height="70" rx="3" fill="var(--diagram-6)" opacity="0.8"/>
+          <rect x="65" y="55" width="30" height="70" rx="3" fill="var(--diagram-6)" opacity="0.8"/>
+          <rect x="110" y="55" width="30" height="70" rx="3" fill="var(--diagram-6)" opacity="0.8"/>
+          <rect x="155" y="55" width="30" height="70" rx="3" fill="var(--diagram-6)" opacity="0.8"/>
+          <!-- Operation labels -->
+          <text x="35" y="50" text-anchor="middle" fill="var(--diagram-6)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1</text>
+          <text x="80" y="50" text-anchor="middle" fill="var(--diagram-6)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1</text>
+          <text x="125" y="50" text-anchor="middle" fill="var(--diagram-6)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1</text>
+          <text x="170" y="50" text-anchor="middle" fill="var(--diagram-6)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1</text>
+          <!-- Input size labels -->
+          <text x="35" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10</text>
+          <text x="80" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">100</text>
+          <text x="125" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">1K</text>
+          <text x="170" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10K</text>
+        </svg>
+      </div>
+    </div>
+
+    <h3>O(n) — Buscar en una lista</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start;" class="reveal-element">
+      <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function buscar(lista, objetivo) {
+  for (let i = 0; i < lista.length; i++) {
+    if (lista[i] === objetivo) return i;
+  }
+  return -1;
+}
+      </code></pre>
+      <div style="text-align: center;">
+        <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" style="max-width: 220px;">
+          <text x="110" y="12" text-anchor="middle" fill="var(--color-text)" font-size="10" font-weight="bold" font-family="JetBrains Mono, monospace">O(n) = crece igual</text>
+          <text x="110" y="24" text-anchor="middle" fill="var(--color-text-muted)" font-size="8" font-family="JetBrains Mono, monospace">n elementoss → n operaciones</text>
+          <!-- Grid -->
+          <line x1="15" y1="125" x2="210" y2="125" stroke="var(--color-border)" stroke-width="1"/>
+          <!-- Bars: growing proportionally -->
+          <rect x="20" y="118" width="30" height="7" rx="3" fill="var(--diagram-2)" opacity="0.8"/>
+          <rect x="65" y="110" width="30" height="15" rx="3" fill="var(--diagram-2)" opacity="0.8"/>
+          <rect x="110" y="90" width="30" height="35" rx="3" fill="var(--diagram-2)" opacity="0.8"/>
+          <rect x="155" y="55" width="30" height="70" rx="3" fill="var(--diagram-2)" opacity="0.8"/>
+          <!-- Operation labels -->
+          <text x="35" y="113" text-anchor="middle" fill="var(--diagram-2)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">10</text>
+          <text x="80" y="105" text-anchor="middle" fill="var(--diagram-2)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">100</text>
+          <text x="125" y="85" text-anchor="middle" fill="var(--diagram-2)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1K</text>
+          <text x="170" y="50" text-anchor="middle" fill="var(--diagram-2)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">10K</text>
+          <!-- Input size labels -->
+          <text x="35" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10</text>
+          <text x="80" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">100</text>
+          <text x="125" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">1K</text>
+          <text x="170" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10K</text>
+        </svg>
+      </div>
+    </div>
+
+    <h3>O(n²) — Comparar todos contra todos</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start;" class="reveal-element">
+      <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+// Bubble sort: dos loops anidados
+function burbuja(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr.length - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+}
+      </code></pre>
+      <div style="text-align: center;">
+        <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" style="max-width: 220px;">
+          <text x="110" y="12" text-anchor="middle" fill="var(--color-text)" font-size="10" font-weight="bold" font-family="JetBrains Mono, monospace">O(n²) = crece rápido</text>
+          <text x="110" y="24" text-anchor="middle" fill="var(--color-text-muted)" font-size="8" font-family="JetBrains Mono, monospace">n elementoss → n² operaciones</text>
+          <!-- Grid -->
+          <line x1="15" y1="125" x2="210" y2="125" stroke="var(--color-border)" stroke-width="1"/>
+          <!-- Bars: growing fast -->
+          <rect x="20" y="123" width="30" height="2" rx="2" fill="var(--diagram-5)" opacity="0.8"/>
+          <rect x="65" y="122" width="30" height="3" rx="2" fill="var(--diagram-5)" opacity="0.8"/>
+          <rect x="110" y="115" width="30" height="10" rx="2" fill="var(--diagram-5)" opacity="0.8"/>
+          <rect x="155" y="55" width="30" height="70" rx="3" fill="var(--diagram-1)" opacity="0.9"/>
+          <!-- Operation labels -->
+          <text x="35" y="118" text-anchor="middle" fill="var(--diagram-5)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">100</text>
+          <text x="80" y="116" text-anchor="middle" fill="var(--diagram-5)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">10K</text>
+          <text x="125" y="108" text-anchor="middle" fill="var(--diagram-5)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">1M</text>
+          <text x="170" y="50" text-anchor="middle" fill="var(--diagram-1)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">100M</text>
+          <!-- Input size labels -->
+          <text x="35" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10</text>
+          <text x="80" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">100</text>
+          <text x="125" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">1K</text>
+          <text x="170" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10K</text>
+        </svg>
+      </div>
+    </div>
+
+    <h3>O(log n) — Búsqueda binaria</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); align-items: start;" class="reveal-element">
+      <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function busquedaBinaria(arr, objetivo) {
+  let inicio = 0, fin = arr.length - 1;
+  while (inicio <= fin) {
+    const medio = Math.floor((inicio + fin) / 2);
+    if (arr[medio] === objetivo) return medio;
+    if (arr[medio] < objetivo) inicio = medio + 1;
+    else fin = medio - 1;
+  }
+  return -1;
+}
+      </code></pre>
+      <div style="text-align: center;">
+        <svg viewBox="0 0 220 140" xmlns="http://www.w3.org/2000/svg" style="max-width: 220px;">
+          <text x="110" y="12" text-anchor="middle" fill="var(--color-text)" font-size="10" font-weight="bold" font-family="JetBrains Mono, monospace">O(log n) = crece lento</text>
+          <text x="110" y="24" text-anchor="middle" fill="var(--color-text-muted)" font-size="8" font-family="JetBrains Mono, monospace">n elementoss → log(n) operaciones</text>
+          <!-- Grid -->
+          <line x1="15" y1="125" x2="210" y2="125" stroke="var(--color-border)" stroke-width="1"/>
+          <!-- Bars: growing very slowly -->
+          <rect x="20" y="115" width="30" height="10" rx="3" fill="var(--diagram-3)" opacity="0.8"/>
+          <rect x="65" y="110" width="30" height="15" rx="3" fill="var(--diagram-3)" opacity="0.8"/>
+          <rect x="110" y="105" width="30" height="20" rx="3" fill="var(--diagram-3)" opacity="0.8"/>
+          <rect x="155" y="98" width="30" height="27" rx="3" fill="var(--diagram-3)" opacity="0.8"/>
+          <!-- Operation labels -->
+          <text x="35" y="110" text-anchor="middle" fill="var(--diagram-3)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">3</text>
+          <text x="80" y="105" text-anchor="middle" fill="var(--diagram-3)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">7</text>
+          <text x="125" y="100" text-anchor="middle" fill="var(--diagram-3)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">10</text>
+          <text x="170" y="93" text-anchor="middle" fill="var(--diagram-3)" font-size="8" font-weight="bold" font-family="JetBrains Mono, monospace">13</text>
+          <!-- Input size labels -->
+          <text x="35" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10</text>
+          <text x="80" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">100</text>
+          <text x="125" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">1K</text>
+          <text x="170" y="137" text-anchor="middle" fill="var(--color-text-muted)" font-size="8">10K</text>
+        </svg>
+      </div>
+    </div>
+
+    <h2>4. Comparación visual</h2>
+
+    <div class="reveal-element">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>n</th>
+            <th>O(1)</th>
+            <th>O(log n)</th>
+            <th>O(n)</th>
+            <th>O(n²)</th>
+            <th>O(2ⁿ)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>10</td><td>1</td><td>3</td><td>10</td><td>100</td><td>1,024</td></tr>
+          <tr><td>100</td><td>1</td><td>7</td><td>100</td><td>10,000</td><td>10³⁰</td></tr>
+          <tr><td>1,000</td><td>1</td><td>10</td><td>1,000</td><td>1,000,000</td><td>—</td></tr>
+          <tr><td>1,000,000</td><td>1</td><td>20</td><td>1,000,000</td><td>10¹²</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>5. Cómo optimizar: el poder de cambiar la complejidad</h2>
+
+    <p>La mejora más grande que podés hacer no es optimizar el código existente, sino <strong>cambiar el algoritmo</strong>. Un algoritmo O(n²) optimizado sigue siendo O(n²). Pero si lo cambias a O(n) o O(log n), el cambio es exponencial.</p>
+
+    <h3>Ejemplo: buscar un elemento en una lista ordenada</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: var(--space-3) 0;" class="reveal-element">
+      <div style="border: 1px solid var(--diagram-1); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-1); margin: 0 0 var(--space-2);">MAL: Búsqueda lineal — O(n)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function buscarLineal(arr, obj) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+}
+// 1,000,000 de elementos
+// = hasta 1,000,000 comparaciones
+        </code></pre>
+      </div>
+      <div style="border: 1px solid var(--diagram-6); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-6); margin: 0 0 var(--space-2);">BIEN: Búsqueda binaria — O(log n)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function buscarBinaria(arr, obj) {
+  let ini = 0, fin = arr.length - 1;
+  while (ini <= fin) {
+    const mid = (ini + fin) >> 1;
+    if (arr[mid] === obj) return mid;
+    if (arr[mid] < obj) ini = mid + 1;
+    else fin = mid - 1;
+  }
+  return -1;
+}
+// 1,000,000 de elementos
+// = solo 20 comparaciones
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="reveal-element" style="margin: var(--space-3) 0;">
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 500px; display: block; margin: 0 auto;">
+        <text x="250" y="18" text-anchor="middle" fill="var(--color-text-muted)" font-size="11" font-family="JetBrains Mono, monospace">Búsqueda lineal vs Búsqueda binaria</text>
+
+        <!-- Grid -->
+        <line x1="80" y1="30" x2="80" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="80" y1="170" x2="480" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+
+        <!-- Y axis labels -->
+        <text x="70" y="175" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">0</text>
+        <text x="70" y="130" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">500K</text>
+        <text x="70" y="85" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">1M</text>
+        <text x="70" y="40" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">2M</text>
+
+        <!-- X axis labels -->
+        <text x="130" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">100</text>
+        <text x="220" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">10K</text>
+        <text x="310" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">100K</text>
+        <text x="400" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">1M</text>
+
+        <!-- O(n) line - steep -->
+        <path d="M90,168 L130,165 L220,130 L310,80 L400,35" fill="none" stroke="var(--diagram-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- O(log n) line - very flat -->
+        <path d="M90,168 L130,165 L220,162 L310,158 L400,155" fill="none" stroke="var(--diagram-6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Legend -->
+        <rect x="100" y="35" width="180" height="50" rx="6" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="115" y1="55" x2="145" y2="55" stroke="var(--diagram-1)" stroke-width="2.5"/>
+        <text x="155" y="59" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n) — lineal</text>
+        <line x1="115" y1="75" x2="145" y2="75" stroke="var(--diagram-6)" stroke-width="2.5"/>
+        <text x="155" y="79" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(log n) — binaria</text>
+      </svg>
+    </div>
+
+    <h3>Ejemplo: encontrar duplicados</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: var(--space-3) 0;" class="reveal-element">
+      <div style="border: 1px solid var(--diagram-1); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-1); margin: 0 0 var(--space-2);">MAL: Dos loops — O(n²)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function tieneDuplicados(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j]) return true;
+    }
+  }
+  return false;
+}
+// 10,000 elementos = 50,000,000 comparaciones
+        </code></pre>
+      </div>
+      <div style="border: 1px solid var(--diagram-6); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-6); margin: 0 0 var(--space-2);">BIEN: Set + un loop — O(n)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function tieneDuplicados(arr) {
+  const vistos = new Set();
+  for (const item of arr) {
+    if (vistos.has(item)) return true;
+    vistos.add(item);
+  }
+  return false;
+}
+// 10,000 elementos = 10,000 operaciones
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="reveal-element" style="margin: var(--space-3) 0;">
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 500px; display: block; margin: 0 auto;">
+        <text x="250" y="18" text-anchor="middle" fill="var(--color-text-muted)" font-size="11" font-family="JetBrains Mono, monospace">Encontrar duplicados: O(n²) vs O(n)</text>
+
+        <!-- Grid -->
+        <line x1="80" y1="30" x2="80" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="80" y1="170" x2="480" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+
+        <!-- Y axis labels -->
+        <text x="70" y="175" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">0</text>
+        <text x="70" y="130" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">25M</text>
+        <text x="70" y="85" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">50M</text>
+        <text x="70" y="40" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">100M</text>
+
+        <!-- X axis labels -->
+        <text x="150" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">1K</text>
+        <text x="240" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">5K</text>
+        <text x="330" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">10K</text>
+        <text x="420" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">20K</text>
+
+        <!-- O(n²) - exponential growth -->
+        <path d="M90,168 L150,160 L240,110 L330,60 L420,35" fill="none" stroke="var(--diagram-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- O(n) - linear growth (barely visible at this scale) -->
+        <path d="M90,168 L150,167 L240,165 L330,163 L420,160" fill="none" stroke="var(--diagram-6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Legend -->
+        <rect x="280" y="35" width="180" height="50" rx="6" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="295" y1="55" x2="325" y2="55" stroke="var(--diagram-1)" stroke-width="2.5"/>
+        <text x="335" y="59" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n²) — dos loops</text>
+        <line x1="295" y1="75" x2="325" y2="75" stroke="var(--diagram-6)" stroke-width="2.5"/>
+        <text x="335" y="79" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n) — Set</text>
+      </svg>
+    </div>
+
+    <h3>Ejemplo: contar frecuencia de caracteres</h3>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: var(--space-3) 0;" class="reveal-element">
+      <div style="border: 1px solid var(--diagram-1); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-1); margin: 0 0 var(--space-2);">MAL: Buscar cada vez — O(n²)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function contarFrecuencia(str) {
+  const chars = [...new Set(str)];
+  return chars.map(c => ({
+    char: c,
+    count: str.split(c).length - 1
+  }));
+}
+// split() recorre el string completo
+// por cada carácter único
+        </code></pre>
+      </div>
+      <div style="border: 1px solid var(--diagram-6); border-radius: var(--radius-lg); padding: var(--space-3); background: var(--color-surface);">
+        <h4 style="color: var(--diagram-6); margin: 0 0 var(--space-2);">BIEN: Un solo recorrido — O(n)</h4>
+        <pre class="code-block" style="margin: 0;"><code class="language-javascript">
+function contarFrecuencia(str) {
+  const freq = {};
+  for (const c of str) {
+    freq[c] = (freq[c] || 0) + 1;
+  }
+  return freq;
+}
+// Un solo loop = n operaciones
+        </code></pre>
+      </div>
+    </div>
+
+    <div class="reveal-element" style="margin: var(--space-3) 0;">
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 500px; display: block; margin: 0 auto;">
+        <text x="250" y="18" text-anchor="middle" fill="var(--color-text-muted)" font-size="11" font-family="JetBrains Mono, monospace">Contar frecuencia: split vs un loop</text>
+
+        <!-- Grid -->
+        <line x1="80" y1="30" x2="80" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="80" y1="170" x2="480" y2="170" stroke="var(--color-border)" stroke-width="1"/>
+
+        <!-- Y axis labels -->
+        <text x="70" y="175" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">0</text>
+        <text x="70" y="130" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">250K</text>
+        <text x="70" y="85" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">500K</text>
+        <text x="70" y="40" text-anchor="end" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">1M</text>
+
+        <!-- X axis labels -->
+        <text x="150" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">1K</text>
+        <text x="240" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">5K</text>
+        <text x="330" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">10K</text>
+        <text x="420" y="185" text-anchor="middle" fill="var(--color-text-muted)" font-size="9" font-family="JetBrains Mono, monospace">20K</text>
+
+        <!-- O(n²) -->
+        <path d="M90,168 L150,155 L240,100 L330,55 L420,35" fill="none" stroke="var(--diagram-1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- O(n) -->
+        <path d="M90,168 L150,165 L240,160 L330,155 L420,148" fill="none" stroke="var(--diagram-6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Legend -->
+        <rect x="280" y="35" width="180" height="50" rx="6" fill="var(--color-surface)" stroke="var(--color-border)" stroke-width="1"/>
+        <line x1="295" y1="55" x2="325" y2="55" stroke="var(--diagram-1)" stroke-width="2.5"/>
+        <text x="335" y="59" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n²) — split()</text>
+        <line x1="295" y1="75" x2="325" y2="75" stroke="var(--diagram-6)" stroke-width="2.5"/>
+        <text x="335" y="79" fill="var(--color-text)" font-size="10" font-family="JetBrains Mono, monospace">O(n) — un loop</text>
+      </svg>
+    </div>
+
+    <h2>5. Complejidad espacial</h2>
+    <p>No solo importa el tiempo: también cuánta memoria usa tu algoritmo. Un algoritmo puede ser rápido pero gastar mucha RAM.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// O(1) espacial: solo usa variables extra fijas
+function maximo(arr) {
+  let mejor = arr[0];
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] > mejor) mejor = arr[i];
+  }
+  return mejor;
+}
+
+// O(n) espacial: crea un nuevo array del mismo tamaño
+function duplicar(arr) {
+  return arr.map(x => x * 2);
+}
+    </code></pre>
+
+    <h2>6. Reglas para analizar complejidad</h2>
+
+    <ul>
+      <li><strong>Ignorá las constantes:</strong> O(2n) es lo mismo que O(n). Lo que importa es la tendencia, no el factor exacto.</li>
+      <li><strong>Ignorá los términos menores:</strong> O(n² + n) se simplifica a O(n²) porque el cuadrático domina.</li>
+      <li><strong>Lo diferente es lo que importa:</strong> Si un algoritmo tiene dos partes, una O(n) y otra O(n²), la complejidad total es O(n²).</li>
+      <li><strong>Mejor, peor y promedio:</strong> Big O normalmente describe el peor caso. También existen Omega (mejor caso) y Theta (promedio).</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla práctica:</strong> Si tu algoritmo tiene un solo loop, es O(n). Si tiene dos loops anidados, es O(n²). Si dividís el problema a la mitad en cada paso, es O(log n). Si accedés directamente por índice, es O(1).</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">&larr; Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
