@@ -22,6 +22,10 @@ Usa este archivo como plantilla y guía cada vez que quieras agregar un nuevo te
    - Tono directo, claro, sin relleno corporativo ("descubre", "sumérgete en").
    - Alterna anchos de texto, columnas, citas, tablas y bloques de código para que la página sea visualmente atractiva y fácil de leer.
 
+5. **Ortografía y Tildes**:
+   - Todo el contenido en español **debe** llevar tildes y acentos correctos.
+   - Revisa cada palabra aguda, grave y esdrújula. No omitas acentos ni en títulos, ni en párrafos.
+
 ---
 
 ## Flujo de Trabajo Técnico (para la IA)

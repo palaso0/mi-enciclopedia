@@ -299,7 +299,7 @@
     
     <h1>Deep Learning: Arquitecturas de Redes</h1>
     
-    <p>Esta página funciona como una ruta de aprendizaje estructurada sobre las arquitecturas fundamentales del Deep Learning moderno. Aquí encontrarás 5 subtemas que cubren desde el mecanismo de atención que revolucionó el procesamiento de lenguaje, pasando por su adaptación al mundo de la visión por computadora, las optimizaciones de hardware que hacen posible entrenar modelos gigantescos, las arquitecturas dispersas que reducen costos de cómputo, y las alternativas híbridas que apuntan al futuro del procesamiento de secuencias.</p>
+    <p>Esta página funciona como una ruta de aprendizaje estructurada sobre las arquitecturas fundamentales del Deep Learning moderno. Aquí encontrarás 5 subtemas que cubren desde el mecanismo de atención que revolucionó el procesamiento de lenguaje, pasando por su adaptación al mundo de la visión por computadora, las optimizaciónes de hardware que hacen posible entrenar modelos gigantescos, las arquitecturas dispersas que reducen costos de cómputo, y las alternativas híbridas que apuntan al futuro del procesamiento de secuencias.</p>
 
     <div class="section-toc reveal-element">
       <h3>Contenidos</h3>
@@ -559,7 +559,7 @@ print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196,
       </div>
     </div>
 
-    <p>En el mecanismo de atención tradicional, el modelo calcula la matriz de atención de tamaño \(N \times N\) (donde \(N\) es la longitud del texto). Esta matriz es tan gigante que no cabe en la SRAM (el escritorio), por lo que la GPU debe escribirla y leerla constantemente desde la HBM (el sótano) para aplicar operaciones como Softmax. Esta transferencia es lenta e ineficiente.</p>
+    <p>En el mecanismo de atención tradicional, el modelo calcula la matriz de atención de tamaño \(N \times N\) (donde \(N\) es la longitud del texto). Esta matriz es tan gigante que no cabe en la SRAM (el escritorio), por lo que la GPU debe escribirla y leerla constantemente desde la HBM (el sótano) para aplicar operaciónes como Softmax. Esta transferencia es lenta e ineficiente.</p>
 
     <h3>3.2 El truco de Flash Attention: "Tiling" (Partición en Bloques)</h3>
     <p>Flash Attention evita almacenar la gigantesca matriz intermedia de atención. En su lugar, utiliza una técnica llamada **Tiling** (mosaicos):</p>
@@ -572,7 +572,7 @@ print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196,
       <li>Escribe directamente el resultado final en la HBM, evitando escribir la matriz de atención temporal.</li>
     </ul>
 
-    <h3>3.3 Comparativa de operaciones en memoria</h3>
+    <h3>3.3 Comparativa de operaciónes en memoria</h3>
     
     <table>
       <thead>
@@ -765,7 +765,7 @@ for idx in top_k_indices:
     <p>Aunque los Transformers dominan la IA actual, tienen un defecto de diseño fundamental: su costo de procesamiento crece de forma **cuadrática** con el largo del texto. Para solucionarlo, en 2023 se presentaron los **State Space Models (SSMs)** como Mamba. Hoy, los modelos más eficientes combinan ambas arquitecturas en diseños híbridos para obtener lo mejor de los dos mundos.</p>
 
     <div class="callout reveal-element">
-      <p><strong>El problema del Transformer:</strong> Para calcular la atención de un texto de 100,000 palabras, el modelo debe hacer comparaciones cruzadas entre todas las palabras, lo que equivale a \(100,000 \times 100,000\) operaciones. El procesamiento en tiempo lineal es el gran reto de la IA.</p>
+      <p><strong>El problema del Transformer:</strong> Para calcular la atención de un texto de 100,000 palabras, el modelo debe hacer comparaciones cruzadas entre todas las palabras, lo que equivale a \(100,000 \times 100,000\) operaciónes. El procesamiento en tiempo lineal es el gran reto de la IA.</p>
     </div>
 
     <h3>5.1 La intuición: El escritorio lleno vs. La taza de té</h3>
@@ -827,7 +827,7 @@ y(t) = C * h(t)</code></pre>
     </table>
 
     <h3>5.4 Simulación conceptual: El bucle lineal vs. cuadrático</h3>
-    <p>Este código en Python simula conceptualmente la diferencia en operaciones necesarias para procesar un documento a medida que se hace más largo:</p>
+    <p>Este código en Python simula conceptualmente la diferencia en operaciónes necesarias para procesar un documento a medida que se hace más largo:</p>
 
     <pre class="code-block reveal-element"><code class="language-python"># Simulación del incremento de costo computacional
 # N = número de tokens en el documento

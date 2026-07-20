@@ -1006,7 +1006,7 @@ print(f"Secuencia generada: {' '.join(secuencia)}")
         </table>
       </div>
 
-      <p class="reveal-element">La emergencia desafió la intuición de que "más grande es simplemente mejor de la misma manera". Resulta que ciertas capacidades son <strong>cualitativamente distintas</strong> y solo aparecen cuando el modelo tiene suficiente capacidad para representarlas.</p>
+      <p class="reveal-element">La emergencia desafió la intuición de que "más grande es simplemente mejor de la misma manera". Resulta que ciertas capacidades son <strong>cualitativamente distintas</strong> y sólo aparecen cuando el modelo tiene suficiente capacidad para representarlas.</p>
 
       <h3 class="reveal-element">6. Limitaciones: Alucinaciones y más allá</h3>
 
@@ -1015,11 +1015,11 @@ print(f"Secuencia generada: {' '.join(secuencia)}")
       <ul class="limitation-list reveal-element">
         <li>
           <span class="limitation-icon" style="color: #B25E35;">⚠</span>
-          <strong>Alucinaciones:</strong> El modelo puede generar información completamente inventada con total confianza. Como solo predice probabilidades, no tiene manera de saber si algo es "verdadero"; solo sabe si es "probable".
+          <strong>Alucinaciones:</strong> El modelo puede generar información completamente inventada con total confianza. Como sólo predice probabilidades, no tiene manera de saber si algo es "verdadero"; sólo sabe si es "probable".
         </li>
         <li>
           <span class="limitation-icon" style="color: #366A9C;">◆</span>
-          <strong>Sin memoria persistente:</strong> Cada conversación empieza de cero. El modelo no recuerda interacciones anteriores (a menos que se le proporcione explícitamente en el contexto).
+          <strong>Sin memoria persistente:</strong> Cada conversación empieza de cero. El modelo no recuerda interacciónes anteriores (a menos que se le proporcione explícitamente en el contexto).
         </li>
         <li>
           <span class="limitation-icon" style="color: #A34E78;">▲</span>
@@ -1075,14 +1075,14 @@ print(f"Secuencia generada: {' '.join(secuencia)}")
       </div>
 
       <div class="callout reveal-element">
-        <p><strong>Analogía del escultor:</strong> Piensa en el proceso directo como esculpir mármol. Empiezas con un bloque perfecto (la imagen real) y vas golpeando el cincel para ir eliminando material. Pero aquí el proceso es al revés: empiezas con una imagen hermosa y vas "ensuciándola" con ruido hasta que solo queda polvo blanco. El reto es entrenar a la computadora para que aprenda a reversar ese proceso: que, dada una pila de polvo, sepa reconstruir la escultura original.</p>
+        <p><strong>Analogía del escultor:</strong> Piensa en el proceso directo como esculpir mármol. Empiezas con un bloque perfecto (la imagen real) y vas golpeando el cincel para ir eliminando material. Pero aquí el proceso es al revés: empiezas con una imagen hermosa y vas "ensuciándola" con ruido hasta que sólo queda polvo blanco. El reto es entrenar a la computadora para que aprenda a reversar ese proceso: que, dada una pila de polvo, sepa reconstruir la escultura original.</p>
       </div>
 
-      <p class="reveal-element">Este proceso se describe matemáticamente como una cadena de Markov. Cada paso <code>x_t</code> depende solo del paso anterior <code>x_{t-1}</code> y una cantidad fija de ruido. El schedule de ruido controla cuánto se añade en cada paso — comúnmente se usa un schedule lineal o el schedule coseno que distribuye el ruido de manera más suave.</p>
+      <p class="reveal-element">Este proceso se describe matemáticamente como una cadena de Markov. Cada paso <code>x_t</code> depende sólo del paso anterior <code>x_{t-1}</code> y una cantidad fija de ruido. El schedule de ruido controla cuánto se añade en cada paso — comúnmente se usa un schedule lineal o el schedule coseno que distribuye el ruido de manera más suave.</p>
 
       <h3 class="reveal-element">2. El proceso inverso: Aprender a eliminar ruido</h3>
 
-      <p class="reveal-element">El proceso directo es trivial — solo suma ruido. El verdadero poder está en el proceso inverso. Se entrena una red neuronal (típicamente una U-Net) para que, dado un paso con ruido <code>x_t</code> y el número de paso <code>t</code>, prediga cuánto ruido se añadió. Si la red predice correctamente el ruido, se puede sustraer para obtener una versión menos ruidosa.</p>
+      <p class="reveal-element">El proceso directo es trivial — sólo suma ruido. El verdadero poder está en el proceso inverso. Se entrena una red neuronal (típicamente una U-Net) para que, dado un paso con ruido <code>x_t</code> y el número de paso <code>t</code>, prediga cuánto ruido se añadió. Si la red predice correctamente el ruido, se puede sustraer para obtener una versión menos ruidosa.</p>
 
       <div class="diffusion-visual reveal-element">
         <div class="diffusion-cell img-clean">Gato 🐱<br><small>Original</small></div>
@@ -1111,7 +1111,7 @@ print(f"Secuencia generada: {' '.join(secuencia)}")
       </ul>
 
       <div class="callout reveal-element">
-        <p><strong>Analogía de la pintura asistida:</strong> Imagina que estás pintando con un amigo ciego que solo puede escuchar tus indicaciones. Tú le dices "más azul aquí", "una forma redonda arriba", "algo que parezca un cohete". En cada pincelada, tu amigo ajusta su trabajo basándose en lo que le describes. El modelo de difusión con condicionamiento funciona igual: el prompt es la guía verbal que dirige cada paso de la creación.</p>
+        <p><strong>Analogía de la pintura asistida:</strong> Imagina que estás pintando con un amigo ciego que sólo puede escuchar tus indicaciones. Tú le dices "más azul aquí", "una forma redonda arriba", "algo que parezca un cohete". En cada pincelada, tu amigo ajusta su trabajo basándose en lo que le describes. El modelo de difusión con condicionamiento funciona igual: el prompt es la guía verbal que dirige cada paso de la creación.</p>
       </div>
 
       <h3 class="reveal-element">4. La arquitectura U-Net: El corazón del denoising</h3>
@@ -1239,7 +1239,7 @@ print(f"\nError de reconstrucción (MSE): {error:.6f}")</code></pre>
         <li><strong>Consistency Models</strong> (OpenAI, 2023): Saltan directamente del ruido a la imagen limpia en 1-2 pasos, aprendiendo mapas de consistencia.</li>
         <li><strong>Rectified Flows / SDXL Turbo</strong>: Reemplazan el schedule de ruido con traysectorias rectas en el espacio latente, generando en 1-4 pasos.</li>
         <li><strong>Difusión de video:</strong> Modelos como Sora (OpenAI) y Runway Gen-3 extienden la difusión a secuencias temporales, generando videos coherentes.</li>
-        <li><strong>Difusión 3D:</strong> Generación de modelos tridimensionales a partir de texto, usando representaciones como NeRFs o Gaussian Splatting.</li>
+        <li><strong>Difusión 3D:</strong> Generación de modelos tridimensionales a partir de texto, usando representaciónes como NeRFs o Gaussian Splatting.</li>
         <li><strong>ControlNet:</strong> Permiten guiar la generación con mapas de bordes, poses, segmentación o bocetos, dando control preciso sobre la composición.</li>
       </ul>
 
@@ -1254,11 +1254,11 @@ print(f"\nError de reconstrucción (MSE): {error:.6f}")</code></pre>
     <section id="razonamiento" class="mega-section">
       <h2 class="reveal-element">3.3 Modelos de Razonamiento</h2>
 
-      <p class="reveal-element">Imagina que en un examen de matemáticas un estudiante escribe solo la respuesta final: <em>"42"</em>. Otro estudiante escribe cada paso que siguió para llegar a esa respuesta. Ambos pueden estar en lo correcto, pero si se equivocan, ¿quién tiene más probabilidades de haber llegado a la respuesta correcta? Exactamente el segundo. Los modelos de razonamiento aplican esta misma lógica: en lugar de saltar directamente a la respuesta, muestran su trabajo paso a paso.</p>
+      <p class="reveal-element">Imagina que en un examen de matemáticas un estudiante escribe sólo la respuesta final: <em>"42"</em>. Otro estudiante escribe cada paso que siguió para llegar a esa respuesta. Ambos pueden estar en lo correcto, pero si se equivocan, ¿quién tiene más probabilidades de haber llegado a la respuesta correcta? Exactamente el segundo. Los modelos de razonamiento aplican esta misma lógica: en lugar de saltar directamente a la respuesta, muestran su trabajo paso a paso.</p>
 
       <div class="analogy-box-reasoning reveal-element">
         <div class="analogy-box-label">Analogía central</div>
-        <p>Piensa en un modelo de lenguaje estándar como un estudiante que memoriza respuestas. Piensa en un modelo de razonamiento como un estudiante que <strong>muestra su trabajo en el examen</strong>: escribe cada paso intermedio, verifica cada operación, y solo entonces entrega la respuesta final. El segundo estudiante no es necesariamente más inteligente, pero piensa de manera más rigurosa.</p>
+        <p>Piensa en un modelo de lenguaje estándar como un estudiante que memoriza respuestas. Piensa en un modelo de razonamiento como un estudiante que <strong>muestra su trabajo en el examen</strong>: escribe cada paso intermedio, verifica cada operación, y sólo entonces entrega la respuesta final. El segundo estudiante no es necesariamente más inteligente, pero piensa de manera más rigurosa.</p>
       </div>
 
       <h3 class="reveal-element">1. ¿Qué es el Chain-of-Thought (Cadena de Pensamiento)?</h3>
@@ -1276,7 +1276,7 @@ print(f"\nError de reconstrucción (MSE): {error:.6f}")</code></pre>
           </div>
           <div class="reasoning-step">
             <span class="step-number">2</span>
-            <span>Genera la respuesta directamente en un solo paso</span>
+            <span>Genera la respuesta directamente en un sólo paso</span>
           </div>
           <div class="reasoning-step">
             <span class="step-number">3</span>
@@ -1311,14 +1311,14 @@ print(f"\nError de reconstrucción (MSE): {error:.6f}")</code></pre>
       <p class="reveal-element">Cuando un modelo genera tokens de manera secuencial, cada token nuevo depende de los anteriores. Si el modelo genera primero el paso 1, luego el paso 2, y así sucesivamente, cada paso actúa como una <strong>señal intermedia</strong> que guía al modelo hacia la respuesta correcta.</p>
 
       <div class="callout reveal-element">
-        <p><strong>La clave matemática:</strong> Un modelo que genera la respuesta en un solo paso tiene que acertar todo de golpe. Un modelo que da 10 pasos tiene 10 oportunidades de acertar en cada uno. La probabilidad de que <em>todos</em> los pasos sean correctos puede ser mayor que la de acertar el resultado final directamente, porque cada paso reduce la complejidad del problema siguiente.</p>
+        <p><strong>La clave matemática:</strong> Un modelo que genera la respuesta en un sólo paso tiene que acertar todo de golpe. Un modelo que da 10 pasos tiene 10 oportunidades de acertar en cada uno. La probabilidad de que <em>todos</em> los pasos sean correctos puede ser mayor que la de acertar el resultado final directamente, porque cada paso reduce la complejidad del problema siguiente.</p>
       </div>
 
       <p class="reveal-element">Esto se relaciona con un concepto llamado <strong>test-time compute scaling</strong>: en lugar de gastar más recursos entrenando el modelo (pre-training), gastamos más recursos durante la inferencia — dejando que el modelo "piense más" antes de responder.</p>
 
       <h3 class="reveal-element">3. Modelos de razonamiento dedicados: o1, o3 y DeepSeek-R1</h3>
 
-      <p class="reveal-element">Más allá del simple truco de "piensa paso a paso", algunos modelos fueron diseñados específicamente para razonar. Estos modelos no solo siguen la instrucción de razonar: <strong>fueron entrenados para hacerlo de manera inherente</strong>.</p>
+      <p class="reveal-element">Más allá del simple truco de "piensa paso a paso", algunos modelos fueron diseñados específicamente para razonar. Estos modelos no sólo siguen la instrucción de razonar: <strong>fueron entrenados para hacerlo de manera inherente</strong>.</p>
 
       <div class="model-timeline reveal-element">
         <div class="timeline-item">
@@ -1418,7 +1418,7 @@ def modelo_razonamiento(pregunta):
 # razonamiento tiene un registro verificable de su proceso.</code></pre>
 
       <div class="callout reveal-element">
-        <p><strong>¿Por qué importa esto?</strong> Cuando un modelo de razonamiento se equivoca, puedes revisar su cadena de pensamiento para encontrar exactamente dónde falló el razonamiento. Con un modelo estándar, solo ves la respuesta incorrecta sin poder diagnosticar el problema.</p>
+        <p><strong>¿Por qué importa esto?</strong> Cuando un modelo de razonamiento se equivoca, puedes revisar su cadena de pensamiento para encontrar exactamente dónde falló el razonamiento. Con un modelo estándar, sólo ves la respuesta incorrecta sin poder diagnosticar el problema.</p>
       </div>
 
       <h3 class="reveal-element">El futuro del razonamiento</h3>
@@ -1434,11 +1434,11 @@ def modelo_razonamiento(pregunta):
     <section id="multimodal" class="mega-section">
       <h2 class="reveal-element">3.4 Modelos Multimodales</h2>
 
-      <p class="reveal-element">Imagina una persona que puede leer un libro, mirar una pintura, escuchar una canción, y luego hablarte sobre todo eso en una sola conversación. Eso es un modelo multimodal: un sistema de inteligencia artificial que no se limita a un solo tipo de información, sino que puede procesar y generar múltiples modalidades — texto, imágenes, audio y, cada vez más, video — todo dentro de una misma arquitectura.</p>
+      <p class="reveal-element">Imagina una persona que puede leer un libro, mirar una pintura, escuchar una canción, y luego hablarte sobre todo eso en una sola conversación. Eso es un modelo multimodal: un sistema de inteligencia artificial que no se limita a un sólo tipo de información, sino que puede procesar y generar múltiples modalidades — texto, imágenes, audio y, cada vez más, video — todo dentro de una misma arquitectura.</p>
 
       <div class="analogy-box-multi reveal-element">
         <div class="analogy-box-label">Analogía central</div>
-        <p>Un modelo de texto tradicional es como una persona que solo puede leer. Un modelo multimodal es como una persona que puede <strong>ver, leer, escuchar y hablar todo a la vez</strong>. Cuando le muestras una foto y le preguntas "¿qué está pasando aquí?", no solo describe la imagen: entiende el contexto, las relaciones entre objetos, el estado emocional de las personas, y puede responder preguntas complejas sobre todo ello.</p>
+        <p>Un modelo de texto tradicional es como una persona que sólo puede leer. Un modelo multimodal es como una persona que puede <strong>ver, leer, escuchar y hablar todo a la vez</strong>. Cuando le muestras una foto y le preguntas "¿qué está pasando aquí?", no sólo describe la imagen: entiende el contexto, las relaciones entre objetos, el estado emocional de las personas, y puede responder preguntas complejas sobre todo ello.</p>
       </div>
 
       <h3 class="reveal-element">1. ¿Qué significa "multimodal"?</h3>
@@ -1704,7 +1704,7 @@ def responder_con_imagen(imagen, pregunta):
 
       <h3 class="reveal-element">El futuro: Modelos verdaderamente unificados</h3>
 
-      <p class="reveal-element">La tendencia apunta hacia modelos que no solo procesan múltiples modalidades, sino que las generan todas nativamente. Mientras que hoy la mayoría de modelos multimodales solo <em>leen</em> imágenes y audio pero solo <em>escriben</em> texto, los próximos modelos podrán generar imágenes, voz y video de la misma forma que hoy generan texto.</p>
+      <p class="reveal-element">La tendencia apunta hacia modelos que no sólo procesan múltiples modalidades, sino que las generan todas nativamente. Mientras que hoy la mayoría de modelos multimodales sólo <em>leen</em> imágenes y audio pero sólo <em>escriben</em> texto, los próximos modelos podrán generar imágenes, voz y video de la misma forma que hoy generan texto.</p>
 
       <p class="reveal-element">Esto nos acerca a sistemas de IA que pueden comunicarse con los humanos en cualquier formato: mostrando, explicando, narrando y demostrando — todo a la vez, como lo haría una persona completa.</p>
     </section>

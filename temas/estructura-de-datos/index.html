@@ -476,12 +476,12 @@
     
     <h1>Estructuras de Datos</h1>
     
-    <p>Imagina que vas a un supermercado. Si el dependiente tiene todos los productos apilados en un solo monton, encontrar lo que necesitas sera un caos. Pero si todo esta organizado en estantes, pasillos y categorias, la busqueda se vuelve instantanea.</p>
+    <p>Imagina que vas a un supermercado. Si el dependiente tiene todos los productos apilados en un sólo montón, encontrar lo que necesitas será un caos. Pero si todo está organizado en estantes, pasillos y categorías, la búsqueda se vuelve instantánea.</p>
 
-    <p>Las estructuras de datos son exactamente eso: <strong>formas de organizar la informacion dentro de una computadora</strong> para que pueda usarse de manera eficiente. No es solo guardar datos; es guardarlos de la forma correcta segun lo que vayas a hacer con ellos.</p>
+    <p>Las estructuras de datos son exactamente eso: <strong>formas de organizar la información dentro de una computadora</strong> para que pueda usarse de manera eficiente. No es sólo guardar datos; es guardarlos de la forma correcta según lo que vayas a hacer con ellos.</p>
 
     <div class="callout reveal-element">
-      <p><strong>La regla de oro:</strong> No existe una estructura de datos perfecta para todo. Elegir la correcta depende de que operaciones necesitas hacer rapido: buscar, insertar, ordenar o recorrer. Cada estructura tiene sus fortalezas y debilidades.</p>
+      <p><strong>La regla de oro:</strong> No existe una estructura de datos perfecta para todo. Elegir la correcta depende de que operaciones necesitas hacer rápido: buscar, insertar, ordenar o recorrer. Cada estructura tiene sus fortalezas y debilidades.</p>
     </div>
 
     <!-- ============================================ -->
@@ -489,11 +489,11 @@
     <!-- ============================================ -->
     <h2>1. El Array (Arreglo)</h2>
 
-    <p>Un array es como una hilera de casillas numeradas. Cada casilla contiene un dato, y puedes acceder a cualquier casilla directamente si conoces su numero de posicion.</p>
+    <p>Un array es como una hilera de casillas numeradas. Cada casilla contiene un dato, y puedes acceder a cualquier casilla directamente si conoces su número de posición.</p>
 
     <div class="ds-visual reveal-element">
       <div class="ds-visual-label">Array en memoria — frutas</div>
-      <div class="array-pointer">indice ↓</div>
+      <div class="array-pointer">índice ↓</div>
       <div class="array-row">
         <div class="array-cell">
           <span class="index">0</span>
@@ -522,14 +522,14 @@
     <div class="ds-analogy reveal-element">
       <span class="ds-analogy-icon">📍</span>
       <div>
-        <strong>Analogia:</strong> Piensa en los apartamentos de un edificio. Si alguien te dice "departamento 5", vas directo ahi sin tener que recorrer todos los pisos. Acceso directo en tiempo constante O(1).
+        <strong>Analogía:</strong> Piensa en los apartamentos de un edificio. Si alguien te dice "departamento 5", vas directo ahí sin tener que recorrer todos los pisos. Acceso directo en tiempo constante O(1).
       </div>
     </div>
 
-    <p><strong>El problema:</strong> Si quieres insertar un elemento en medio, todo lo que esta despues se tiene que mover.</p>
+    <p><strong>El problema:</strong> Si quieres insertar un elemento en medio, todo lo que está después se tiene que mover.</p>
 
     <div class="ds-visual reveal-element">
-      <div class="ds-visual-label">Insertar "fresa" en la posicion 1</div>
+      <div class="ds-visual-label">Insertar "fresa" en la posición 1</div>
       <div class="array-row" style="margin-bottom: var(--space-2);">
         <div class="array-cell"><span class="index">0</span><span class="value">manzana</span></div>
         <div class="array-cell"><span class="index">1</span><span class="value new-item">fresa</span></div>
@@ -539,7 +539,7 @@
         <div class="array-cell"><span class="index">5</span><span class="value">cereza</span></div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted);">
-        ↑ platano, naranja, uva y cereza se movieron una posicion → O(n)
+        ↑ plátano, naranja, uva y cereza se movieron una posición → O(n)
       </div>
     </div>
 
@@ -559,7 +559,7 @@ frutas.insert(1, "fresa")
     <!-- ============================================ -->
     <h2>2. Stack (Pila) y Cola (Queue)</h2>
 
-    <p>Estas dos estructuras son las mas simples: solo puedes agregar y quitar elementos de un extremo.</p>
+    <p>Estas dos estructuras son las más simples: sólo puedes agregar y quitar elementos de un extremo.</p>
 
     <div class="ds-visual reveal-element">
       <div class="ds-visual-label">Stack (Pila) — LIFO: Last In, First Out</div>
@@ -578,7 +578,7 @@ frutas.insert(1, "fresa")
           <div>2. push("libro2") → [libro1, libro2]</div>
           <div>3. push("libro3") → [libro1, libro2, libro3]</div>
           <div style="color: var(--color-accent);">4. pop() → libro3</div>
-          <div style="color: var(--color-text-muted);">   Solo saca el ultimo</div>
+          <div style="color: var(--color-text-muted);">   Sólo saca el último</div>
         </div>
       </div>
     </div>
@@ -597,7 +597,7 @@ frutas.insert(1, "fresa")
           <div class="queue-item queue-enter">maria</div>
         </div>
         <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted);">
-          ana entro primero → sale primero | maria entro ultimo → sale ultimo
+          ana entró primero → sale primero | maria entró último → sale último
         </div>
       </div>
     </div>
@@ -620,7 +620,7 @@ print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
     </code></pre>
 
     <div class="callout reveal-element">
-      <p><strong>Usos reales:</strong> Las pilas se usan para el "deshacer" (Ctrl+Z), evaluar expresiones matematicas y el call stack de funciones. Las colas se usan en colas de impresion, mensajes pendientes y sistemas de atencion al cliente.</p>
+      <p><strong>Usos reales:</strong> Las pilas se usan para el "deshacer" (Ctrl+Z), evaluar expresiones matemáticas y el call stack de funciones. Las colas se usan en colas de impresión, mensajes pendientes y sistemas de atención al cliente.</p>
     </div>
 
     <!-- ============================================ -->
@@ -628,7 +628,7 @@ print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
     <!-- ============================================ -->
     <h2>3. Linked List (Lista Enlazada)</h2>
 
-    <p>Un array tiene todos los datos juntos en memoria. Una lista enlazada es diferente: cada elemento (nodo) contiene su dato mas un puntero que apunta al siguiente.</p>
+    <p>Un array tiene todos los datos juntos en memoria. Una lista enlazada es diferente: cada elemento (nodo) contiene su dato más un puntero que apunta al siguiente.</p>
 
     <div class="ds-visual reveal-element">
       <div class="ds-visual-label">Lista enlazada simple: A → B → C → D</div>
@@ -657,7 +657,7 @@ print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
       </div>
     </div>
 
-    <p><strong>La ventaja:</strong> Insertar entre B y C es rapido. Solo cambias los punteros, no mueves nada.</p>
+    <p><strong>La ventaja:</strong> Insertar entre B y C es rápido. Sólo cambias los punteros, no mueves nada.</p>
 
     <div class="ds-visual reveal-element">
       <div class="ds-visual-label">Insertar nodo "X" entre B y C</div>
@@ -690,7 +690,7 @@ print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
         <div class="ll-null">None</div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #2d7d46; margin-top: var(--space-2);">
-        Solo se modificaron los punteros de B y X — No se movio ningun dato
+        Sólo se modificaron los punteros de B y X — No se movió ningún dato
       </div>
     </div>
 
@@ -720,10 +720,10 @@ b.siguiente = x   # B ahora apunta a X
     <!-- ============================================ -->
     <h2>4. Hash Table (Tabla Hash)</h2>
 
-    <p>Una tabla hash convierte una clave en un numero que determina la posicion donde guardar el dato. Es como un archivador con etiquetas numeradas.</p>
+    <p>Una tabla hash convierte una clave en un número que determina la posición donde guardar el dato. Es como un archivador con etiquetas numeradas.</p>
 
     <div class="ds-visual reveal-element">
-      <div class="ds-visual-label">Tabla hash: email → posicion</div>
+      <div class="ds-visual-label">Tabla hash: email → posición</div>
       <div style="display: flex; gap: var(--space-4); align-items: flex-start; flex-wrap: wrap;">
         <div class="hash-table">
           <div class="hash-row">
@@ -752,9 +752,9 @@ b.siguiente = x   # B ahora apunta a X
           </div>
         </div>
         <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.8;">
-          <div>hash("ana@mail.com") → <strong style="color: var(--color-accent);">posicion 1</strong></div>
-          <div>hash("luis@mail.com") → posicion 4</div>
-          <div>hash("carlos@mail.com") → posicion 3</div>
+          <div>hash("ana@mail.com") → <strong style="color: var(--color-accent);">posición 1</strong></div>
+          <div>hash("luis@mail.com") → posición 4</div>
+          <div>hash("carlos@mail.com") → posición 3</div>
           <div style="margin-top: var(--space-2); color: #2d7d46;">Buscar ana: va directo a 1 — O(1)</div>
         </div>
       </div>
@@ -778,18 +778,18 @@ else:
     </code></pre>
 
     <div class="callout reveal-element">
-      <p><strong>Colisiones:</strong> A veces dos claves generan la misma posicion. Se resuelve con encadenamiento (una lista en ese slot) o direccion abierta (buscar el siguiente slot libre). En la practica, las colisiones son raras con una buena funcion hash.</p>
+      <p><strong>Colisiones:</strong> A veces dos claves generan la misma posición. Se resuelve con encadenamiento (una lista en ese slot) o dirección abierta (buscar el siguiente slot libre). En la práctica, las colisiones son raras con una buena función hash.</p>
     </div>
 
     <!-- ============================================ -->
     <!-- 5. ARBOL -->
     <!-- ============================================ -->
-    <h2>5. Arbol (Tree)</h2>
+    <h2>5. Árbol (Tree)</h2>
 
-    <p>Un arbol es una estructura jerarquica donde cada nodo puede tener multiples hijos. Es como un organigrama: una raiz en la cima, con ramas que se dividen hacia abajo.</p>
+    <p>Un árbol es una estructura jerárquica donde cada nodo puede tener múltiples hijos. Es como un organigrama: una raíz en la cima, con ramas que se dividen hacia abajo.</p>
 
     <div class="ds-visual reveal-element">
-      <div class="ds-visual-label">Arbol binario de busqueda — Izquierda menor, derecha mayor</div>
+      <div class="ds-visual-label">Árbol binario de búsqueda — Izquierda menor, derecha mayor</div>
       <div class="tree">
         <div class="tree-node tree-root">8</div>
         <div class="tree-connector"><span></span></div>
@@ -818,23 +818,23 @@ else:
     </div>
 
     <div class="ds-visual reveal-element">
-      <div class="ds-visual-label">Comparacion: Buscar en lista vs. arbol</div>
+      <div class="ds-visual-label">Comparación: Buscar en lista vs. árbol</div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
         <div style="text-align: center;">
           <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #9a2a2a; font-weight: 600;">Lista lineal</div>
           <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin: var(--space-2) 0;">1M de elementos</div>
           <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #9a2a2a;">1,000,000</div>
-          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos maximo</div>
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos máximo</div>
         </div>
         <div style="text-align: center;">
-          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #2d7d46; font-weight: 600;">Arbol balanceado</div>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #2d7d46; font-weight: 600;">Árbol balanceado</div>
           <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin: var(--space-2) 0;">1M de elementos</div>
           <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #2d7d46;">~20</div>
-          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos maximo</div>
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos máximo</div>
         </div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.75rem; text-align: center; margin-top: var(--space-2);">
-        <span class="ds-complexity slow">Lista: O(n)</span> &nbsp;&nbsp; vs &nbsp;&nbsp; <span class="ds-complexity fast">Arbol: O(log n)</span>
+        <span class="ds-complexity slow">Lista: O(n)</span> &nbsp;&nbsp; vs &nbsp;&nbsp; <span class="ds-complexity fast">Árbol: O(log n)</span>
       </div>
     </div>
 
@@ -870,7 +870,7 @@ print(buscar(raiz, 99))  # → False
     <!-- ============================================ -->
     <h2>6. Grafo (Graph)</h2>
 
-    <p>Un grafo es la estructura mas flexible: nodos conectados por aristas. Puede representar redes sociales, mapas, dependencias de software, o cualquier relacion entre entidades.</p>
+    <p>Un grafo es la estructura más flexible: nodos conectados por aristas. Puede representar redes sociales, mapas, dependencias de software, o cualquier relación entre entidades.</p>
 
     <div class="ds-visual reveal-element">
       <div class="ds-visual-label">Grafo — estaciones de metro</div>
@@ -894,7 +894,7 @@ print(buscar(raiz, 99))  # → False
         </div>
       </div>
       <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); text-align: center;">
-        Camino mas corto de A a F: A → C → F | <span style="color: #2d7d46;">verde = visitado</span> | <span style="color: var(--color-accent);">rojo = actual</span>
+        Camino más corto de A a F: A → C → F | <span style="color: #2d7d46;">verde = visitado</span> | <span style="color: var(--color-accent);">rojo = actual</span>
       </div>
     </div>
 
@@ -933,41 +933,41 @@ print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
     <!-- ============================================ -->
     <!-- 7. COMPARATIVA -->
     <!-- ============================================ -->
-    <h2>7. Comparativa: Que elegir y cuando</h2>
+    <h2>7. Comparativa: Qué elegir y cuándo</h2>
 
     <table>
       <thead>
         <tr>
           <th>Estructura</th>
-          <th>Busqueda</th>
-          <th>Insercion</th>
-          <th>Cuando usarla</th>
+          <th>Búsqueda</th>
+          <th>Inserción</th>
+          <th>Cuándo usarla</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><strong>Array</strong></td>
-          <td><span class="ds-complexity fast">O(1) indice</span> <span class="ds-complexity slow">O(n) valor</span></td>
+          <td><span class="ds-complexity fast">O(1) índice</span> <span class="ds-complexity slow">O(n) valor</span></td>
           <td><span class="ds-complexity slow">O(n)</span></td>
-          <td>Datos fijos, acceso por posicion</td>
+          <td>Datos fijos, acceso por posición</td>
         </tr>
         <tr>
           <td><strong>Linked List</strong></td>
           <td><span class="ds-complexity slow">O(n)</span></td>
           <td><span class="ds-complexity fast">O(1)*</span></td>
-          <td>Insercion frecuente en medio</td>
+          <td>Inserción frecuente en medio</td>
         </tr>
         <tr>
           <td><strong>Hash Table</strong></td>
           <td><span class="ds-complexity fast">O(1)</span></td>
           <td><span class="ds-complexity fast">O(1)</span></td>
-          <td>Busqueda por clave, conteo, caches</td>
+          <td>Búsqueda por clave, conteo, caches</td>
         </tr>
         <tr>
-          <td><strong>Arbol (BST)</strong></td>
+          <td><strong>Árbol (BST)</strong></td>
           <td><span class="ds-complexity fast">O(log n)</span></td>
           <td><span class="ds-complexity fast">O(log n)</span></td>
-          <td>Datos ordenados, busqueda eficiente</td>
+          <td>Datos ordenados, búsqueda eficiente</td>
         </tr>
         <tr>
           <td><strong>Grafo</strong></td>
@@ -979,7 +979,7 @@ print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
           <td><strong>Pila / Cola</strong></td>
           <td><span class="ds-complexity slow">O(n)</span></td>
           <td><span class="ds-complexity fast">O(1)</span></td>
-          <td>Undo, impresion, mensajes</td>
+          <td>Undo, impresión, mensajes</td>
         </tr>
       </tbody>
     </table>
@@ -991,16 +991,16 @@ print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
 
     <div class="ds-grid reveal-element">
       <div class="ds-card">
-        <h4>Acceso rapido por posicion</h4>
+        <h4>Acceso rápido por posición</h4>
         <p>→ Usa un <strong>Array</strong></p>
       </div>
       <div class="ds-card">
-        <h4>Busqueda por clave o nombre</h4>
+        <h4>Búsqueda por clave o nombre</h4>
         <p>→ Usa una <strong>Hash Table</strong></p>
       </div>
       <div class="ds-card">
-        <h4>Datos jerarquicos o con orden</h4>
-        <p>→ Usa un <strong>Arbol</strong></p>
+        <h4>Datos jerárquicos o con orden</h4>
+        <p>→ Usa un <strong>Árbol</strong></p>
       </div>
       <div class="ds-card">
         <h4>Relaciones entre entidades</h4>
@@ -1017,7 +1017,7 @@ print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
     </div>
 
     <div class="callout reveal-element">
-      <p><strong>Consejo practico:</strong> En la mayoria de lenguajes modernos, la estructura por defecto es una lista (array dinamico). Si tu programa es lento, antes de optimizar algoritmos, preguntate si estas usando la estructura correcta. Cambiar de array a hash table puede reducir el tiempo de horas a milisegundos.</p>
+      <p><strong>Consejo práctico:</strong> En la mayoría de lenguajes modernos, la estructura por defecto es una lista (array dinámico). Si tu programa es lento, antes de optimizar algoritmos, pregúntate si estás usando la estructura correcta. Cambiar de array a hash table puede reducir el tiempo de horas a milisegundos.</p>
     </div>
 
     <div class="reveal-element">
