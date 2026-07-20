@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antipatrones de Software — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+  <style>
+    .ap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .ap-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      border-top: 3px solid var(--color-accent);
+    }
+    .ap-card.severity-low { border-top-color: #2d7d46; }
+    .ap-card.severity-mid { border-top-color: #B25E35; }
+    .ap-card.severity-high { border-top-color: #9a2a2a; }
+    .ap-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-1);
+    }
+    .ap-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .ap-severity {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+    .ap-severity.low { background: rgba(45, 125, 70, 0.1); color: #2d7d46; }
+    .ap-severity.mid { background: rgba(178, 94, 53, 0.1); color: #B25E35; }
+    .ap-severity.high { background: rgba(154, 42, 42, 0.1); color: #9a2a2a; }
+    .ap-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 640px) {
+      .ap-compare { grid-template-columns: 1fr; }
+    }
+    .ap-compare-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .ap-compare-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0;
+      margin-bottom: var(--space-2);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .ap-compare-box.bad h4 { color: #9a2a2a; }
+    .ap-compare-box.good h4 { color: #2d7d46; }
+    .ap-symptom {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+      font-size: 0.9rem;
+    }
+    .ap-symptom-icon {
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .ap-fix {
+      background: rgba(45, 125, 70, 0.05);
+      border-left: 3px solid #2d7d46;
+      padding: var(--space-3);
+      margin: var(--space-3) 0;
+      font-size: 0.9rem;
+    }
+    .ap-fix strong { color: #2d7d46; }
+    .ap-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      columns: 2;
+      column-gap: var(--space-4);
+    }
+    @media (max-width: 640px) {
+      .ap-toc { columns: 1; }
+    }
+    .ap-toc h3 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      column-span: all;
+    }
+    .ap-toc ol {
+      margin: 0;
+      padding-left: var(--space-4);
+    }
+    .ap-toc li {
+      font-size: 0.9rem;
+      margin-bottom: var(--space-1);
+      break-inside: avoid;
+    }
+    .ap-toc a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .ap-toc a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Computer Science</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Antipatrones de Software</h1>
+    
+    <p>Un patrón de diseño es una solucion probada a un problema comun. Un <strong>antipatron</strong> es lo contrario: una solucion que parece buena pero que te crea problemas a largo plazo. Es como confundir una atajito por un camino que lleva a un precipicio.</p>
+
+    <p>Los antipatrones no son errores de sintaxis ni bugs. Son <strong>decisiones de diseño</strong> que funcionan a corto plazo pero que degradan el codigo, dificultan el mantenimiento y aumentan la deuda tecnica. Reconocerlos a tiempo es la diferencia entre un proyecto sostenible y uno que se convierte en un infierno de cambios.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla de oro:</strong> Si tu codigo funciona pero cada cambio nuevo te toma 10 veces mas de lo esperado, probablemente tienes un antipatron escondido. El buen codigo no solo funciona; es facil de modificar.</p>
+    </div>
+
+    <div class="ap-toc reveal-element">
+      <h3>Contenido</h3>
+      <ol>
+        <li><a href="#golden-hammer">Golden Hammer</a></li>
+        <li><a href="#spaghetti-code">Spaghetti Code</a></li>
+        <li><a href="#god-object">God Object</a></li>
+        <li><a href="#big-ball-mud">Big Ball of Mud</a></li>
+        <li><a href="#singleton">Singleton</a></li>
+        <li><a href="#lava-flow">Lava Flow</a></li>
+        <li><a href="#dead-code">Dead Code</a></li>
+        <li><a href="#copy-paste">Copy-Paste Programming</a></li>
+        <li><a href="#magic-numbers">Magic Numbers</a></li>
+        <li><a href="#callback-hell">Callback Hell</a></li>
+        <li><a href="#speculative-generality">Speculative Generality</a></li>
+        <li><a href="#feature-envy">Feature Envy</a></li>
+        <li><a href="#data-clumps">Data Clumps</a></li>
+        <li><a href="#primitive-obsession">Primitive Obsession</a></li>
+        <li><a href="#refused-bequest">Refused Bequest</a></li>
+        <li><a href="#parallel-inheritance">Parallel Inheritance</a></li>
+        <li><a href="#blob">Blob</a></li>
+        <li><a href="#poltergeist">Poltergeist</a></li>
+        <li><a href="#functional-decomposition">Functional Decomposition</a></li>
+        <li><a href="#bicycle-shed">Bicycle Shed</a></li>
+        <li><a href="#vendor-lockin">Vendor Lock-in</a></li>
+        <li><a href="#death-march">Death March</a></li>
+        <li><a href="#analysis-paralysis">Analysis Paralysis</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 1. GOLDEN HAMMER -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="golden-hammer">1. Golden Hammer (Martillo Dorado)</h2>
+
+    <p>Si solo tienes un martillo, todo parece un clavo. El Golden Hammer es usar una misma herramienta o tecnologia para todos los problemas, sin importar si es la mas adecuada.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Martillo Dorado</h4>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✗</span> "Usamos MongoDB para todo"</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✗</span> "Esto lo resolvemos con un microservicio"</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✗</span> "React para una landing page estatica"</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✗</span> "Masiva tabla SQL para un conteo simple"</div>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>Enfoque correcto</h4>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✓</span> MongoDB para datos semi-estructurados</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✓</span> SQL para datos relacionales</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✓</span> HTML estatico para landing pages</div>
+        <div class="ap-symptom"><span class="ap-symptom-icon">✓</span> Redis para cache</div>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Evalua cada problema por separado. Antes de elegir una herramienta, pregunta: "¿Es esta la mejor opcion para <em>este</em> problema especifico?"
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 2. SPAGHETTI CODE -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="spaghetti-code">2. Spaghetti Code</h2>
+
+    <p>Como un plato de spaghetti: todo esta enredado. No hay estructura, no hay separacion, y desenredar un hilo (cambiar una parte) mueve todo el plato.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Spaghetti</h4>
+<pre class="language-python"><code class="language-python">
+def procesar_pedido(pedido):
+    # Validar
+    if not pedido: return None
+    if pedido.total < 0: return None
+    # Calcular
+    descuento = 0
+    if pedido.cliente.tipo == "vip":
+        descuento = 0.2
+    elif pedido.cliente.tipo == "regular":
+        descuento = 0.1
+    # Guardar
+    db.execute("INSERT...")
+    # Notificar
+    if pedido.total > 1000:
+        email.enviar(...)
+    # Log
+    log.info(...)
+    return resultado</code></pre>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>Organizado</h4>
+<pre class="language-python"><code class="language-python">
+def procesar_pedido(pedido):
+    validar_pedido(pedido)
+    descuento = calcular_descuento(pedido.cliente)
+    total = aplicar_descuento(pedido.total, descuento)
+    guardar_pedido(pedido, total)
+    notificar_si_aplica(pedido)
+    registrar_pedido(pedido)
+    return total</code></pre>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Aplica el Principio de Responsabilidad Unica (SRP): cada funcion debe hacer una sola cosa. Si una funcion tiene mas de 30 lineas, probablemente esta haciendo demasiado.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 3. GOD OBJECT -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="god-object">3. God Object (Objeto Dios)</h2>
+
+    <p>Una clase que lo hace todo. Controla la base de datos, la interfaz, las notificaciones, los reportes y el cafetero. Cuando quieres cambiar algo, tocas esta clase y se rompe todo.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# El anti-patron: una clase que hace demasiado
+class SistemaCompleto:
+    def __init__(self):
+        self.conectar_db()
+        self.cargar_config()
+        self.iniciar_servidor()
+    
+    def conectar_db(self): ...       # Base de datos
+    def crear_usuario(self): ...     # Logica de negocio
+    def enviar_email(self): ...      # Notificaciones
+    def generar_reporte(self): ...   # Reportes
+    def validar_pago(self): ...      # Pagos
+    def renderizar_html(self): ...   # Frontend
+    def calcular_impuestos(self): ...# Impuestos
+    # ... 200 metodos mas</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# La solucion: separar responsabilidades
+class UsuarioService:
+    def crear(self, datos): ...
+
+class EmailService:
+    def enviar(self, para, asunto, cuerpo): ...
+
+class ReporteService:
+    def generar(self, filtros): ...
+
+class PagoService:
+    def validar(self, pago): ...</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Aplica SRP. Cada clase debe tener una razon para cambiar. Si tu clase se llama "Sistema", "Manager" o "Utils", probablemente es un God Object.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 4. BIG BALL OF MUD -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="big-ball-mud">4. Big Ball of Mud (Bola de Barro)</h2>
+
+    <p>Un sistema sin arquitectura visible. Nadie sabe como funciona completamente, nadie se atreve a tocar mucho, y cada cambio es una loteria. Es el resultado natural del Golden Hammer + God Object + tiempo suficiente.</p>
+
+    <div class="ap-symptom reveal-element">
+      <span class="ap-symptom-icon">🔍</span>
+      <div><strong>Sintomas:</strong> Cualquier desarrollador nuevo tarda meses en entender el sistema. Hay archivos con "temp", "v2", "final", "final_v2", "nunca_borrar". Nadie puede explicar por que certain cosas estan conectadas.</div>
+    </div>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Estructura tipica de un Big Ball of Mud
+mi_proyecto/
+├── src/
+│   ├── utils.py           # 3000 lineas de todo
+│   ├── helpers.py          # 2000 lineas mas
+│   ├── main.py            # 5000 lineas
+│   ├── main_v2.py         # "Mejorado" (no lo es)
+│   ├── main_v2_bak.py     # Backup por si acaso
+│   ├── pruebas.py         # 3 tests que no pasan
+│   └── FIXME.py           # Cosas pendientes desde 2019
+├── config_produccion_real.py
+├── config_produccion_real_v2.py
+└── NO_BORRAR.py</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Refactorizacion continua. No necesitas reescribir todo de golpe. Empieza por documentar, luego separa responsabilidades, y gradualmente extrae modulos. El Strangler Fig Pattern es ideal para esto.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5. SINGLETON -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="singleton">5. Singleton (como anti-patron)</h2>
+
+    <p>El patron Singleton garantiza que solo exista una instancia de una clase. El problema no es el patron en si, sino su <strong>abuso</strong>: cuando lo usas para "resolver" el acoplamiento en vez de diseñar bien la dependencia.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Singleton abusado</h4>
+<pre class="language-python"><code class="language-python">
+class Config:
+    _instancia = None
+    def __new__(cls):
+        if not cls._instancia:
+            cls._instancia = super().__new__(cls)
+        return cls._instancia
+
+# En cualquier parte del codigo:
+config = Config()
+config.db_host = "localhost"  # Side effect global
+
+# Problemas:
+# - Imposible de testear
+# - Acoplamiento oculto
+# - Estado global mutable
+# - No puedes tener dos configuraciones</code></pre>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>Dependencia inyectada</h4>
+<pre class="language-python"><code class="language-python">
+class Config:
+    def __init__(self, db_host, api_key):
+        self.db_host = db_host
+        self.api_key = api_key
+
+# Inyectar dependencia
+config = Config(
+    db_host="localhost",
+    api_key="abc123"
+)
+servicio = MiServicio(config)
+
+# Ventajas:
+# - Testeable (puedes mockear)
+# - Explicito (ves que depende de que)
+# - Sin estado global
+# - Puedes tener multiples instancias</code></pre>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Usa inyeccion de dependencias en lugar de singleton. Si necesitas una unica instancia, que sea el contenedor de DI quien la gestione, no la clase misma.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 6. LAVA FLOW -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="lava-flow">6. Lava Flow</h2>
+
+    <p>Codigo muerto o defectuoso que nadie se atreve a eliminar porque "por ahi algo lo esta usando". Como lava enfriada: se ve solido, pero si lo tocas, puedes activar algo que explota.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Lava Flow tipico: codigo que nadie entiende pero "funciona"
+def calcular_total(pedido):
+    # TODO: investigar por que esto funciona
+    # No tocar - somehow arregla el bug del 2021
+    total = sum(item.precio for item in pedido.items)
+    
+    # Este bloque parece muerto pero si lo quitas
+    # se rompe el reporte mensual (nadie sabe por que)
+    if hasattr(pedido, '_legacy_discount'):
+        total *= 0.95
+    
+    # Fix temporal para el bug #347 (ya no existe el bug)
+    if total > 10000:
+        total = total  # Esto no hace nada pero no lo quites
+    
+    return total</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Escribe tests antes de borrar. Si el codigo no tiene tests, escribe uno que verifique el comportamiento esperado, luego elimina el codigo muerto. Si algo se rompe, el test te avisara.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 7. DEAD CODE -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="dead-code">7. Dead Code (Codigo Muerto)</h2>
+
+    <p>Funciones, clases o variables que nunca se ejecutan. Ocupan espacio, confunden al desarrollador que los lee, y aumentan la superficie de mantenimiento sin ningun beneficio.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Dead code: nunca se llama a esta funcion
+def enviar_email_a_todos_usuarios(usuarios, asunto, cuerpo):
+    for usuario in usuarios:
+        smtp.enviar(usuario.email, asunto, cuerpo)
+
+# Esta otra tampoco se usa desde 2023
+class ReporteLegacy:
+    def generar_en_pdf(self): ...
+    def enviar_por_fax(self): ...
+
+# Variable declarada pero nunca leida
+debug_mode = True  # Se usaba en desarrollo, olvidada aqui
+
+def mi_funcion():
+    resultado = calcular_algo()
+    # resultado nunca se usa ni se retorna
+    pass</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Herramientas como <code>pylint</code>, <code>eslint</code> o <code>deadcode</code> detectan codigo muerto automaticamente. Ejecutalas periodicamente y limpia lo que no se use.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 8. COPY-PASTE -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="copy-paste">8. Copy-Paste Programming</h2>
+
+    <p>Copiar y pegar codigo de un lugar a otro con modificaciones minimas. Funciona rapido, pero crea duplicacion. Si encuentras un bug en una copia, tienes que buscar y arreglar todas las demas.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Duplicado</h4>
+<pre class="language-python"><code class="language-python">
+def validar_usuario(usuario):
+    if not usuario.nombre:
+        raise Error("Nombre requerido")
+    if not usuario.email:
+        raise Error("Email requerido")
+    if len(usuario.password) < 8:
+        raise Error("Password corto")
+
+def validar_admin(admin):
+    if not admin.nombre:
+        raise Error("Nombre requerido")
+    if not admin.email:
+        raise Error("Email requerido")
+    if len(admin.password) < 8:
+        raise Error("Password corto")
+    if not admin.permisos:
+        raise Error("Permisos requeridos")</code></pre>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>DRY (Don't Repeat Yourself)</h4>
+<pre class="language-python"><code class="language-python">
+def validar_campos_base(datos, campos_requeridos):
+    for campo in campos_requeridos:
+        if not getattr(datos, campo, None):
+            raise Error(f"{campo} requerido")
+    if len(datos.password) < 8:
+        raise Error("Password corto")
+
+def validar_usuario(usuario):
+    validar_campos_base(usuario, ["nombre", "email"])
+
+def validar_admin(admin):
+    validar_campos_base(admin, ["nombre", "email"])
+    if not admin.permisos:
+        raise Error("Permisos requeridos")</code></pre>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Aplica el principio DRY. Si copias mas de 3 lineas, extrae una funcion o clase. La unica excepcion es cuando las "copias" tienen probabilidad de cambiar independientemente.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 9. MAGIC NUMBERS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="magic-numbers">9. Magic Numbers</h2>
+
+    <p>Numeros literales hardcodeados en el codigo sin explicacion. Cuando ves <code>if x > 86400</code>, ¿que es 86400? ¿Por que 86400? Sin contexto, es magia.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Magia</h4>
+<pre class="language-python"><code class="language-python">
+if edad > 65:
+    tarifa = precio * 0.7
+
+if len(password) < 8:
+    raise Error("Invalido")
+
+if tiempo_espera > 300:
+   重试()
+
+while intentos < 3:
+    intentar()</code></pre>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>Explicito</h4>
+<pre class="language-python"><code class="language-python">
+TARIFA_JUBILACION = 0.7
+EDAD_JUBILACION = 65
+LONGITUD_MINIMA_PASSWORD = 8
+TIMEOUT_SEGUNDOS = 300
+MAXIMO_INTENTOS = 3
+
+if edad > EDAD_JUBILACION:
+    tarifa = precio * TARIFA_JUBILACION
+
+if len(password) < LONGITUD_MINIMA_PASSWORD:
+    raise Error("Invalido")</code></pre>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Extrae todos los numeros a constantes con nombres descriptivos. Un numero sin nombre es un misterio; un numero con nombre es una decision documentada.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 10. CALLBACK HELL -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="callback-hell">10. Callback Hell (Infierno de Callbacks)</h2>
+
+    <p>Cuando las funciones anidadas se apilan como capas de una cebolla, cada una esperando a la anterior. Resultado: codigo ilegible, dificil de depurar y imposible de mantener.</p>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// Callback Hell: el infierno de la indentacion
+usuario.obtener(function(u) {
+    pedidos.obtener(u.id, function(pedidos) {
+        producto.obtener(pedidos[0].producto_id, function(prod) {
+            inventario.verificar(prod.id, function(stock) {
+                if (stock > 0) {
+                    carrito.agregar(prod, function(resultado) {
+                        email.enviar(u.email, "Agregado!", function() {
+                            console.log("Todo listo"); // 7 niveles
+                        });
+                    });
+                }
+            });
+        });
+    });
+});</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-javascript">
+// La solucion: async/await (JavaScript)
+async function agregarAlCarrito(usuarioId) {
+    const usuario = await usuario.obtener(usuarioId);
+    const pedidos = await pedidos.obtener(usuario.id);
+    const prod = await producto.obtener(pedidos[0].producto_id);
+    const stock = await inventario.verificar(prod.id);
+    
+    if (stock > 0) {
+        await carrito.agregar(prod);
+        await email.enviar(usuario.email, "Agregado!");
+    }
+}</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Usa async/await (JavaScript/Python), Promises, o RxJS para aplanar la indentacion. Si tu lenguaje no soporta async, usa patrones como el Pipeline o Chain of Responsibility.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 11. SPECULATIVE GENERALITY -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="speculative-generality">11. Speculative Generality (Generalidad Especulativa)</h2>
+
+    <p>Crear abstracciones, interfaces o funcionalidades "por si acaso" se necesitan en el futuro. El resultado es codigo sobre-ingeniado que nadie usa y que dificulta el entendimiento.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Especulativo: "por si acaso necesitamos otros tipos"
+class IRepositorio(ABC):
+    @abstractmethod
+    def guardar(self): ...
+    @abstractmethod
+    def obtener(self): ...
+    @abstractmethod
+    def eliminar(self): ...
+    @abstractmethod
+    def exportar_a_csv(self): ...
+    @abstractmethod
+    def exportar_a_json(self): ...
+    @abstractmethod
+    def sincronizar_con_cloud(self): ...
+
+# Reality: solo se usa guardar() y obtener()
+# Las demas 4 funciones son ruido puro</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> YAGNI (You Ain't Gonna Need It). No construyas para un futuro que no existe. Cuando lo necesites, lo refactorizas. Es mas barato agregar despues que mantener codigo muerto por anos.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 12. FEATURE ENVY -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="feature-envy">12. Feature Envy (Envidia de Funcionalidad)</h2>
+
+    <p>Una funcion que usa mas datos y metodos de otra clase que de la suya propia. Esta "envidiando" la funcionalidad de otra clase y deberia estar ahi.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Feature Envy: esta funcion esta obsesionada con Pedido
+class Factura:
+    def calcular_total(self, pedido):
+        # Todo esto accede a pedido, no a self
+        subtotal = sum(item.precio * item.cantidad 
+                      for item in pedido.items)
+        descuento = pedido.cliente.obtener_descuento()
+        impuestos = subtotal * pedido.pais.tasa_impuesto()
+        total = subtotal - descuento + impuestos
+        return total</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Solucion: mover la funcion donde sus datos
+class Pedido:
+    def calcular_total(self):
+        subtotal = sum(item.precio * item.cantidad 
+                      for item in self.items)
+        descuento = self.cliente.obtener_descuento()
+        impuestos = subtotal * self.pais.tasa_impuesto()
+        return subtotal - descuento + impuestos</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Si una funcion usa mas datos de otra clase que de la suya, muevela a esa otra clase. Esto reduce el acoplamiento y hace el codigo mas cohesivo.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 13. DATA CLUMPS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="data-clumps">13. Data Clumps (Amontonamiento de Datos)</h2>
+
+    <p>Grupos de datos que siempre aparecen juntos en multiples lugares. Si ves los mismos 3-4 parametros pasados juntos una y otra vez, es una senal de que deberian ser una clase.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Data Clumps: estos 3 campos siempre viajan juntos
+def crear_usuario(nombre, email, telefono):
+    ...
+
+def enviar_paquete(nombre, email, telefono, direccion):
+    ...
+
+def generar_factura(nombre, email, telefono, monto):
+    ...
+
+# "nombre, email, telefono" aparecen en 3 lugares diferentes
+# Son un Data Clump → deberian ser una clase Contacto</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Solucion: extraer a una clase
+class Contacto:
+    def __init__(self, nombre, email, telefono):
+        self.nombre = nombre
+        self.email = email
+        self.telefono = telefono
+
+def crear_usuario(contacto: Contacto): ...
+def enviar_paquete(contacto: Contacto, direccion): ...
+def generar_factura(contacto: Contacto, monto): ...</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Si 3 o mas campos se repiten juntos en 2+ lugares, extraelos a una clase. Esto reduce duplicacion y facilita cambios futuros (si agregas un campo, solo lo haces en un lugar).
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 14. PRIMITIVE OBSESSION -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="primitive-obsession">14. Primitive Obsession (Obsesion con Primitivos)</h2>
+
+    <p>Usar tipos primitivos (string, int, boolean) para modelar conceptos del dominio. Un email no es un string; es un Email. Un dinero no es un float; es un Money.</p>
+
+    <div class="ap-compare reveal-element">
+      <div class="ap-compare-box bad">
+        <h4>Obsesion con primitivos</h4>
+<pre class="language-python"><code class="language-python">
+# Todo es string o number
+def crear_producto(nombre: str, precio: float, 
+                   moneda: str, descuento: float):
+    total = precio * (1 - descuento/100)
+    return {"nombre": nombre, "total": total}
+
+# Problemas:
+# - ¿Que moneda es? "USD" o "usd"?
+# - ¿El descuento es 0.2 o 20?
+# - ¿Que pasa con precio negativo?</code></pre>
+      </div>
+      <div class="ap-compare-box good">
+        <h4>Tipos de dominio</h4>
+<pre class="language-python"><code class="language-python">
+class Dinero:
+    def __init__(self, cantidad, moneda):
+        if cantidad < 0:
+            raise ValueError("No negativo")
+        self.cantidad = cantidad
+        self.moneda = moneda
+
+class Descuento:
+    def __init__(self, porcentaje):
+        if not 0 <= porcentaje <= 100:
+            raise ValueError("0-100%")
+        self.porcentaje = porcentaje
+
+# El codigo se auto-documenta
+def crear_producto(nombre, precio: Dinero, 
+                   descuento: Descuento):</code></pre>
+      </div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Crea Value Objects para conceptos del dominio. Un <code>Dinero</code>, un <code>Email</code>, un <code>Fecha</code> validada. El codigo se auto-documenta y previene errores en compilacion.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 15. REFUSED BEQUEST -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="refused-bequest">15. Refused Bequest (Herencia Rechazada)</h2>
+
+    <p>Una clase hija que hereda metodos o propiedades de su padre pero no los usa. Hereda solo porque "es lo correcto" en la jerarquia, no porque realmente lo necesite.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Herencia rechazada
+class Animal:
+    def comer(self): ...
+    def dormir(self): ...
+    def nadar(self): ...      # No todos los animales nadan
+    def volar(self): ...      # No todos los animales vuelan
+
+class Perro(Animal):
+    def nadar(self):
+        raise NotImplementedError("Perros no nadan")
+    
+    def volar(self):
+        raise NotImplementedError("Perros no vuelan")
+    
+    # Perro "rechaza" nadar y volar de su padre</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Solucion: composicion o interfaces mas finas
+class Animal:
+    def comer(self): ...
+    def dormir(self): ...
+
+class Nadador(ABC):
+    @abstractmethod
+    def nadar(self): ...
+
+class Volador(ABC):
+    @abstractmethod
+    def volar(self): ...
+
+class Perro(Animal):  # Solo hereda lo que usa
+    pass
+
+class Pato(Animal, Nadador, Volador):  # Compone habilidades
+    def nadar(self): ...
+    def volar(self): ...</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Preferir composicion sobre herencia. Si un hijo no usa los metodos del padre, la jerarquia esta mal disenada. Usa interfaces/traits para compartir comportamiento.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 16. PARALLEL INHERITANCE -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="parallel-inheritance">16. Parallel Inheritance Hierarchies</h2>
+
+    <p>Cuando agregar una subclase en una jerarquia obliga a crear una subclase correspondiente en otra jerarquia. Las dos jerarquias crecen en paralelo, como gemelas siamesas.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Jerarquias paralelas: cada forma tiene su impresora
+class Forma: ...
+class Circulo(Forma): ...
+class Cuadrado(Forma): ...
+
+class ImpresoraForma: ...
+class ImpresoraCirculo(ImpresoraForma): ...
+class ImpresoraCuadrado(ImpresoraForma): ...
+
+# Si agregas Triangulo, DEBES crear ImpresoraTriangulo
+# Cada vez que creas una subclase, tocas dos archivos</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Solucion: patron Visitor o doble despacho
+class Forma:
+    def aceptar(self, visitor): ...
+
+class Circulo(Forma):
+    def aceptar(self, visitor):
+        visitor.visitar_circulo(self)
+
+class Impresora:
+    def visitar_circulo(self, circulo):
+        print(f"Imprimiendo circulo radio {circulo.radio}")
+
+# Agregar Triangulo solo toca UNA clase
+# No necesitas tocar la impresora existente</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Usa el patron Visitor o double dispatch para evitar duplicar jerarquias. Si verdos jerarquias crecen juntas, probablemente una deberia absorber a la otra.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 17. BLOB -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="blob">17. Blob</h2>
+
+    <p>Una clase o modulo grande que contiene toda la logica de negocio, mientras el resto del sistema son solo wrappers delgados. Es un God Object disfrazado.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Blob: toda la logica en un solo lugar
+class LogicaNegocio:
+    def procesar_pedido(self, pedido): ...    # 200 lineas
+    def calcular_impuestos(self, monto): ...   # 150 lineas
+    def gestionar_inventario(self, items): ... # 300 lineas
+    def generar_reportes(self, fecha): ...     # 250 lineas
+    def notificar_clientes(self, evento): ...  # 100 lineas
+    # Total: 1000+ lineas en una sola clase
+
+# El resto del sistema es puro wrapper
+class PedidoController:
+    def crear(self, datos):
+        return self.logica.procesar_pedido(datos)  # delega todo
+
+class InventarioController:
+    def actualizar(self, datos):
+        return self.logica.gestionar_inventario(datos)  # delega</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Divide por responsabilidades. Cada controller debe tener su propia logica o delegar a un servicio especializado, no a un mono-clase que lo hace todo.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 18. POLTERGEIST -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="poltergeist">18. Poltergeist (Poltergeist)</h2>
+
+    <p>Una clase que solo existe para coordinar o pasar mensajes entre otras clases, sin tener logica propia. Como un fantasma: aparece y desaparece sin dejar rastro de valor.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Poltergeist: una clase que solo coordina
+class PedidoOrquestador:
+    def __init__(self, repositorio, notificador, pagador):
+        self.repositorio = repositorio
+        self.notificador = notificador
+        self.pagador = pagador
+    
+    def procesar(self, pedido):
+        self.repositorio.guardar(pedido)
+        self.pagador.cobrar(pedido.total)
+        self.notificador.enviar(pedido.cliente)
+        # Esta clase no tiene logica propia
+        # Solo pasa mensajes entre otras tres</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Si una clase no tiene estado ni logica, eliminada. Usa una secuencia de llamadas directas, un patron Chain of Responsibility, o un simple script secuencial.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 19. FUNCTIONAL DECOMPOSITION -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="functional-decomposition">19. Functional Decomposition</h2>
+
+    <p>Dividir el sistema en funciones que reflejan el proceso paso a paso en lugar de reflejar el dominio del negocio. Es como organizar un restaurante por "paso 1: abrir puerta, paso 2: encender luz" en vez de por "cocina, caja, salon".</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Decomposicion funcional: refleja el proceso, no el dominio
+def paso_1_recibir_pedido(): ...
+def paso_2_validar_stock(): ...
+def paso_3_calcular_precio(): ...
+def paso_4_procesar_pago(): ...
+def paso_5_generar_envio(): ...
+def paso_6_notificar_cliente(): ...
+
+# Problema: ¿donde pongo un nuevo paso?
+# ¿Donde valido el descuento? ¿En el paso 3 o 4?
+# No hay cohesion, solo una secuencia lineal</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Modela tu codigo alrededor del dominio: <code>PedidoService</code>, <code>InventarioService</code>, <code>PagoService</code>. Cada servicio encapsula toda la logica de su area, incluyendo multiples pasos.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 20. BICYCLE SHED -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="bicycle-shed">20. Bicycle Shed (Ley de Parkinson de la Trivialidad)</h2>
+
+    <p>Discutir eternamente sobre decisiones triviales mientras las importantes se ignoran. Todo el mundo tiene opinion sobre el color del boton, pero nadie cuestiona la arquitectura de base de datos.</p>
+
+    <div class="ap-symptom reveal-element">
+      <span class="ap-symptom-icon">🔍</span>
+      <div><strong>Ejemplos reales:</strong> 3 reuniones para elegir el nombre de una variable, 2 semanas de debate sobre el color de la UI, 50 comentarios en un PR por el estilo del codigo, pero nadie pregunta "¿por que estamos usando esta base de datos?"</div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Timebox las decisiones triviales (5 minutos max). Para decisiones que parecen triviales pero no lo son, asigna a un solo responsable. Las decisiones reversibles no necesitan consenso.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 21. VENDOR LOCK-IN -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="vendor-lockin">21. Vendor Lock-in</h2>
+
+    <p>Acoplar tu sistema a un proveedor externo de forma que migrar sea doloroso o imposible. Como vivir de alquiler sin contrato: si el casero sube el alquiler, no tienes donde ir.</p>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Vendor Lock-in: dependencia total de AWS
+import boto3
+
+# Tu codigo esta lleno de esto:
+s3 = boto3.client('s3')
+sqs = boto3.client('sqs')
+dynamodb = boto3.resource('dynamodb')
+lambda_client = boto3.client('lambda')
+
+# Migrar a GCP o Azure significaria reescribir TODO
+# porque cada servicio tiene su API propietaria</code></pre>
+
+    <pre class="code-block reveal-element"><code class="language-python">
+# Solucion: capa de abstraccion
+class StorageInterface(ABC):
+    @abstractmethod
+    def guardar(self, clave, datos): ...
+    @abstractmethod
+    def obtener(self, clave): ...
+
+class S3Storage(StorageInterface):
+    def guardar(self, clave, datos):
+        s3.put_object(Bucket=bucket, Key=clave, Body=datos)
+
+class GCSStorage(StorageInterface):  # Facil de agregar
+    def guardar(self, clave, datos):
+        bucket.blob(clave).upload_from_string(datos)</code></pre>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Usa abstracciones e interfaces. Tu logica de negocio no deberia saber si usa AWS, GCP o tu servidor. La capa de infraestructura es un detalle de implementacion.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 22. DEATH MARCH -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="death-march">22. Death March (Marcha de la Muerte)</h2>
+
+    <p>Un proyecto con objetivos irrealistas, plazos imposibles y recursos insuficientes, donde todos saben que fracasara pero nadie lo dice. El equipo trabaja horas extra, el calidad se sacrifica, y la moral se desploma.</p>
+
+    <div class="ap-symptom reveal-element">
+      <span class="ap-symptom-icon">🔍</span>
+      <div><strong>Sintomas:</strong> "Necesitamos esto para ayer". Horas extra obligatorias. Bugs que se ignoran para cumplir plazos. Desarrolladores renunciando. El backlog crece mas rapido de lo que se completa. "Despues lo refactorizamos" (nunca pasa).</div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Negocia alcances realistas. Es mejor entregar menos features bien hechas que un producto incompleto y roto. El patrón MoSCoW (Must, Should, Could, Won't) ayuda a priorizar.
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 23. ANALYSIS PARALYSIS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="analysis-paralysis">23. Analysis Paralysis (Paralisis por Analisis)</h2>
+
+    <p>Tan preocupado por tomar la decision correcta que no tomas ninguna. Investigar infinitamente, documentar excesivamente, y nunca empezar a construir por miedo a equivocarse.</p>
+
+    <div class="ap-symptom reveal-element">
+      <span class="ap-symptom-icon">🔍</span>
+      <div><strong>Sintomas:</strong> Documentos de 100 paginas que nadie lee. Reuniones infinitas sin decisiones. Comparar 15 frameworks distintos durante meses. "Necesitamos investigar mas" como respuesta perpetua.</div>
+    </div>
+
+    <div class="ap-fix reveal-element">
+      <strong>Solucion:</strong> Establece un limite de tiempo para decidir. Usa el patron "Two Pizza Team" para decisiones rapidas. Recuerda: una decision revertible a tiempo es mejor que no decidir. El codigo imperfecto que funciona es mejor que el diseño perfecto que no existe.
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

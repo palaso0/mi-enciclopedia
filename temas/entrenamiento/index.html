@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* Estilos locales para Scaling Laws */
     .scaling-curve-box {
@@ -490,7 +491,7 @@
 
     <p>Esto creó una tensión fundamental en la industria: las leyes de potencia dicen que más cómputo siempre ayuda, pero el costo crece rápido. La solución fue una segunda ola de investigación centrada en la <strong>eficiencia</strong>: modelos más pequeños pero mejor entrenados, técnicas como LoRA para fine-tuning eficiente, y arquitecturas sparse como Mixture-of-Experts.</p>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Simulación del concepto de few-shot learning con GPT-3
 # El modelo NO se re-entrena; solo recibe ejemplos en el prompt
 
@@ -522,7 +523,7 @@ print(resultado)  # Salida: "Negativo"
 
 # El modelo clasificó correctamente sin haber visto
 # este ejemplo específico durante el entrenamiento.
-# Solo necesitó 3 ejemplos para entender la tarea.</pre>
+# Solo necesitó 3 ejemplos para entender la tarea.</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Legado de los Scaling Laws:</strong> Establecieron la filosofía de diseño que dominó la industria del 2020 al 2024: construye el modelo más grande posible con los mejores datos disponibles. Este paradigma solo comenzó a cuestionarse con la llegada de modelos como Phi-2 y Gemma, que demostraron que datos de alta calidad pueden compensar parámetros faltantes.</p>
@@ -666,7 +667,7 @@ print(resultado)  # Salida: "Negativo"
 
     <p>La biblioteca PEFT (Parameter-Efficient Fine-Tuning) de Hugging Face hace que aplicar LoRA sea casi trivial. Solo necesitas definir qué capas adaptar y el rango deseado:</p>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Ejemplo de fine-tuning con LoRA usando PEFT + transformers
 from peft import LoraConfig, get_peft_model, TaskType
 from transformers import AutoModelForCausalLM
@@ -701,7 +702,7 @@ modelo_lora.print_trainable_parameters()
 
 # 5. Entrenar normalmente con un dataset de tu tarea
 # El modelo solo ajustará los ~42M parámetros de LoRA,
-# manteniendo los 8B originales completamente intactos.</pre>
+# manteniendo los 8B originales completamente intactos.</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Ventaja clave:</strong> Como el modelo base no se modifica, puedes tener <strong>múltiples adaptadores LoRA</strong> para diferentes tareas (uno para español, otro para código, otro para resúmenes) e intercambiarlos instantáneamente sin recargar el modelo completo.</p>
@@ -819,7 +820,7 @@ modelo_lora.print_trainable_parameters()
 
     <p>En CAI, el modelo genera respuestas, luego se auto-critica usando la constitución, y luego genera una versión mejorada. Este ciclo de auto-mejora reduce drásticamente la necesidad de evaluadores humanos, manteniendo resultados de alta calidad.</p>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Simulación simplificada del pipeline de RLHF
 # Paso 1: SFT (Supervised Fine-Tuning) - ya completado
 # Paso 2: Entrenar modelo de recompensa
@@ -862,7 +863,7 @@ for i, r in enumerate(respuestas, 1):
 
 # El modelo de recompensa guía al generador:
 # respuestas precisas y honestas reciben recompensa alta,
-# respuestas incorrectas o deshonestas reciben penalización.</pre>
+# respuestas incorrectas o deshonestas reciben penalización.</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Impacto:</strong> RLHF fue lo que transformó a GPT-3 en ChatGPT. El modelo base podía generar texto, pero RLHF lo hizo <strong>seguro, útil y conversacional</strong>. Sin este paso, los modelos generan contenido ofensivo, inventan datos, o simplemente no entienden qué se espera de ellos en una interacción real.</p>
@@ -882,6 +883,8 @@ for i, r in enumerate(respuestas, 1):
     </div>
   </main>
 
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
   <script src="../../assets/js/main.js"></script>
 </body>
 </html>

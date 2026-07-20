@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* Estilos locales combinados de todos los subtemas */
 
@@ -377,7 +378,7 @@
     <h3>1.4 Un ejemplo simplificado en código</h3>
     <p>Para ver cómo se traduce esto a lógica, imagina que calculamos la fuerza de relación (atención) entre las palabras de la oración: <em>"El banco de la plaza"</em>.</p>
 
-    <pre class="code-block reveal-element"># Simulación de la matriz de atención para la palabra "banco"
+    <pre class="code-block reveal-element"><code class="language-python"># Simulación de la matriz de atención para la palabra "banco"
 palabras = ["El", "banco", "de", "la", "plaza"]
 
 # Valores calculados por el modelo que miden la relación (de 0 a 1)
@@ -389,7 +390,7 @@ atencion_para_banco = {
     "plaza": 0.85   # ¡Fuerte conexión contextual!
 }
 
-# El modelo aprende que "banco" y "plaza" forman un bloque de significado</pre>
+# El modelo aprende que "banco" y "plaza" forman un bloque de significado</code></pre>
 
     <h3>1.5 El truco final: Positional Encoding</h3>
     <p>Como el Transformer lee todo al mismo tiempo, no sabe qué palabra va primero y cuál va después. Para él, estas dos oraciones serían idénticas:</p>
@@ -485,7 +486,7 @@ atencion_para_banco = {
     <h3>2.4 Simulación en código: De imagen a embeddings</h3>
     <p>Este script de Python demuestra matemáticamente cómo se descompone y proyecta una imagen en parches antes de entrar al Transformer:</p>
 
-    <pre class="code-block reveal-element"># Simulación conceptual de preparación de parches para ViT
+    <pre class="code-block reveal-element"><code class="language-python"># Simulación conceptual de preparación de parches para ViT
 import numpy as np
 
 # Configuración básica
@@ -508,7 +509,7 @@ print(f"Dimensiones de los parches aplanados: {parches_aplanados.shape}") # (196
 # 4. Proyección Lineal (matriz de pesos W_p)
 W_p = np.random.rand(patch_size * patch_size * C, d_model)
 patch_embeddings = np.dot(parches_aplanados, W_p)
-print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196, 768)</pre>
+print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196, 768)</code></pre>
 
     <h3>2.5 El dilema de los datos: Inductive Bias</h3>
     <p>A diferencia de las CNNs, los Transformers no tienen **sesgo inductivo (inductive bias)** sobre las imágenes. Una CNN "sabe" implícitamente que los píxeles vecinos son importantes y que los patrones se mantienen iguales si se desplazan (invarianza de traslación).</p>
@@ -608,7 +609,7 @@ print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196,
     <h3>3.4 Simulación conceptual: El costo de los accesos a memoria</h3>
     <p>El siguiente código simula conceptualmente la cantidad de lecturas y escrituras de memoria (I/O) requeridas por ambos algoritmos para procesar una secuencia larga:</p>
 
-    <pre class="code-block reveal-element"># Simulación del costo de acceso a memoria (I/O Complexity)
+    <pre class="code-block reveal-element"><code class="language-python"># Simulación del costo de acceso a memoria (I/O Complexity)
 # N = Longitud de secuencia, d = Dimensión de embedding, M = Tamaño de la SRAM
 
 def costo_memoria_clasico(N, d):
@@ -633,7 +634,7 @@ io_flash = costo_memoria_flash(N_seq, d_emb, M_sram)
 
 print(f"Accesos a HBM (Tradicional): {io_clasico:,} lecturas/escrituras")
 print(f"Accesos a HBM (Flash):       {int(io_flash):,} lecturas/escrituras")
-print(f"Reducción de I/O de memoria: ~{io_clasico / io_flash:.1f}x")</pre>
+print(f"Reducción de I/O de memoria: ~{io_clasico / io_flash:.1f}x")</code></pre>
 
     <h3>3.5 Impacto en los modelos modernos</h3>
     <p>Gracias a Flash Attention, la industria pudo dar el salto de los 2,048 tokens de contexto originales de GPT-3 a los 128k o 1M de tokens que manejan los modelos actuales. Al no consumir memoria en almacenar la matriz intermedia de atención, las GPUs pueden procesar documentos enteros, libros o códigos fuente masivos de una sola vez.</p>
@@ -718,7 +719,7 @@ print(f"Reducción de I/O de memoria: ~{io_clasico / io_flash:.1f}x")</pre>
     <h3>4.4 Simulación conceptual: El Router MoE</h3>
     <p>Este fragmento de Python simula la toma de decisiones del Router para asignar un token a los mejores 2 expertos de un pool de 4:</p>
 
-    <pre class="code-block reveal-element"># Simulación del Router (Gating Network) en una capa MoE
+    <pre class="code-block reveal-element"><code class="language-python"># Simulación del Router (Gating Network) en una capa MoE
 import numpy as np
 
 def softmax(x):
@@ -746,7 +747,7 @@ for idx, prob in enumerate(probabilidades):
 
 print("\nExpertos ACTIVADOS para este token:")
 for idx in top_k_indices:
-    print(f" -> {expertos[idx]} (Prob: {probabilidades[idx]:.2%})")</pre>
+    print(f" -> {expertos[idx]} (Prob: {probabilidades[idx]:.2%})")</code></pre>
 
     <h3>4.5 Los desafíos de MoE</h3>
     <ul>
@@ -789,9 +790,9 @@ for idx in top_k_indices:
     <h3>5.2 ¿Cómo funciona un Modelo de Estado de Espacio (SSM)?</h3>
     <p>Inspirados en la teoría de sistemas de control en física e ingeniería, los SSMs procesan la información de manera matemática secuencial, similar a una Red Recurrente (RNN) pero con la capacidad de entrenarse en paralelo. Su ecuación matemática básica actualiza un **estado oculto (hidden state)** interno continuo:</p>
     
-    <pre class="code-block reveal-element"># Ecuación básica de actualización de estado
+    <pre class="code-block reveal-element"><code class="language-python"># Ecuación básica de actualización de estado
 h(t) = A * h(t-1) + B * x(t)
-y(t) = C * h(t)</pre>
+y(t) = C * h(t)</code></pre>
 
     <ul>
       <li>\(x(t)\): El token o palabra de entrada actual.</li>
@@ -828,7 +829,7 @@ y(t) = C * h(t)</pre>
     <h3>5.4 Simulación conceptual: El bucle lineal vs. cuadrático</h3>
     <p>Este código en Python simula conceptualmente la diferencia en operaciones necesarias para procesar un documento a medida que se hace más largo:</p>
 
-    <pre class="code-block reveal-element"># Simulación del incremento de costo computacional
+    <pre class="code-block reveal-element"><code class="language-python"># Simulación del incremento de costo computacional
 # N = número de tokens en el documento
 
 def procesar_transformer(N):
@@ -852,7 +853,7 @@ ops_mamba = procesar_mamba(tokens)
 
 print(f"Costo de Atención (Transformer): {ops_trans:,} operaciones")
 print(f"Costo de Estado (Mamba/SSM):    {ops_mamba:,} operaciones")
-print(f"Mamba es ~{ops_trans / ops_mamba:.1f} veces más eficiente en computación")</pre>
+print(f"Mamba es ~{ops_trans / ops_mamba:.1f} veces más eficiente en computación")</code></pre>
 
     <h3>5.5 Estado actual</h3>
     <p>El diseño híbrido se está convirtiendo en el estándar para modelos de contexto masivo de nueva generación. Al comprimir la información histórica en un estado oculto de tamaño constante, estos modelos reducen drásticamente el consumo de memoria RAM de video (VRAM) en inferencia, haciendo viable correr modelos potentes localmente en computadoras portátiles o teléfonos móviles.</p>

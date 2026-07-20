@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* Estilos locales para embeddings y bases vectoriales */
     .embedding-space {
@@ -528,7 +529,7 @@
     <h2>7. Simulación: Búsqueda de similitud en código</h2>
     <p>El siguiente código simula el proceso completo: crear embeddings de documentos, almacenarlos, y buscar los más similares a una consulta:</p>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Simulación de un sistema de embeddings y búsqueda vectorial
 import numpy as np
 
@@ -576,7 +577,7 @@ for i, (doc_id, texto, sim) in enumerate(resultados, 1):
     print(f"  {i}. [{sim:.3f}] {barra} {texto}")
 
 print(f"\nDocumento más relevante: {resultados[0][1]}")
-    </pre>
+    </code></pre>
 
     <div class="callout reveal-element">
       <p><strong>En producción real:</strong> Los embeddings se calculan con modelos como <code>text-embedding-3-small</code> de OpenAI (1536 dims), <code>all-MiniLM-L6-v2</code> de Sentence Transformers (384 dims), o <code>embed-v3</code> de Cohere (1024 dims). La búsqueda vectorial en bases como Pinecone o Weaviate puede encontrar los 10 más relevantes entre millones de vectores en menos de 10 milisegundos.</p>
@@ -735,7 +736,7 @@ print(f"\nDocumento más relevante: {resultados[0][1]}")
       <li><strong>Instrucciones de formato:</strong> Cómo estructurar la respuesta.</li>
     </ol>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Ejemplo de prompt RAG construido
 system_prompt = """
 Eres un asistente experto en el reglamento de la empresa.
@@ -766,7 +767,7 @@ PREGUNTA: {usuario}
 
 RESPUESTA:
 """
-    </pre>
+    </code></pre>
 
     <div class="callout reveal-element" style="border-left-color: #3E8453;">
       <p><strong>El patrón clave:</strong> El LLM no necesita "saber" la respuesta. Solo necesita razonar sobre la información que se le proporciona. Esto reduce drásticamente las alucinaciones porque el modelo tiene evidencia concreta a la que atenerse. Es como la diferencia entre responder de memoria y responder leyendo el párrafo correcto de un libro.</p>
@@ -775,7 +776,7 @@ RESPUESTA:
     <h2>6. Simulación completa de RAG en código</h2>
     <p>El siguiente código simula una pipeline RAG simplificada: indexar documentos, buscar los relevantes, y construir el prompt para el LLM:</p>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Simulación de una pipeline RAG completa
 import numpy as np
 
@@ -842,7 +843,7 @@ Responde basándote ÚNICAMENTE en el contexto anterior."""
 print(f"\nPrompt generado para el LLM:")
 print("-" * 50)
 print(prompt)
-    </pre>
+    </code></pre>
 
     <h2>7. Avances recientes: GraphRAG, agentic RAG y más</h2>
     <p>El campo de RAG evoluciona rápidamente. Algunas tendencias importantes:</p>

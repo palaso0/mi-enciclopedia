@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* === Estilos de sección del mega-page === */
     .mega-section-divider {
@@ -735,7 +736,7 @@
     <h3 class="reveal-element">6. Simulación: Un agente en acción</h3>
     <p class="reveal-element">Veamos cómo se ve el bucle de un agente en pseudocódigo simplificado. Imagina un agente que debe investigar un tema y crear un resumen:</p>
 
-    <pre class="code-block reveal-element">class AgenteIA:
+    <pre class="code-block reveal-element"><code class="language-python">class AgenteIA:
     def __init__(self, llm, herramientas, memoria):
         self.llm = llm                # El modelo de lenguaje (cerebro)
         self.herramientas = herramientas  # Dict de herramientas disponibles
@@ -771,7 +772,7 @@
             if self.es_suficiente(resultado, objetivo):
                 return self.sintetizar_respuesta()
         
-        return "Se alcanzó el límite de iteraciones"</pre>
+        return "Se alcanzó el límite de iteraciones"</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Nota sobre la implementación real:</strong> En la práctica, los frameworks como LangChain ya implementan este bucle internamente. El desarrollador define las herramientas, el objetivo y la estrategia de planificación, y el framework se encarga del ciclo observe-piensa-actúa. Lo importante es entender el patrón subyacente para poder diseñar, depurar y mejorar agentes efectivos.</p>
@@ -842,7 +843,7 @@
     <p class="reveal-element">Cada function call tiene un formato estructurado. Primero, el desarrollador define las herramientas disponibles para el modelo. Luego, cuando el modelo decide usar una herramienta, genera un JSON con la estructura esperada:</p>
 
     <span class="step-badge reveal-element">Paso 1: Definición de herramientas</span>
-    <pre class="code-block reveal-element">{
+    <pre class="code-block reveal-element"><code class="language-json">{
   "nombre": "obtener_clima",
   "descripcion": "Obtiene el pronóstico del clima para una ciudad",
   "parametros": {
@@ -860,10 +861,10 @@
     },
     "required": ["ciudad"]
   }
-}</pre>
+}</code></pre>
 
     <span class="step-badge reveal-element">Paso 2: Respuesta del modelo (function call)</span>
-    <pre class="code-block reveal-element">{
+    <pre class="code-block reveal-element"><code class="language-json">{
   "tool_calls": [
     {
       "id": "call_abc123",
@@ -873,10 +874,10 @@
       }
     }
   ]
-}</pre>
+}</code></pre>
 
     <span class="step-badge reveal-element">Paso 3: Resultado devuelto al modelo</span>
-    <pre class="code-block reveal-element">{
+    <pre class="code-block reveal-element"><code class="language-json">{
   "tool_call_id": "call_abc123",
   "output": {
     "ciudad": "Buenos Aires",
@@ -885,7 +886,7 @@
     "probabilidad_lluvia": 30,
     "viento_kmh": 15
   }
-}</pre>
+}</code></pre>
 
     <h3 class="reveal-element">3. Validación de parámetros</h3>
     <p class="reveal-element">El sistema valida que los parámetros generados por el modelo coincidan con el esquema definido. Esto previene errores en tiempo de ejecución:</p>
@@ -949,7 +950,7 @@
     <h3 class="reveal-element">5. Ejemplo real: Consulta a una base de datos</h3>
     <p class="reveal-element">Veamos un ejemplo completo de cómo un asistente de e-commerce usa function calling para responder preguntas sobre pedidos:</p>
 
-    <pre class="code-block reveal-element">import json
+    <pre class="code-block reveal-element"><code class="language-python">import json
 
 # Herramientas disponibles para el asistente
 herramientas = [
@@ -1008,7 +1009,7 @@ resultado_real = buscar_producto(
 respuesta = "Sí, tenemos dos opciones por debajo de $50.000:
   1. Sony WH-CH520 — $35.000
   2. JBL Tune 510BT — $28.000
-  ¿Querés que verifique el stock de alguno?"</pre>
+  ¿Querés que verifique el stock de alguno?"</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>La ventaja de function calling:</strong> El LLM no "inventa" precios ni inventarios. Consulta datos reales del sistema y genera una respuesta precisa y actualizada. Si no encuentra resultados, simplemente lo informa en lugar de fabricar información.</p>
@@ -1152,7 +1153,7 @@ respuesta = "Sí, tenemos dos opciones por debajo de $50.000:
     <h3 class="reveal-element">6. Simulación: Sistema de skills en acción</h3>
     <p class="reveal-element">Veamos una implementación simplificada de cómo un sistema de skills funciona en la práctica:</p>
 
-    <pre class="code-block reveal-element">class Skill:
+    <pre class="code-block reveal-element"><code class="language-python">class Skill:
     def __init__(self, nombre, instrucciones, herramientas=None, contexto=None):
         self.nombre = nombre
         self.instrucciones = instrucciones   # Prompt especializado
@@ -1225,7 +1226,7 @@ biblioteca = {
 agente = AgenteConSkills(llm=modelo, biblioteca_skills=biblioteca)
 resultado = agente.resolver_tarea(
     "Genera un informe de ventas del Q1 con gráficos de tendencia"
-)</pre>
+)</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>El poder de las skills:</strong> En lugar de tener un prompt gigantesco que intente cubrir todas las posibles tareas, las skills permiten un enfoque modular. El agente carga solo lo que necesita, lo que reduce el consumo de tokens, mejora la precisión de las respuestas, y permite que la biblioteca de skills crezca sin degradar el rendimiento.</p>
@@ -1407,7 +1408,7 @@ resultado = agente.resolver_tarea(
     <h3 class="reveal-element">7. Simulación: Un servidor MCP en acción</h3>
     <p class="reveal-element">Veamos cómo se ve la interacción entre un cliente MCP y un servidor que expone acceso a una base de datos:</p>
 
-    <pre class="code-block reveal-element">import json
+    <pre class="code-block reveal-element"><code class="language-python">import json
 
 class ServidorMCP:
     """Simulación de un servidor MCP que expone una base de datos"""
@@ -1491,7 +1492,7 @@ print("3. Cliente envía: resources/list → Descubre los recursos disponibles")
 print("4. LLM decide usar 'consultar_usuarios' con nombre='Pablo'")
 print("5. Cliente envía: tools/call con los argumentos")
 print("6. Servidor ejecuta la consulta y retorna resultados")
-print("7. LLM integra los resultados en una respuesta natural")</pre>
+print("7. LLM integra los resultados en una respuesta natural")</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>El futuro de MCP:</strong> A medida que más proveedores adopten el protocolo, los agentes de IA podrán conectarse a cualquier servicio con un estándar universal. Esto reduce drásticamente la fricción para crear agentes verdaderamente útiles que puedan interactuar con el mundo real sin necesidad de integraciones custom para cada servicio.</p>
@@ -1505,6 +1506,8 @@ print("7. LLM integra los resultados en una respuesta natural")</pre>
     </div>
   </main>
 
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
   <script src="../../assets/js/main.js"></script>
 </body>
 </html>

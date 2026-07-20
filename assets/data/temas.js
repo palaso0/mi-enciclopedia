@@ -46,5 +46,13 @@ window.temasData = [
     "resumen": "Agentes de IA, function calling, skills y MCP — los sistemas que actúan en el mundo real.",
     "fecha": "2026-07-20",
     "orden": 6
+  },
+  {
+    "slug": "antipatrones-de-software",
+    "titulo": "Anti-patrones de Software",
+    "categoria": "Computer Science",
+    "resumen": "23 anti-patrones clásicos que todo desarrollador debe conocer para evitarlos: Golden Hammer, Spaghetti Code, God Object, Copy-Paste y más.",
+    "fecha": "2026-07-20",
+    "orden": 7
   }
 ];

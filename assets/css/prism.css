@@ -1,0 +1,206 @@
+/* ============================================
+   PrismJS Theme — Códice
+   Custom theme matching project light/dark palette
+   ============================================ */
+
+/* --- Light Mode --- */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #2C2C2B;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  tab-size: 2;
+  hyphens: none;
+}
+
+pre[class*="language-"] {
+  padding: var(--space-4, 1.5rem);
+  margin: 0 0 var(--space-4, 1.5rem);
+  overflow: auto;
+  background: #FFFFFF;
+}
+
+:not(pre) > code[class*="language-"] {
+  padding: 0.15em 0.4em;
+  border-radius: 2px;
+  background: #F0EFED;
+}
+
+/* Tokens — Light */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6B6B6A;
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: #2C2C2B;
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #9A2A2A;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.inserted {
+  color: #2D7D46;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #2C2C2B;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #7B2D8E;
+}
+
+.token.function,
+.token.class-name {
+  color: #2563EB;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #B25E35;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* --- Dark Mode --- */
+@media (prefers-color-scheme: dark) {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #EAE9E7;
+  }
+
+  pre[class*="language-"] {
+    background: #242423;
+  }
+
+  :not(pre) > code[class*="language-"] {
+    background: #2C2C2B;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #A0A09F;
+    font-style: italic;
+  }
+
+  .token.punctuation {
+    color: #EAE9E7;
+  }
+
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #E87575;
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.inserted {
+    color: #6BCB8B;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: #EAE9E7;
+  }
+
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword {
+    color: #C88FE0;
+  }
+
+  .token.function,
+  .token.class-name {
+    color: #6DA3F2;
+  }
+
+  .token.regex,
+  .token.important,
+  .token.variable {
+    color: #D4956A;
+  }
+}
+
+/* --- Override PrismJS defaults to work with .code-block --- */
+.code-block[class*="language-"] {
+  background: var(--color-surface, #FFFFFF);
+  border: 1px solid var(--color-border, #E5E4E2);
+  border-radius: var(--radius-sm, 2px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .code-block[class*="language-"] {
+    background: var(--color-surface, #242423);
+    border-color: var(--color-border, #3A3A38);
+  }
+}
+
+/* --- Comparison box code blocks (antipatrones) --- */
+.ap-compare-box pre[class*="language-"] {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 0.8rem;
+  overflow: visible;
+}
+
+.ap-compare-box pre[class*="language-"] code[class*="language-"] {
+  font-size: 0.8rem;
+}

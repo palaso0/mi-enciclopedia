@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* ===================== Estilos de secciones del mega-page ===================== */
     .mega-section {
@@ -897,7 +898,7 @@
         <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-3);">El modelo genera "París" porque tiene la mayor probabilidad. El parámetro <strong>temperature</strong> controla si siempre elige el más probable o si explora opciones menos obvias.</p>
       </div>
 
-      <pre class="code-block reveal-element">
+      <pre class="code-block reveal-element"><code class="language-python">
 # Simulación de la predicción de tokens en un LLM
 import random
 
@@ -948,7 +949,7 @@ for _ in range(5):
     secuencia.append(nuevo)
 
 print(f"Secuencia generada: {' '.join(secuencia)}")
-# Ejemplo de salida: "La capital de Francia es conocida París una"</pre>
+# Ejemplo de salida: "La capital de Francia es conocida París una"</code></pre>
 
       <h3 class="reveal-element">5. La emergencia: Cuando más datos crean nuevas capacidades</h3>
 
@@ -1187,7 +1188,7 @@ print(f"Secuencia generada: {' '.join(secuencia)}")
 
       <p class="reveal-element">El siguiente código Python simula conceptualmente el proceso de denoising, mostrando cómo se elimina ruido paso a paso de una señal:</p>
 
-      <pre class="code-block reveal-element">
+      <pre class="code-block reveal-element"><code class="language-python">
 # Simulación simplificada del proceso de denoising
 import numpy as np
 
@@ -1226,7 +1227,7 @@ for t in range(total_pasos, 0, -1):
 print(f"Reconstruido:{np.round(signal_denoised, 2)}")
 
 error = np.mean((imagen_original - signal_denoised) ** 2)
-print(f"\nError de reconstrucción (MSE): {error:.6f}")</pre>
+print(f"\nError de reconstrucción (MSE): {error:.6f}")</code></pre>
 
       <p class="reveal-element">Este ejemplo es una simplificación extrema. En un modelo real, la predicción de ruido la hace una U-Net con millones de parámetros entrenada sobre millones de imágenes, y el proceso usa 20-50 pasos con programación diferenciable completa.</p>
 
@@ -1377,7 +1378,7 @@ print(f"\nError de reconstrucción (MSE): {error:.6f}")</pre>
 
       <p class="reveal-element">Para visualizar la diferencia entre un modelo estándar y uno de razonamiento, veamos una simulación simplificada:</p>
 
-      <pre class="code-block reveal-element">
+      <pre class="code-block reveal-element"><code class="language-python">
 # Simulación: Resolución de un problema de lógica
 # Pregunta: "Si María tiene el doble de años que Juan,
 #            y juntos tienen 45 años, ¿cuántos años tiene María?"
@@ -1414,7 +1415,7 @@ def modelo_razonamiento(pregunta):
     }
 
 # Ambos llegan a la misma respuesta, pero el modelo de
-# razonamiento tiene un registro verificable de su proceso.</pre>
+# razonamiento tiene un registro verificable de su proceso.</code></pre>
 
       <div class="callout reveal-element">
         <p><strong>¿Por qué importa esto?</strong> Cuando un modelo de razonamiento se equivoca, puedes revisar su cadena de pensamiento para encontrar exactamente dónde falló el razonamiento. Con un modelo estándar, solo ves la respuesta incorrecta sin poder diagnosticar el problema.</p>
@@ -1634,7 +1635,7 @@ def modelo_razonamiento(pregunta):
 
       <p class="reveal-element">Para entender cómo estos componentes trabajan juntos, veamos una simulación simplificada del flujo de información:</p>
 
-      <pre class="code-block reveal-element">
+      <pre class="code-block reveal-element"><code class="language-python">
 # Simulación simplificada de un modelo multimodal
 import numpy as np
 
@@ -1695,7 +1696,7 @@ def responder_con_imagen(imagen, pregunta):
     secuencia = proyectar_a_espacio_comun(      # Unificar
         vectores_img, vectores_txt
     )
-    return modelo_unificado(secuencia)          # Generar respuesta</pre>
+    return modelo_unificado(secuencia)          # Generar respuesta</code></pre>
 
       <div class="callout reveal-element" style="border-left-color: var(--color-text);">
         <p><strong>Observación clave:</strong> Una vez que la imagen y el texto están en el mismo espacio vectorial, el Transformer los procesa de exactamente la misma manera que procesa cualquier secuencia de tokens. No hay un "código especial" para las imágenes — simplemente son otro tipo de token que el modelo aprendió a interpretar.</p>

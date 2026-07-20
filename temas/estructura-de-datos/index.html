@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
   <style>
     /* ========== Visuales de estructuras ========== */
     .ds-visual {
@@ -542,7 +543,7 @@
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 frutas = ["manzana", "platano", "naranja", "uva", "cereza"]
 
 # Acceso directo por indice — O(1)
@@ -551,7 +552,7 @@ print(frutas[2])  # → "naranja"
 # Insertar en medio — O(n), hay que mover elementos
 frutas.insert(1, "fresa")
 # → ["manzana", "fresa", "platano", "naranja", "uva", "cereza"]
-    </pre>
+    </code></pre>
 
     <!-- ============================================ -->
     <!-- 2. STACK Y QUEUE -->
@@ -601,7 +602,7 @@ frutas.insert(1, "fresa")
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # PILA — como una pila de platos
 pila = []
 pila.append("libro1")   # push
@@ -616,7 +617,7 @@ cola.append("ana")        # enqueue
 cola.append("luis")
 cola.append("pedro")
 print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
-    </pre>
+    </code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Usos reales:</strong> Las pilas se usan para el "deshacer" (Ctrl+Z), evaluar expresiones matematicas y el call stack de funciones. Las colas se usan en colas de impresion, mensajes pendientes y sistemas de atencion al cliente.</p>
@@ -693,7 +694,7 @@ print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 class Nodo:
     def __init__(self, dato):
         self.dato = dato
@@ -712,7 +713,7 @@ x.siguiente = c   # X apunta a C
 b.siguiente = x   # B ahora apunta a X
 
 # Resultado: A → B → X → C
-    </pre>
+    </code></pre>
 
     <!-- ============================================ -->
     <!-- 4. HASH TABLE -->
@@ -759,7 +760,7 @@ b.siguiente = x   # B ahora apunta a X
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Python: los diccionarios son tablas hash
 usuarios = {}
 
@@ -774,7 +775,7 @@ if "pedro@mail.com" in usuarios:
     print("Encontrado")
 else:
     print("No existe")  # ← Esto se ejecuta
-    </pre>
+    </code></pre>
 
     <div class="callout reveal-element">
       <p><strong>Colisiones:</strong> A veces dos claves generan la misma posicion. Se resuelve con encadenamiento (una lista en ese slot) o direccion abierta (buscar el siguiente slot libre). En la practica, las colisiones son raras con una buena funcion hash.</p>
@@ -837,7 +838,7 @@ else:
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 class NodoArbol:
     def __init__(self, valor):
         self.valor = valor
@@ -862,7 +863,7 @@ def buscar(nodo, valor):
 
 print(buscar(raiz, 6))   # → True
 print(buscar(raiz, 99))  # → False
-    </pre>
+    </code></pre>
 
     <!-- ============================================ -->
     <!-- 6. GRAFO -->
@@ -897,7 +898,7 @@ print(buscar(raiz, 99))  # → False
       </div>
     </div>
 
-    <pre class="code-block reveal-element">
+    <pre class="code-block reveal-element"><code class="language-python">
 # Grafo: diccionario de adyacencia
 grafo = {
     "A": ["B", "C"],      # A conectado con B y C
@@ -927,7 +928,7 @@ def bfs(grafo, inicio, objetivo):
     return None
 
 print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
-    </pre>
+    </code></pre>
 
     <!-- ============================================ -->
     <!-- 7. COMPARATIVA -->
