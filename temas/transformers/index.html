@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformers y el mecanismo de atención — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para ayudas visuales de la lección */
+    .word-relation-box {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .word-chain {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .word-token {
+      font-family: var(--font-mono);
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      position: relative;
+    }
+    .word-token.active {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.05);
+      font-weight: 600;
+    }
+    .word-token.highlight-strong {
+      border-color: var(--color-text);
+      background: rgba(44, 44, 43, 0.1);
+    }
+    .relation-line {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-2);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Deep Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Transformers y el mecanismo de atención</h1>
+    
+    <p>Si alguna vez usaste ChatGPT, usaste un Transformer. Esta arquitectura, creada en 2017 por Google, cambió por completo cómo las computadoras entienden nuestro lenguaje. En lugar de procesar la información palabra por palabra, aprendieron a mirar todo el contexto a la vez.</p>
+
+    <h2>1. La diferencia clave: Leer con lupa vs. Mirar la foto completa</h2>
+    <p>Para entender por qué son especiales, comparemos cómo leían los modelos antiguos frente a cómo lee un Transformer:</p>
+
+    <div class="callout reveal-element">
+      <p><strong>El modelo antiguo (Redes Recurrentes / RNNs):</strong> Imagina que lees un libro con una lupa, viendo solo una palabra a la vez. Para entender la palabra 10, tienes que recordar las 9 anteriores en orden. Si la oración es muy larga, para cuando llegas al final ya te olvidaste de cómo empezó.</p>
+    </div>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>El Transformer:</strong> En lugar de una lupa, toma una fotografía de toda la página a la vez. No lee en orden secuencial; analiza todas las palabras al mismo tiempo e identifica qué palabras se relacionan entre sí para darles sentido.</p>
+    </div>
+
+    <h2>2. El poder del contexto: El problema de la palabra "banco"</h2>
+    <p>El lenguaje humano está lleno de palabras con múltiples significados (polisemia). Una computadora necesita contexto para saber de qué estamos hablando.</p>
+    
+    <p>Analicemos estas dos oraciones con el concepto de <strong>Atención</strong>:</p>
+
+    <div class="word-relation-box reveal-element">
+      <p><strong>Caso A:</strong></p>
+      <div class="word-chain">
+        <span class="word-token">El</span>
+        <span class="word-token active">banco</span>
+        <span class="word-token">de</span>
+        <span class="word-token">la</span>
+        <span class="word-token highlight-strong">plaza</span>
+        <span class="word-token">estaba</span>
+        <span class="word-token">roto</span>
+      </div>
+      <p class="relation-line">→ Aquí, la palabra <strong>banco</strong> "presta atención" a <strong>plaza</strong> y <strong>roto</strong>. El modelo deduce que se refiere a un <em>asiento físico</em>.</p>
+    </div>
+
+    <div class="word-relation-box reveal-element">
+      <p><strong>Caso B:</strong></p>
+      <div class="word-chain">
+        <span class="word-token">El</span>
+        <span class="word-token active">banco</span>
+        <span class="word-token highlight-strong">central</span>
+        <span class="word-token">subió</span>
+        <span class="word-token">las</span>
+        <span class="word-token highlight-strong">tasas</span>
+      </div>
+      <p class="relation-line">→ Aquí, la palabra <strong>banco</strong> "presta atención" a <strong>central</strong> y <strong>tasas</strong>. El modelo deduce que se trata de una <em>institución financiera</em>.</p>
+    </div>
+
+    <h2>3. ¿Cómo calcula esto la computadora? (Query, Key y Value)</h2>
+    <p>Para decidir qué palabra se relaciona con cuál, el Transformer usa una fórmula matemática que funciona de manera muy similar a **hacer una búsqueda en YouTube**:</p>
+
+    <ul>
+      <li><strong>Query (Búsqueda):</strong> Es lo que la palabra actual está buscando. *(Ejemplo: "Busco palabras que definan mi significado físico o institucional")*.</li>
+      <li><strong>Key (Etiqueta):</strong> Es la etiqueta que ofrecen todas las demás palabras de la oración. *(Ejemplo: "plaza" tiene la etiqueta "lugar/exterior", "central" tiene la etiqueta "finanzas")*.</li>
+      <li><strong>Value (Contenido):</strong> Si la búsqueda (Query) coincide con una etiqueta (Key), se extrae la información de esa palabra para ajustar el significado final.</li>
+    </ul>
+
+    <p>Este cruce de búsquedas y etiquetas se realiza mediante multiplicaciones de matrices muy veloces que se pueden procesar en paralelo, lo que permite entrenar modelos con millones de textos de internet.</p>
+
+    <h2>4. Un ejemplo simplificado en código</h2>
+    <p>Para ver cómo se traduce esto a lógica, imagina que calculamos la fuerza de relación (atención) entre las palabras de la oración: <em>"El banco de la plaza"</em>.</p>
+
+    <div class="code-block reveal-element">
+# Simulación de la matriz de atención para la palabra "banco"
+palabras = ["El", "banco", "de", "la", "plaza"]
+
+# Valores calculados por el modelo que miden la relación (de 0 a 1)
+atencion_para_banco = {
+    "El": 0.05,
+    "banco": 1.00,  # Relación consigo mismo
+    "de": 0.05,
+    "la": 0.05,
+    "plaza": 0.85   # ¡Fuerte conexión contextual!
+}
+
+# El modelo aprende que "banco" y "plaza" forman un bloque de significado
+    </div>
+
+    <h2>5. El truco final: Positional Encoding</h2>
+    <p>Como el Transformer lee todo al mismo tiempo, no sabe qué palabra va primero y cuál va después. Para él, estas dos oraciones serían idénticas:</p>
+    
+    <ol>
+      <li>"El gato se comió al ratón"</li>
+      <li>"El ratón se comió al gato"</li>
+    </ol>
+
+    <p>Para solucionar esto, el Transformer añade una **coordenada de posición** a cada palabra antes de procesarla. Es como darle a cada palabra una etiqueta con su número de orden (Posición 1, Posición 2, etc.), asegurando que entienda la estructura de la oración sin sacrificar la velocidad de lectura paralela.</p>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/vision-transformers/index.html" class="btn btn-primary">Siguiente: Vision Transformers →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

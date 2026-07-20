@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelos de Razonamiento: Chain-of-Thought y más allá — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para modelo de razonamiento */
+    .reasoning-comparison {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+
+    @media (min-width: 640px) {
+      .reasoning-comparison {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .reasoning-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+    }
+
+    .reasoning-panel-header {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .reasoning-panel-header.standard {
+      color: var(--color-text-muted);
+    }
+
+    .reasoning-panel-header.cot {
+      color: var(--color-accent);
+    }
+
+    .reasoning-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    .step-number.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    .thinking-bubble {
+      background: var(--color-bg);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin: var(--space-3) 0;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+      position: relative;
+    }
+
+    .thinking-bubble::before {
+      content: "thinking...";
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-style: normal;
+      color: var(--color-accent);
+      display: block;
+      margin-bottom: var(--space-1);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .compute-scale-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+      padding: var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .scale-bar-track {
+      flex: 1;
+      height: 8px;
+      background: var(--color-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .scale-bar-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 4px;
+      transition: width 0.8s ease;
+    }
+
+    .scale-bar-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .scale-bar-value {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text);
+      white-space: nowrap;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .model-timeline {
+      position: relative;
+      padding-left: var(--space-5);
+      margin: var(--space-5) 0;
+    }
+
+    .model-timeline::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: calc(-1 * var(--space-5) + 4px);
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: 2px solid var(--color-bg);
+    }
+
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .timeline-title {
+      font-weight: 700;
+      margin-bottom: var(--space-1);
+    }
+
+    .timeline-desc {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+    }
+
+    .analogy-box {
+      background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+
+    .analogy-box-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Modelos GenAI</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Modelos de Razonamiento: Chain-of-Thought y más allá</h1>
+    
+    <p>Imagina que en un examen de matemáticas un estudiante escribe solo la respuesta final: <em>"42"</em>. Otro estudiante escribe cada paso que siguió para llegar a esa respuesta. Ambos pueden estar en lo correcto, pero si se equivocan, ¿quién tiene más probabilidades de haber llegado a la respuesta correcta? Exactamente el segundo. Los modelos de razonamiento aplican esta misma lógica: en lugar de saltar directamente a la respuesta, muestran su trabajo paso a paso.</p>
+
+    <div class="analogy-box reveal-element">
+      <div class="analogy-box-label">Analogía central</div>
+      <p>Piensa en un modelo de lenguaje estándar como un estudiante que memoriza respuestas. Piensa en un modelo de razonamiento como un estudiante que <strong>muestra su trabajo en el examen</strong>: escribe cada paso intermedio, verifica cada operación, y solo entonces entrega la respuesta final. El segundo estudiante no es necesariamente más inteligente, pero piensa de manera más rigurosa.</p>
+    </div>
+
+    <h2 class="reveal-element">1. ¿Qué es el Chain-of-Thought (Cadena de Pensamiento)?</h2>
+    <p>Chain-of-Thought es una técnica de prompting donde le pedimos al modelo que explique su razonamiento antes de dar una respuesta. En lugar de una pregunta directa, incluimos una instrucción como <strong>"piensa paso a paso"</strong> o <strong>"explica tu razonamiento"</strong>.</p>
+
+    <p>Comparémoslo con un modelo tradicional:</p>
+
+    <div class="reasoning-comparison reveal-element">
+      <div class="reasoning-panel">
+        <div class="reasoning-panel-header standard">Modelo estándar</div>
+        <div class="reasoning-step">
+          <span class="step-number">1</span>
+          <span>Recibe la pregunta</span>
+        </div>
+        <div class="reasoning-step">
+          <span class="step-number">2</span>
+          <span>Genera la respuesta directamente en un solo paso</span>
+        </div>
+        <div class="reasoning-step">
+          <span class="step-number">3</span>
+          <span>Si se equivoca, no hay forma de saber por qué</span>
+        </div>
+      </div>
+      <div class="reasoning-panel">
+        <div class="reasoning-panel-header cot">Con Chain-of-Thought</div>
+        <div class="reasoning-step">
+          <span class="step-number active">1</span>
+          <span>Recibe la pregunta</span>
+        </div>
+        <div class="reasoning-step">
+          <span class="step-number active">2</span>
+          <span>Descompone el problema en pasos intermedios</span>
+        </div>
+        <div class="reasoning-step">
+          <span class="step-number active">3</span>
+          <span>Resuelve cada paso individualmente</span>
+        </div>
+        <div class="reasoning-step">
+          <span class="step-number active">4</span>
+          <span>Llega a la respuesta final con justificación</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">2. ¿Por qué paso a paso mejora la precisión?</h2>
+    <p>El razonamiento paso a paso funciona por una razón simple: <strong>dividir un problema complejo en problemas pequeños es más fácil</strong>. Esto no es una intuición nueva — es lo que enseñan en todas las escuelas del mundo.</p>
+
+    <p>Cuando un modelo genera tokens de manera secuencial, cada token nuevo depende de los anteriores. Si el modelo genera primero el paso 1, luego el paso 2, y así sucesivamente, cada paso actúa como una <strong>señal intermedia</strong> que guía al modelo hacia la respuesta correcta.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La clave matemática:</strong> Un modelo que genera la respuesta en un solo paso tiene que acertar todo de golpe. Un modelo que da 10 pasos tiene 10 oportunidades de acertar en cada uno. La probabilidad de que <em>todos</em> los pasos sean correctos puede ser mayor que la de acertar el resultado final directamente, porque cada paso reduce la complejidad del problema siguiente.</p>
+    </div>
+
+    <p>Esto se relaciona con un concepto llamado <strong>test-time compute scaling</strong>: en lugar de gastar más recursos entrenando el modelo (pre-training), gastamos más recursos durante la inferencia — dejando que el modelo "piense más" antes de responder.</p>
+
+    <h2 class="reveal-element">3. Modelos de razonamiento dedicados: o1, o3 y DeepSeek-R1</h2>
+    <p>Más allá del simple truco de "piensa paso a paso", algunos modelos fueron diseñados específicamente para razonar. Estos modelos no solo siguen la instrucción de razonar: <strong>fueron entrenados para hacerlo de manera inherente</strong>.</p>
+
+    <div class="model-timeline reveal-element">
+      <div class="timeline-item">
+        <div class="timeline-date">Septiembre 2024</div>
+        <div class="timeline-title">OpenAI o1-preview</div>
+        <div class="timeline-desc">El primer modelo de razonamiento de OpenAI. Entrenado con refuerzo para generar cadenas de pensamiento largas y detalladas antes de responder.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Diciembre 2024</div>
+        <div class="timeline-title">DeepSeek-R1</div>
+        <div class="timeline-desc">Modelo abierto que demostró que el razonamiento profundo no era exclusivo de laboratorios gigantes. Entrenado con RL sobre modelos base de 7B a 70B parámetros.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Enero 2025</div>
+        <div class="timeline-title">OpenAI o3-mini</div>
+        <div class="timeline-desc">Versión optimizada que balancea razonamiento profundo con costo computacional, haciendo el razonamiento accesible para más casos de uso.</div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>La diferencia fundamental:</strong> Un modelo estándar como GPT-4 responde preguntas. Un modelo de razonamiento como o1 <strong>se detiene a pensar</strong>. Puedes verlo en la interfaz: hay una animación de "thinking" donde el modelo genera tokens intermedios que el usuario normalmente no ve, pero que son cruciales para llegar a la respuesta correcta.</p>
+    </div>
+
+    <h2 class="reveal-element">4. Test-Time Compute Scaling: Pensar más cuesta más</h2>
+    <p>Existe una relación directa entre cuánto "piensa" un modelo y la calidad de su respuesta. Esto se llama <strong>escalamiento de computación en tiempo de prueba</strong> (test-time compute scaling).</p>
+
+    <p>Mientras que el escalamiento tradicional se enfoca en hacer el modelo más grande durante el entrenamiento, este enfoque gasta más cómputo durante la inferencia:</p>
+
+    <div class="compute-scale-bar reveal-element">
+      <span class="scale-bar-label">Razonamiento rápido</span>
+      <div class="scale-bar-track">
+        <div class="scale-bar-fill" style="width: 20%;"></div>
+      </div>
+      <span class="scale-bar-value">~100 tokens</span>
+    </div>
+
+    <div class="compute-scale-bar reveal-element">
+      <span class="scale-bar-label">Razonamiento medio</span>
+      <div class="scale-bar-track">
+        <div class="scale-bar-fill" style="width: 50%;"></div>
+      </div>
+      <span class="scale-bar-value">~1,000 tokens</span>
+    </div>
+
+    <div class="compute-scale-bar reveal-element">
+      <span class="scale-bar-label">Razonamiento profundo</span>
+      <div class="scale-bar-track">
+        <div class="scale-bar-fill" style="width: 90%;"></div>
+      </div>
+      <span class="scale-bar-value">~10,000 tokens</span>
+    </div>
+
+    <p>Los modelos de razonamiento pueden generar miles de tokens de "pensamiento interno" antes de producir una respuesta final. Cada token intermedio es un paso en la cadena de razonamiento.</p>
+
+    <h2 class="reveal-element">5. Simulación: Cómo funciona el razonamiento en la práctica</h2>
+    <p>Para visualizar la diferencia entre un modelo estándar y uno de razonamiento, veamos una simulación simplificada:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación: Resolución de un problema de lógica
+# Pregunta: "Si María tiene el doble de años que Juan,
+#            y juntos tienen 45 años, ¿cuántos años tiene María?"
+
+# ============ MODELO ESTÁNDAR ============
+def modelo_estandar(pregunta):
+    # El modelo genera una respuesta directa sin razonamiento
+    respuesta = "María tiene 30 años"
+    return respuesta
+    # Resultado: Puede ser correcto O incorrecto, sin explicación
+
+# ============ MODELO DE RAZONAMIENTO ============
+def modelo_razonamiento(pregunta):
+    pensamiento = []
+
+    # Paso 1: Identificar las variables
+    pensamiento.append("Juan tiene J años")
+    pensamiento.append("María tiene 2*J años (el doble)")
+
+    # Paso 2: Establecer la ecuación
+    pensamiento.append("J + 2*J = 45")
+    pensamiento.append("3*J = 45")
+
+    # Paso 3: Resolver
+    pensamiento.append("J = 45 / 3 = 15")
+    pensamiento.append("María = 2 * 15 = 30")
+
+    # Verificación cruzada
+    pensamiento.append("Verificar: 15 + 30 = 45 ✓")
+
+    return {
+        "razonamiento": pensamiento,
+        "respuesta": "María tiene 30 años"
+    }
+
+# Ambos llegan a la misma respuesta, pero el modelo de
+# razonamiento tiene un registro verificable de su proceso.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>¿Por qué importa esto?</strong> Cuando un modelo de razonamiento se equivoca, puedes revisar su cadena de pensamiento para encontrar exactamente dónde falló el razonamiento. Con un modelo estándar, solo ves la respuesta incorrecta sin poder diagnosticar el problema.</p>
+    </div>
+
+    <h2 class="reveal-element">El futuro del razonamiento</h2>
+    <p>Los modelos de razonamiento están cambiando la forma en que interactuamos con la IA. Ya no basta con preguntar algo y esperar una respuesta: ahora podemos pedirle a la IA que piense en voz alta, que verifique su trabajo, y que muestre su proceso. Esto abre puertas a aplicaciones donde la precisión y la trazabilidad del razonamiento son críticas: matemáticas, programación, medicina, y derecho.</p>
+
+    <p>La pregunta ya no es <em>"¿cuán grande es el modelo?"</em>, sino <em>"¿cuán profundo puede pensar?"</em>.</p>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/modelos-multimodales/index.html" class="btn btn-primary">Siguiente: Modelos Multimodales →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

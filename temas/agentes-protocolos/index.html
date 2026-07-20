@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentes y Ecosistemas — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* === Estilos de sección del mega-page === */
+    .mega-section-divider {
+      border: none;
+      border-top: 2px solid var(--color-border);
+      margin: var(--space-6) 0;
+    }
+    .mega-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4) var(--space-5);
+      margin: var(--space-5) 0;
+    }
+    .mega-toc h2 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-3);
+    }
+    .mega-toc ol {
+      padding-left: var(--space-4);
+      margin: 0;
+    }
+    .mega-toc li {
+      margin-bottom: var(--space-2);
+      font-size: 0.95rem;
+    }
+    .mega-toc a {
+      color: var(--color-text);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+    .mega-toc a:hover {
+      color: var(--color-accent);
+    }
+
+    /* === Estilos de Agentes IA === */
+    .agent-loop-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-5) 0;
+    }
+    .loop-step {
+      width: 100%;
+      max-width: 420px;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+    .loop-step.active {
+      border-left-color: var(--color-text);
+      background: rgba(154, 42, 42, 0.05);
+      transform: scale(1.03);
+    }
+    .loop-arrow {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+    }
+    .loop-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .framework-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .framework-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .framework-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .framework-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .memory-diagram {
+      display: flex;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+      flex-wrap: wrap;
+    }
+    .memory-box {
+      flex: 1;
+      min-width: 200px;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .memory-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+    .memory-box p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-4) 0;
+      font-size: 0.95rem;
+    }
+    .comparison-table th {
+      text-align: left;
+      padding: var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .comparison-table td {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* === Estilos de Function Calling === */
+    .restaurant-flow {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: var(--space-5) 0;
+      max-width: 520px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .flow-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .flow-text {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+    }
+    .flow-text strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+    .flow-arrow-down {
+      text-align: center;
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+      margin-left: 24px;
+    }
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-4) 0;
+      font-size: 0.9rem;
+    }
+    .param-table th {
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .param-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+    .param-table code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--color-bg);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+    .step-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+    .chain-visual {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+    .chain-block {
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .chain-block.accent {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.05);
+    }
+    .chain-arrow {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* === Estilos de Skills === */
+    .recipe-book {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+    }
+    .recipe-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      border-top: 3px solid var(--color-accent);
+    }
+    .recipe-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .recipe-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .skill-vs-prompt {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+    @media (max-width: 600px) {
+      .skill-vs-prompt {
+        grid-template-columns: 1fr;
+      }
+    }
+    .compare-box {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .compare-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-3);
+    }
+    .compare-box ul {
+      list-style: none;
+      padding: 0;
+    }
+    .compare-box li {
+      font-size: 0.9rem;
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+    }
+    .compare-box li:last-child {
+      border-bottom: none;
+    }
+    .compare-box li strong {
+      color: var(--color-text);
+    }
+    .composition-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+    .comp-block {
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .comp-block.skill {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.04);
+    }
+    .comp-plus {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+    .comp-equals {
+      font-family: var(--font-mono);
+      color: var(--color-accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .platform-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .platform-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .platform-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .dynamic-load-visual {
+      margin: var(--space-5) 0;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .load-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .load-step:last-child {
+      border-bottom: none;
+    }
+    .load-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .load-content {
+      font-size: 0.95rem;
+    }
+    .load-content code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--color-bg);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* === Estilos de MCP === */
+    .usb-analogy {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+      max-width: 560px;
+    }
+    .usb-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .usb-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .usb-text {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .usb-text strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+    .usb-text p {
+      margin-bottom: 0;
+      font-size: 0.95rem;
+    }
+    .usb-connector {
+      text-align: center;
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      padding: var(--space-1) 0;
+    }
+    .arch-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--space-3);
+      align-items: center;
+      margin: var(--space-5) 0;
+    }
+    @media (max-width: 600px) {
+      .arch-diagram {
+        grid-template-columns: 1fr;
+      }
+    }
+    .arch-box {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+    .arch-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+    .arch-box p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .arch-connector {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .feature-item {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .feature-item h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .feature-item p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .impl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .impl-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .impl-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .impl-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta reveal-element">
+      <span class="topic-badge">Agentes &amp; Protocolos</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1 class="reveal-element">Agentes y Ecosistemas</h1>
+    
+    <p class="reveal-element">Los agentes de IA representan el salto más importante en la evolución de los modelos de lenguaje: de simples generadores de texto a sistemas autónomos que observan, razonan y actúan sobre el mundo real. Este mega-tema recorre los cuatro pilares que conforman el ecosistema moderno de agentes: el bucle de decisión-acción que los gobierna, el function calling que les permite usar herramientas, las skills que encapsulan conocimiento reutilizable, y el Model Context Protocol que estandariza cómo se conectan con el mundo exterior.</p>
+
+    <div class="mega-toc reveal-element">
+      <h2>Contenido</h2>
+      <ol>
+        <li><a href="#agentes-ia">Agentes de IA: El loop de decisión-acción</a></li>
+        <li><a href="#function-calling">Function Calling: Uso de herramientas</a></li>
+        <li><a href="#skills">Skills: Contexto reutilizable para agentes</a></li>
+        <li><a href="#mcp">MCP: Model Context Protocol</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5.1 AGENTES DE IA -->
+    <!-- ============================================ -->
+    <hr class="mega-section-divider">
+    <h2 id="agentes-ia" class="reveal-element">5.1 Agentes de IA: El loop de decisión-acción</h2>
+    
+    <p class="reveal-element">Un chatbot te responde. Un agente hace cosas por ti. La diferencia es fundamental: mientras un chatbot genera texto y se detiene, un agente observa su entorno, toma decisiones y ejecuta acciones reales hasta completar un objetivo. Piensa en un asistente personal que no solo conversa, sino que busca información, ejecuta comandos, gestiona tu calendario y coordina con otros servicios para lograr lo que le pediste.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía clave:</strong> Un chatbot es como un diccionario: puedes preguntarle cosas y te da respuestas. Un agente de IA es como un asistente personal competente: le das un objetivo ("organiza mi viaje a Barcelona"), y él coordina reservas, busca vuelos, verifica disponibilidad y te entrega un plan completo. La diferencia no está en la inteligencia, sino en la capacidad de <em>actuar</em>.</p>
+    </div>
+
+    <h3 class="reveal-element">1. La diferencia entre un chatbot y un agente</h3>
+    <p class="reveal-element">Un chatbot tradicional opera en un ciclo simple: recibe una pregunta y genera una respuesta. No tiene acceso a herramientas externas, no mantiene memoria entre interacciones, y no puede ejecutar acciones en el mundo real. Un agente de IA rompe esas limitaciones al integrar tres capacidades adicionales:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Capacidad</th>
+          <th>Chatbot</th>
+          <th>Agente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Generación de texto</strong></td>
+          <td>Sí</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td><strong>Acceso a herramientas</strong></td>
+          <td>No</td>
+          <td>Sí (APIs, bases de datos, código)</td>
+        </tr>
+        <tr>
+          <td><strong>Memoria persistente</strong></td>
+          <td>No (solo ventana actual)</td>
+          <td>Sí (corto y largo plazo)</td>
+        </tr>
+        <tr>
+          <td><strong>Planificación multi-paso</strong></td>
+          <td>No</td>
+          <td>Sí (descompone tareas complejas)</td>
+        </tr>
+        <tr>
+          <td><strong>Ejecución autónoma</strong></td>
+          <td>No (espera input humano)</td>
+          <td>Sí (bucle decisión-acción)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="reveal-element">2. El bucle Observe-Piensa-Actúa</h3>
+    <p class="reveal-element">Todo agente de IA gira alrededor de un ciclo fundamental: observar, pensar y actuar. Este bucle se repite iterativamente hasta que el agente considera que la tarea está completa.</p>
+
+    <div class="agent-loop-visual reveal-element">
+      <div class="loop-label">Paso 1</div>
+      <div class="loop-step active" id="loop-observe">OBSERVAR — Recopilar información del entorno</div>
+      <div class="loop-arrow">↓</div>
+      <div class="loop-label">Paso 2</div>
+      <div class="loop-step" id="loop-think">PENSAR — Analizar, planificar y decidir la siguiente acción</div>
+      <div class="loop-arrow">↓</div>
+      <div class="loop-label">Paso 3</div>
+      <div class="loop-step" id="loop-act">ACTUAR — Ejecutar la acción mediante una herramienta</div>
+      <div class="loop-arrow">↻</div>
+      <div class="loop-label" style="color: var(--color-accent); font-weight: 600;">¿Objetivo completado? Si no → repetir</div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Cada paso del bucle tiene un rol claro:</strong> <strong>Observar</strong> es recopilar datos (leer un archivo, consultar una API, recibir la respuesta del usuario). <strong>Pensar</strong> es razonar sobre qué hacer con esos datos (el LLM decide qué herramienta usar y con qué parámetros). <strong>Actuar</strong> es ejecutar la herramienta seleccionada y obtener un resultado.</p>
+    </div>
+
+    <h3 class="reveal-element">3. Memoria: Corto plazo y largo plazo</h3>
+    <p class="reveal-element">Un agente sin memoria es como un employado que olvida todo lo que le dijiste cada vez que te vas de la habitación. Los agentes modernos manejan dos tipos de memoria que les permiten mantener contexto y aprender:</p>
+
+    <div class="memory-diagram reveal-element">
+      <div class="memory-box">
+        <h4>Memoria a corto plazo</h4>
+        <p>Es el contexto de la conversación actual. Se almacena en la ventana de contexto del LLM (el "buffer" de tokens). Cuando se llena, los datos más antiguos se descartan. Es rápida pero limitada en capacidad.</p>
+      </div>
+      <div class="memory-box">
+        <h4>Memoria a largo plazo</h4>
+        <p>Es información persistente guardada externamente: bases de vectores, archivos, bases de datos. Permite al agente recordar interacciones pasadas, preferencias del usuario y conocimiento acumulado entre sesiones.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">La memoria a largo plazo funciona de manera similar a un RAG (Retrieval-Augmented Generation): el agente almacena información en un vector store y la recupera por similitud cuando la necesita. Esto le permite mantener contexto sin saturar la ventana de tokens.</p>
+
+    <h3 class="reveal-element">4. Estrategias de planificación</h3>
+    <p class="reveal-element">No todas las tareas se pueden resolver con un solo paso. Los agentes necesitan estrategias para descomponer problemas complejos en pasos manejables:</p>
+
+    <ul class="reveal-element">
+      <li><strong>Planificación reactiva:</strong> El agente toma una acción a la vez, evalúa el resultado y decide el siguiente paso. Es simple pero puede ser lento para tareas complejas.</li>
+      <li><strong>Planificación jerárquica:</strong> El agente genera un plan completo antes de ejecutar, con sub-tareas y dependencias. Más eficiente pero requiere mayor capacidad de razonamiento.</li>
+      <li><strong>Planificación por reflejo:</strong> El agente tiene reglas predefinidas que activan ciertas acciones bajo ciertas condiciones. Rápido pero inflexible.</li>
+      <li><strong>Planificación con herramientas:</strong> El agente delega partes de la planificación a herramientas especializadas (por ejemplo, un planificador que genera un DAG de tareas).</li>
+    </ul>
+
+    <h3 class="reveal-element">5. Sistemas multi-agente y frameworks reales</h3>
+    <p class="reveal-element">Los agentes más poderosos no trabajan solos. Los sistemas multi-agente coordinan varios agentes especializados, cada uno con un rol específico, para resolver problemas que un solo agente no podría abordar eficientemente.</p>
+
+    <div class="framework-grid reveal-element">
+      <div class="framework-card">
+        <h4>LangChain / LangGraph</h4>
+        <p>Framework modular para construir agentes con grafo de estados. Permite definir nodos (acciones) y aristas (transiciones) para crear flujos complejos con control total.</p>
+      </div>
+      <div class="framework-card">
+        <h4>AutoGPT</h4>
+        <p>Uno de los primeros agentes autónomos de código abierto. Genera sus propios prompts y ejecuta tareas de forma iterativa sin intervención humana.</p>
+      </div>
+      <div class="framework-card">
+        <h4>CrewAI</h4>
+        <p>Framework para orquestar equipos de agentes con roles definidos (investigador, escritor, revisor). Cada agente tiene herramientas y objetivos específicos.</p>
+      </div>
+      <div class="framework-card">
+        <h4>OpenAI Assistants</h4>
+        <p>API gestionada que proporciona agentes con herramientas integradas (code interpreter, file search, function calling). Abstracta la complejidad del loop.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal-element">6. Simulación: Un agente en acción</h3>
+    <p class="reveal-element">Veamos cómo se ve el bucle de un agente en pseudocódigo simplificado. Imagina un agente que debe investigar un tema y crear un resumen:</p>
+
+    <pre class="code-block reveal-element">class AgenteIA:
+    def __init__(self, llm, herramientas, memoria):
+        self.llm = llm                # El modelo de lenguaje (cerebro)
+        self.herramientas = herramientas  # Dict de herramientas disponibles
+        self.memoria = memoria        # Almacén de corto y largo plazo
+        self.historial = []           # Registro de acciones tomadas
+
+    def ejecutar(self, objetivo):
+        """Bucle principal: Observe → Piensa → Actúa"""
+        while not self.objetivo_cumplido(objetivo):
+            # 1. OBSERVAR: Recopilar contexto actual
+            contexto = self.construir_contexto(objetivo)
+            
+            # 2. PENSAR: El LLM decide la siguiente acción
+            decision = self.llm.predict(f"""
+                Objetivo: {objetivo}
+                Contexto: {contexto}
+                Historial: {self.historial}
+                ¿Qué herramienta debo usar y con qué parámetros?
+            """)
+            
+            # 3. ACTUAR: Ejecutar la herramienta elegida
+            herramienta = self.herramientas[decision.nombre]
+            resultado = herramienta.ejecutar(decision.parametros)
+            
+            # Guardar en memoria
+            self.historial.append({
+                "accion": decision.nombre,
+                "parametros": decision.parametros,
+                "resultado": resultado
+            })
+            
+            # Evaluar si el objetivo se cumplió
+            if self.es_suficiente(resultado, objetivo):
+                return self.sintetizar_respuesta()
+        
+        return "Se alcanzó el límite de iteraciones"</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Nota sobre la implementación real:</strong> En la práctica, los frameworks como LangChain ya implementan este bucle internamente. El desarrollador define las herramientas, el objetivo y la estrategia de planificación, y el framework se encarga del ciclo observe-piensa-actúa. Lo importante es entender el patrón subyacente para poder diseñar, depurar y mejorar agentes efectivos.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5.2 FUNCTION CALLING -->
+    <!-- ============================================ -->
+    <hr class="mega-section-divider">
+    <h2 id="function-calling" class="reveal-element">5.2 Function Calling: Uso de herramientas</h2>
+    
+    <p class="reveal-element">Un LLM por sí solo solo puede generar texto. Function calling es el mecanismo que le permite decir "necesito usar esta herramienta con estos datos" en lugar de simplemente inventar una respuesta. Es la diferencia entre un modelo que te dice "hace calor hoy" y uno que consulta una API del clima y te da la temperatura exacta de tu ciudad.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía del restaurante:</strong> Piensa en un LLM como un cliente en un restaurante. El cliente sabe qué quiere comer (el objetivo), pero no puede cocinar. Le dice al mesero (el sistema): "Quiero una pasta al pesto sin frutos secos". El mesero traduce eso a una orden específica (function call) para la cocina (API externa), la cocina prepara el plato, y el mesero regresa con el resultado (la respuesta de la función). El cliente nunca entra a la cocina — solo recibe el resultado.</p>
+    </div>
+
+    <h3 class="reveal-element">1. ¿Cómo funciona el mecanismo?</h3>
+    <p class="reveal-element">El proceso de function calling sigue un flujo preciso entre el usuario, el LLM y las herramientas externas:</p>
+
+    <div class="restaurant-flow reveal-element">
+      <div class="flow-row">
+        <div class="flow-icon">👤</div>
+        <div class="flow-text">
+          <strong>Usuario</strong>
+          "¿Qué tiempo hace en Buenos Aires mañana?"
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-text">
+          <strong>LLM analiza</strong>
+          Identifica que necesita datos externos. Decide llamar a <code>obtener_clima(ciudad="Buenos Aires", fecha="mañana")</code>
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">⚡</div>
+        <div class="flow-text">
+          <strong>Sistema ejecuta</strong>
+          Envía la llamada a la API del clima con los parámetros exactos
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">📡</div>
+        <div class="flow-text">
+          <strong>API responde</strong>
+          Retorna: <code>{"temp": 22, "condicion": "parcialmente nublado", "lluvia": 30}</code>
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-text">
+          <strong>LLM integra</strong>
+          "Mañana en Buenos Aires habrá 22°C con cielo parcialmente nublado. Hay 30% de probabilidad de lluvia, llevá paraguas."
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Punto clave:</strong> El LLM nunca ejecuta la función directamente. Solo <em>genera</em> la llamada con el nombre correcto y los parámetros correctos. Es el sistema externo (el runtime del agente) quien realmente conecta con la API y ejecuta la operación.</p>
+    </div>
+
+    <h3 class="reveal-element">2. Formato de la llamada: Request y Response</h3>
+    <p class="reveal-element">Cada function call tiene un formato estructurado. Primero, el desarrollador define las herramientas disponibles para el modelo. Luego, cuando el modelo decide usar una herramienta, genera un JSON con la estructura esperada:</p>
+
+    <span class="step-badge reveal-element">Paso 1: Definición de herramientas</span>
+    <pre class="code-block reveal-element">{
+  "nombre": "obtener_clima",
+  "descripcion": "Obtiene el pronóstico del clima para una ciudad",
+  "parametros": {
+    "type": "object",
+    "properties": {
+      "ciudad": {
+        "type": "string",
+        "description": "Nombre de la ciudad"
+      },
+      "fecha": {
+        "type": "string",
+        "enum": ["hoy", "mañana", "pasado"],
+        "description": "Para qué día se consulta"
+      }
+    },
+    "required": ["ciudad"]
+  }
+}</pre>
+
+    <span class="step-badge reveal-element">Paso 2: Respuesta del modelo (function call)</span>
+    <pre class="code-block reveal-element">{
+  "tool_calls": [
+    {
+      "id": "call_abc123",
+      "function": {
+        "name": "obtener_clima",
+        "arguments": "{\"ciudad\": \"Buenos Aires\", \"fecha\": \"mañana\"}"
+      }
+    }
+  ]
+}</pre>
+
+    <span class="step-badge reveal-element">Paso 3: Resultado devuelto al modelo</span>
+    <pre class="code-block reveal-element">{
+  "tool_call_id": "call_abc123",
+  "output": {
+    "ciudad": "Buenos Aires",
+    "temperatura": 22,
+    "condicion": "parcialmente nublado",
+    "probabilidad_lluvia": 30,
+    "viento_kmh": 15
+  }
+}</pre>
+
+    <h3 class="reveal-element">3. Validación de parámetros</h3>
+    <p class="reveal-element">El sistema valida que los parámetros generados por el modelo coincidan con el esquema definido. Esto previene errores en tiempo de ejecución:</p>
+
+    <table class="param-table reveal-element">
+      <thead>
+        <tr>
+          <th>Parámetro</th>
+          <th>Tipo</th>
+          <th>Requerido</th>
+          <th>Validación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ciudad</code></td>
+          <td>string</td>
+          <td>Sí</td>
+          <td>No puede estar vacío</td>
+        </tr>
+        <tr>
+          <td><code>fecha</code></td>
+          <td>enum</td>
+          <td>No</td>
+          <td>Debe ser "hoy", "mañana" o "pasado"</td>
+        </tr>
+        <tr>
+          <td><code>unidades</code></td>
+          <td>enum</td>
+          <td>No</td>
+          <td>Debe ser "celsius" o "fahrenheit"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">Si el modelo genera un parámetro inválido (por ejemplo, una fecha fuera del enum), el sistema puede rechazar la llamada antes de ejecutarla, o devolver un error que el modelo puede usar para corregir su respuesta.</p>
+
+    <h3 class="reveal-element">4. Llamadas encadenadas y ejecución paralela</h3>
+    <p class="reveal-element">Las tareas complejas suelen requerir múltiples llamadas a herramientas. Hay dos patrones principales:</p>
+
+    <p class="reveal-element"><strong>Encadenamiento secuencial:</strong> Cada llamada depende del resultado de la anterior. El modelo genera una llamada, recibe el resultado, decide la siguiente, y así sucesivamente.</p>
+
+    <div class="chain-visual reveal-element">
+      <div class="chain-block accent">buscar_usuario("pablo")</div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-block">obtener_pedidos(id=42)</div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-block">calcular_total(pedidos)</div>
+    </div>
+
+    <p class="reveal-element"><strong>Ejecución paralela:</strong> Cuando las llamadas son independientes, el modelo puede generar múltiples tool calls en una sola respuesta. El sistema las ejecuta simultáneamente y devuelve todos los resultados juntos.</p>
+
+    <div class="chain-visual reveal-element">
+      <div class="chain-block accent">obtener_clima("Buenos Aires")</div>
+      <span class="chain-arrow">+</span>
+      <div class="chain-block accent">obtener_clima("Córdoba")</div>
+      <span class="chain-arrow">+</span>
+      <div class="chain-block accent">obtener_clima("Mendoza")</div>
+    </div>
+
+    <h3 class="reveal-element">5. Ejemplo real: Consulta a una base de datos</h3>
+    <p class="reveal-element">Veamos un ejemplo completo de cómo un asistente de e-commerce usa function calling para responder preguntas sobre pedidos:</p>
+
+    <pre class="code-block reveal-element">import json
+
+# Herramientas disponibles para el asistente
+herramientas = [
+    {
+        "nombre": "buscar_producto",
+        "descripcion": "Busca productos por nombre o categoría",
+        "parametros": {
+            "consulta": "string (requerido)",
+            "categoria": "string (opcional)",
+            "precio_maximo": "number (opcional)"
+        }
+    },
+    {
+        "nombre": "consultar_stock",
+        "descripcion": "Verifica disponibilidad de un producto",
+        "parametros": {
+            "producto_id": "string (requerido)",
+            "sucursal": "string (opcional)"
+        }
+    },
+    {
+        "nombre": "crear_pedido",
+        "descripcion": "Crea un nuevo pedido con los productos indicados",
+        "parametros": {
+            "productos": "array de {id, cantidad} (requerido)",
+            "direccion_envio": "string (requerido)"
+        }
+    }
+]
+
+# Simulación: el usuario hace una pregunta
+pregunta = "¿Tienen auriculares bluetooth por menos de $50.000?"
+
+# El LLM decide qué herramienta usar
+decision_llm = {
+    "tool_calls": [{
+        "function": {
+            "name": "buscar_producto",
+            "arguments": json.dumps({
+                "consulta": "auriculares bluetooth",
+                "precio_maximo": 50000
+            })
+        }
+    }]
+}
+
+# El sistema ejecuta la función
+resultado_real = buscar_producto(
+    consulta="auriculares bluetooth",
+    precio_maximo=50000
+)
+# → [{"id": "AUR001", "nombre": "Sony WH-CH520", "precio": 35000},
+#    {"id": "AUR002", "nombre": "JBL Tune 510BT", "precio": 28000}]
+
+# El LLM integra el resultado en una respuesta natural
+respuesta = "Sí, tenemos dos opciones por debajo de $50.000:
+  1. Sony WH-CH520 — $35.000
+  2. JBL Tune 510BT — $28.000
+  ¿Querés que verifique el stock de alguno?"</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>La ventaja de function calling:</strong> El LLM no "inventa" precios ni inventarios. Consulta datos reales del sistema y genera una respuesta precisa y actualizada. Si no encuentra resultados, simplemente lo informa en lugar de fabricar información.</p>
+    </div>
+
+    <h3 class="reveal-element">6. Consideraciones importantes</h3>
+    <p class="reveal-element">Function calling no es infalible. Hay varios aspectos a tener en cuenta al diseñar un sistema con herramientas:</p>
+
+    <ul class="reveal-element">
+      <li><strong>El modelo puede equivocarse:</strong> A veces genera parámetros incorrectos o elige la herramienta equivocada. Siempre validar las llamadas antes de ejecutarlas.</li>
+      <li><strong>Seguridad:</strong> Si una función puede modificar datos o ejecutar código, el agente necesita permisos bien definidos. Nunca expongas funciones destructivas sin validación humana.</li>
+      <li><strong>Latencia:</strong> Cada llamada a herramienta agrega tiempo. Las llamadas paralelas mitigan esto, pero el encadenamiento secuencial puede ser lento.</li>
+      <li><strong>Límites de la ventana:</strong> El resultado de cada función consume tokens en la ventana de contexto. Si los resultados son muy grandes, el modelo puede perder información importante.</li>
+    </ul>
+
+    <!-- ============================================ -->
+    <!-- 5.3 SKILLS -->
+    <!-- ============================================ -->
+    <hr class="mega-section-divider">
+    <h2 id="skills" class="reveal-element">5.3 Skills: Contexto reutilizable para agentes</h2>
+    
+    <p class="reveal-element">Un chef experimentado no memoriza cada receta desde cero cada vez que cocina. Tiene un libro de recetas: cada receta es un conjunto de instrucciones que puede consultar, adaptar y ejecutar en cualquier momento. Las skills en agentes de IA funcionan igual: son paquetes reutilizables de instrucciones, contexto y herramientas que un agente puede cargar dinámicamente según la tarea que necesite resolver.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía del chef:</strong> Un chef sin libro de recetas tendría que reinventar cada platillo desde cero cada vez. Un chef con un libro puede preparar cualquier receta que conozca, combinar sabores de diferentes recetas, e incluso crear nuevas variantes a partir de las que ya tiene. Las skills son ese libro de recetas para agentes de IA: cada skill encapsula un conjunto de conocimientos e instrucciones que el agente puede activar bajo demanda.</p>
+    </div>
+
+    <h3 class="reveal-element">1. ¿Qué es una skill exactamente?</h3>
+    <p class="reveal-element">Una skill es un módulo reutilizable que contiene tres componentes esenciales:</p>
+
+    <div class="recipe-book reveal-element">
+      <div class="recipe-card">
+        <h4>Instrucciones</h4>
+        <p>Prompt o conjunto de directrices que definen cómo el agente debe abordar un tipo específico de tarea. Incluye formato de salida, restricciones y mejores prácticas.</p>
+      </div>
+      <div class="recipe-card">
+        <h4>Herramientas</h4>
+        <p>Funciones o APIs específicas que el agente puede invocar cuando esta skill está activa. No todas las skills necesitan herramientas, pero la mayoría sí.</p>
+      </div>
+      <div class="recipe-card">
+        <h4>Contexto</h4>
+        <p>Ejemplos, plantillas, datos de referencia y conocimiento especializado que el agente necesita para ejecutar la skill correctamente.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">Una skill no es solo un prompt más largo. Es una estructura modular que encapsula todo lo que un agente necesita para realizar un dominio específico de tareas. Cuando el agente detecta que una tarea coincide con una skill disponible, carga esa skill y la usa como marco de referencia.</p>
+
+    <h3 class="reveal-element">2. Skills vs. Prompts: La diferencia clave</h3>
+    <p class="reveal-element">Es fácil confundir skills con prompts, pero son conceptos distintos con propósitos diferentes:</p>
+
+    <div class="skill-vs-prompt reveal-element">
+      <div class="compare-box">
+        <h4>Prompt simple</h4>
+        <ul>
+          <li><strong>Estático:</strong> Se define una vez y no cambia</li>
+          <li><strong>Genérico:</strong> Funciona para muchas tareas del mismo tipo</li>
+          <li><strong>Sin estado:</strong> No recuerda interacciones anteriores</li>
+          <li><strong>Sin herramientas:</strong> Solo genera texto</li>
+          <li><strong>Sin composición:</strong> No se combina con otros prompts</li>
+        </ul>
+      </div>
+      <div class="compare-box">
+        <h4>Skill</h4>
+        <ul>
+          <li><strong>Dinámico:</strong> Se carga y descarga bajo demanda</li>
+          <li><strong>Especializado:</strong> Optimizado para un dominio específico</li>
+          <li><strong>Con estado:</strong> Puede mantener contexto entre pasos</li>
+          <li><strong>Con herramientas:</strong> Integra funciones ejecutables</li>
+          <li><strong>Componible:</strong> Se combina con otras skills</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Ejemplo práctico:</strong> Un prompt diría "Sos un asistente de atención al cliente". Una skill de atención al cliente incluiría: las instrucciones de tono y protocolo, acceso a la base de conocimiento de productos, funciones para consultar el estado de pedidos, plantillas de respuestas para problemas comunes, y reglas de escalamiento a un humano.</p>
+    </div>
+
+    <h3 class="reveal-element">3. Composición de skills</h3>
+    <p class="reveal-element">Una de las ventajas más poderosas de las skills es que se pueden combinar. Un agente puede cargar múltiples skills simultáneamente para resolver tareas que requieren conocimiento de varios dominios:</p>
+
+    <div class="composition-flow reveal-element">
+      <div class="comp-block skill">Skill: Análisis de datos</div>
+      <span class="comp-plus">+</span>
+      <div class="comp-block skill">Skill: Visualización</div>
+      <span class="comp-plus">+</span>
+      <div class="comp-block skill">Skill: Escritura técnica</div>
+      <span class="comp-equals">=</span>
+      <div class="comp-block">Agente que genera informes con gráficos</div>
+    </div>
+
+    <p class="reveal-element">La composición permite crear agentes versátiles sin necesidad de entrenar un modelo gigantesco para todo. En lugar de eso, se arma un "set de habilidades" según la tarea. Es como darle a un empleado diferentes herramientas según el proyecto: para uno necesita un destornillador, para otro una sierra, y para otro ambas.</p>
+
+    <h3 class="reveal-element">4. Carga dinámica de skills</h3>
+    <p class="reveal-element">El proceso de carga dinámica permite al agente seleccionar y activar skills en tiempo de ejecución, sin necesidad de reiniciar o reconfigurar el modelo:</p>
+
+    <div class="dynamic-load-visual reveal-element">
+      <div class="load-step">
+        <div class="load-num">1</div>
+        <div class="load-content">El usuario envía una tarea: <code>"Genera un informe de ventas del Q1 con gráficos"</code></div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">2</div>
+        <div class="load-content">El enrutador analiza la intención y detecta que necesita: análisis de datos + visualización + escritura</div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">3</div>
+        <div class="load-content">Se cargan las skills relevantes al contexto: <code>skill_analisis</code>, <code>skill_graficos</code>, <code>skill_informes</code></div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">4</div>
+        <div class="load-content">El agente ejecuta la tarea usando las instrucciones y herramientas de cada skill activa</div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">5</div>
+        <div class="load-content">Al completar, las skills se descargan del contexto para liberar espacio de tokens</div>
+      </div>
+    </div>
+
+    <h3 class="reveal-element">5. Plataformas y su implementación de skills</h3>
+    <p class="reveal-element">Diversas plataformas han implementado variantes del concepto de skills para sus agentes:</p>
+
+    <div class="platform-grid reveal-element">
+      <div class="platform-card">
+        <h4>OpenAI (Custom GPTs)</h4>
+        <p>Permite crear "Custom GPTs" con instrucciones, archivos y acciones (APIs). Cada Custom GPT es esencialmente una skill empaquetada que se puede compartir y reutilizar.</p>
+      </div>
+      <div class="platform-card">
+        <h4>Anthropic (Claude Projects)</h4>
+        <p>Projects permite definir instrucciones de sistema, archivos de referencia y personalización. Funciona como un workspace con skills pre-cargadas para un dominio específico.</p>
+      </div>
+      <div class="platform-card">
+        <h4>LangChain (Tools + Agents)</h4>
+        <p>Tools en LangChain son equivalentes a skills atómicas. Se combinan en agents que pueden usar múltiples tools según la necesidad de cada paso.</p>
+      </div>
+      <div class="platform-card">
+        <h4>OpenAI (Assistants API)</h4>
+        <p>Los Assistants permiten definir "instructions" (skill base) + "tools" (herramientas) + "file_search" (contexto). Es la implementación más cercana a una skill completa.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal-element">6. Simulación: Sistema de skills en acción</h3>
+    <p class="reveal-element">Veamos una implementación simplificada de cómo un sistema de skills funciona en la práctica:</p>
+
+    <pre class="code-block reveal-element">class Skill:
+    def __init__(self, nombre, instrucciones, herramientas=None, contexto=None):
+        self.nombre = nombre
+        self.instrucciones = instrucciones   # Prompt especializado
+        self.herramientas = herramientas or []  # Funciones disponibles
+        self.contexto = contexto or ""        # Datos de referencia
+
+class AgenteConSkills:
+    def __init__(self, llm, biblioteca_skills):
+        self.llm = llm
+        self.biblioteca = biblioteca_skills  # Dict de skills disponibles
+        self.skills_activas = []
+    
+    def cargar_skill(self, nombre_skill):
+        """Carga una skill al contexto activo del agente"""
+        if nombre_skill in self.biblioteca:
+            skill = self.biblioteca[nombre_skill]
+            self.skills_activas.append(skill)
+            print(f"  Skill cargada: {skill.nombre}")
+    
+    def resolver_tarea(self, tarea):
+        # 1. Analizar qué skills necesita la tarea
+        skills_necesarias = self.analizar_necesidades(tarea)
+        
+        # 2. Cargar las skills relevantes
+        for nombre in skills_necesarias:
+            self.cargar_skill(nombre)
+        
+        # 3. Construir el contexto combinado
+        contexto_total = self.construir_contexto()
+        
+        # 4. Ejecutar con el LLM usando las skills activas
+        return self.llm.predict(f"""
+            {contexto_total}
+            
+            Tarea: {tarea}
+            
+            Resuelve la tarea usando las instrucciones
+            y herramientas de las skills cargadas.
+        """)
+    
+    def construir_contexto(self):
+        """Combina instrucciones y contexto de todas las skills activas"""
+        partes = []
+        for skill in self.skills_activas:
+            partes.append(f"--- Skill: {skill.nombre} ---")
+            partes.append(skill.instrucciones)
+            if skill.contexto:
+                partes.append(f"Contexto: {skill.contexto}")
+            if skill.herramientas:
+                nombres = [h.__name__ for h in skill.herramientas]
+                partes.append(f"Herramientas: {', '.join(nombres)}")
+        return "\n".join(partes)
+
+# Ejemplo de uso
+biblioteca = {
+    "analisis_datos": Skill(
+        nombre="Análisis de datos",
+        instrucciones="Analiza datasets y genera estadísticas descriptivas.",
+        herramientas=[calcular_promedio, generar_estadisticas],
+        contexto="Usa métricas estándar: media, mediana, desviación."
+    ),
+    "visualizacion": Skill(
+        nombre="Visualización",
+        instrucciones="Crea gráficos claros y informativos.",
+        herramientas=[crear_grafico_barras, crear_grafico_lineas],
+        contexto="Formato: SVG, colores accesibles, leyendas claras."
+    )
+}
+
+agente = AgenteConSkills(llm=modelo, biblioteca_skills=biblioteca)
+resultado = agente.resolver_tarea(
+    "Genera un informe de ventas del Q1 con gráficos de tendencia"
+)</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>El poder de las skills:</strong> En lugar de tener un prompt gigantesco que intente cubrir todas las posibles tareas, las skills permiten un enfoque modular. El agente carga solo lo que necesita, lo que reduce el consumo de tokens, mejora la precisión de las respuestas, y permite que la biblioteca de skills crezca sin degradar el rendimiento.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5.4 MCP -->
+    <!-- ============================================ -->
+    <hr class="mega-section-divider">
+    <h2 id="mcp" class="reveal-element">5.4 MCP: Model Context Protocol</h2>
+    
+    <p class="reveal-element">Imagina que cada dispositivo electrónico tuviera su propio tipo de puerto de carga: uno para cables redondos, otro para cables planos, otro magnético. Sería un caos. USB unificó todo eso: un solo puerto que funciona con cualquier dispositivo. El Model Context Protocol (MCP), creado por Anthropic, hace lo mismo para los agentes de IA: un estándar universal que permite conectar cualquier modelo con cualquier fuente de datos o herramienta, sin importar quién hizo cada uno.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía USB:</strong> Antes de MCP, cada integración entre un LLM y una herramienta era custom: si querías que tu modelo accediera a Notion, escribías código específico para Notion. Si luego querías Slack, escribías otro código diferente. MCP estandariza esa conexión: el proveedor de datos implementa el protocolo una vez, y cualquier modelo compatible puede conectarse automáticamente. Es un "puerto universal" para la IA.</p>
+    </div>
+
+    <h3 class="reveal-element">1. ¿Qué es MCP exactamente?</h3>
+    <p class="reveal-element">MCP es un protocolo de comunicación abierto que define cómo los modelos de IA (clientes) se conectan con fuentes de datos y herramientas externas (servidores). No es una API, no es un SDK, no es un framework: es un protocolo, como HTTP lo es para la web. Cualquier plataforma puede implementarlo.</p>
+
+    <div class="feature-list reveal-element">
+      <div class="feature-item">
+        <h4>Estándar abierto</h4>
+        <p>Cualquier desarrollador puede implementar un servidor MCP o un cliente MCP. No hay vendor lock-in ni licencias restrictivas.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Transporte flexible</h4>
+        <p>Funciona sobre stdio (para procesos locales), HTTP/SSE (para servicios remotos) y potencialmente WebSocket. Se adapta al entorno de ejecución.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Descubrimiento automático</h4>
+        <p>El cliente puede preguntar al servidor qué herramientas, recursos y prompts tiene disponibles, sin configuración previa.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Seguridad integrada</h4>
+        <p>El protocolo define mecanismos de autenticación y control de acceso para proteger los datos del servidor.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal-element">2. Arquitectura cliente-servidor</h3>
+    <p class="reveal-element">MCP utiliza una arquitectura cliente-servidor donde el cliente es la aplicación de IA (como Claude Desktop o un agente custom) y el servidor es la fuente de datos o herramienta que se conecta:</p>
+
+    <div class="arch-diagram reveal-element">
+      <div class="arch-box">
+        <h4>Cliente MCP</h4>
+        <p>La aplicación de IA que necesita acceder a datos y herramientas. Ej: Claude Desktop, VS Code con Copilot, un agente personalizado.</p>
+      </div>
+      <div class="arch-connector">⇄</div>
+      <div class="arch-box">
+        <h4>Servidor MCP</h4>
+        <p>El proveedor de datos o herramientas. Ej: un servidor de Notion, de GitHub, de una base de datos, de un sistema de archivos.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">La comunicación entre cliente y servidor se realiza mediante mensajes JSON-RPC 2.0. El cliente envía solicitudes y el servidor responde con resultados. También puede enviar notificaciones unidireccionales para actualizaciones en tiempo real.</p>
+
+    <h3 class="reveal-element">3. Los tres pilares: Recursos, Herramientas y Prompts</h3>
+    <p class="reveal-element">MCP define tres tipos de primitives que un servidor puede exponer. Cada una tiene un propósito distinto y se usa de manera diferente:</p>
+
+    <div class="feature-list reveal-element">
+      <div class="feature-item">
+        <h4>Recursos (Resources)</h4>
+        <p>Datos que el servidor pone a disposición del modelo. Son solo lectura. Ej: el contenido de un archivo, datos de una API, registros de una base de datos. El modelo puede leerlos pero no modificarlos directamente.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Herramientas (Tools)</h4>
+        <p>Funciones que el modelo puede invocar para ejecutar acciones. Son ejecutables. Ej: crear un archivo, enviar un mensaje, ejecutar una consulta SQL. Requieren aprobación del usuario en muchos casos.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Prompts</h4>
+        <p>Plantillas predefinidas que el servidor puede ofrecer al modelo. Ayudan a estructurar interacciones comunes. Ej: un prompt para revisar código, otro para resumir documentos, otro para generar tests.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>La diferencia clave:</strong> Las <em>recursos</em> son datos pasivos (como abrir un libro). Las <em>herramientas</em> son acciones activas (como usar un destornillador). Los <em>prompts</em> son plantillas de interacción (como un formulario pre-armado). Un servidor MCP puede exponer las tres cosas o solo una, dependiendo de su diseño.</p>
+    </div>
+
+    <h3 class="reveal-element">4. ¿Por qué importa la estandarización?</h3>
+    <p class="reveal-element">Sin un protocolo estándar, cada integración entre LLMs y herramientas es un proyecto custom. Esto crea un problema de escalabilidad:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Sin MCP (custom)</th>
+          <th>Con MCP (estándar)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>N proveedores × M modelos = N×M integraciones</td>
+          <td>N proveedores + M modelos = N+M implementaciones</td>
+        </tr>
+        <tr>
+          <td>Cada integración es única y frágil</td>
+          <td>Una implementación funciona con todos los clientes</td>
+        </tr>
+        <tr>
+          <td>Actualizar una API rompe la integración</td>
+          <td>El protocolo gestiona compatibilidad</td>
+        </tr>
+        <tr>
+          <td>No hay descubrimiento automático</td>
+          <td>El cliente descubre herramientas al conectarse</td>
+        </tr>
+        <tr>
+          <td>Cada desarrollador resuelve autenticación a su manera</td>
+          <td>Mecanismos de auth estandarizados</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">La estandarización también beneficia a los desarrolladores de herramientas: implementan el protocolo una vez y su herramienta funciona con Claude, GPT, Gemini, y cualquier otro modelo compatible. No necesitan escribir integración separada para cada proveedor de IA.</p>
+
+    <h3 class="reveal-element">5. MCP vs. Function Calling</h3>
+    <p class="reveal-element">MCP y function calling resuelven problemas similares pero en niveles diferentes. No son competidores; son complementarios:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Aspecto</th>
+          <th>Function Calling</th>
+          <th>MCP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Alcance</strong></td>
+          <td>Llamadas a funciones específicas definidas por el desarrollador</td>
+          <td>Protocolo completo para conectar fuentes de datos y herramientas</td>
+        </tr>
+        <tr>
+          <td><strong>Descubrimiento</strong></td>
+          <td>Las funciones se definen estáticamente en el código</td>
+          <td>El cliente descubre automáticamente qué está disponible</td>
+        </tr>
+        <tr>
+          <td><strong>Portabilidad</strong></td>
+          <td>Cada proveedor tiene su propio formato</td>
+          <td>Protocolo universal compatible con múltiples proveedores</td>
+        </tr>
+        <tr>
+          <td><strong>Recursos</strong></td>
+          <td>Solo ejecuta funciones</td>
+          <td>También accede a datos (recursos) y ofrece prompts</td>
+        </tr>
+        <tr>
+          <td><strong>Transporte</strong></td>
+          <td>HTTP directo o SDK del proveedor</td>
+          <td>stdio, HTTP/SSE,WebSocket con handshake definido</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">En la práctica, un agente puede usar MCP para conectarse a un servidor que, internamente, expone sus capacidades como tools. MCP actúa como la capa de transport y descubrimiento, mientras que las tools individuales son las unidades de ejecución.</p>
+
+    <h3 class="reveal-element">6. Implementaciones reales y el ecosistema</h3>
+    <p class="reveal-element">Desde su lanzamiento a finales de 2024, MCP ha generado un ecosistema creciente de implementaciones:</p>
+
+    <div class="impl-grid reveal-element">
+      <div class="impl-card">
+        <h4>Claude Desktop</h4>
+        <p>Fue la primera aplicación en soportar MCP. Permite conectar servidores locales y remotos para que Claude acceda a archivos, bases de datos y APIs.</p>
+      </div>
+      <div class="impl-card">
+        <h4>Servidores comunitarios</h4>
+        <p>Existen servidores MCP para: GitHub, Notion, Slack, PostgreSQL, MySQL, Slack, Google Drive, Filesystem, Puppeteer, y muchos más.</p>
+      </div>
+      <div class="impl-card">
+        <h4>SDK oficial</h4>
+        <p>Anthropic provee SDKs en TypeScript y Python para construir servidores y clientes MCP. Simplifican la implementación del protocolo.</p>
+      </div>
+      <div class="impl-card">
+        <h4>Adopción</h4>
+        <p>OpenAI, Google y otros proveedores han anunciado compatibilidad o interés en MCP, convirtiéndolo en un estándar de facto emergente.</p>
+      </div>
+    </div>
+
+    <h3 class="reveal-element">7. Simulación: Un servidor MCP en acción</h3>
+    <p class="reveal-element">Veamos cómo se ve la interacción entre un cliente MCP y un servidor que expone acceso a una base de datos:</p>
+
+    <pre class="code-block reveal-element">import json
+
+class ServidorMCP:
+    """Simulación de un servidor MCP que expone una base de datos"""
+    
+    def __init__(self):
+        self.herramientas = {
+            "consultar_usuarios": {
+                "descripcion": "Busca usuarios por nombre o email",
+                "parametros": {
+                    "tipo": "object",
+                    "propiedades": {
+                        "nombre": {"tipo": "string"},
+                        "email": {"tipo": "string"}
+                    }
+                }
+            },
+            "crear_pedido": {
+                "descripcion": "Crea un nuevo pedido para un usuario",
+                "parametros": {
+                    "tipo": "object",
+                    "propiedades": {
+                        "usuario_id": {"tipo": "integer"},
+                        "productos": {"tipo": "array"},
+                        "direccion": {"tipo": "string"}
+                    },
+                    "requeridos": ["usuario_id", "productos"]
+                }
+            }
+        }
+        
+        self.recursos = {
+            "file:///docs/catalogo.json": {
+                "nombre": "Catálogo de productos",
+                "tipo": "application/json"
+            },
+            "file:///docs/politicas.md": {
+                "nombre": "Políticas de envío",
+                "tipo": "text/markdown"
+            }
+        }
+    
+    def manejar_solicitud(self, solicitud):
+        """Procesa mensajes JSON-RPC 2.0 del cliente"""
+        metodo = solicitud.get("method")
+        params = solicitud.get("params", {})
+        
+        if metodo == "tools/list":
+            # El cliente pregunta: ¿qué herramientas tenés?
+            return {
+                "tools": [
+                    {"name": k, "description": v["descripcion"],
+                     "inputSchema": v["parametros"]}
+                    for k, v in self.herramientas.items()
+                ]
+            }
+        
+        elif metodo == "tools/call":
+            # El cliente pide ejecutar una herramienta
+            nombre = params.get("name")
+            args = params.get("arguments", {})
+            return self.ejecutar_herramienta(nombre, args)
+        
+        elif metodo == "resources/list":
+            # El cliente pregunta: ¿qué recursos tenés?
+            return {
+                "resources": [
+                    {"uri": uri, "name": r["nombre"], "mimeType": r["tipo"]}
+                    for uri, r in self.recursos.items()
+                ]
+            }
+        
+        elif metodo == "resources/read":
+            # El cliente quiere leer un recurso específico
+            uri = params.get("uri")
+            return self.leer_recurso(uri)
+
+# Flujo de la conversación cliente ↔ servidor
+print("1. Cliente se conecta al servidor MCP")
+print("2. Cliente envía: tools/list → Descubre las herramientas disponibles")
+print("3. Cliente envía: resources/list → Descubre los recursos disponibles")
+print("4. LLM decide usar 'consultar_usuarios' con nombre='Pablo'")
+print("5. Cliente envía: tools/call con los argumentos")
+print("6. Servidor ejecuta la consulta y retorna resultados")
+print("7. LLM integra los resultados en una respuesta natural")</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>El futuro de MCP:</strong> A medida que más proveedores adopten el protocolo, los agentes de IA podrán conectarse a cualquier servicio con un estándar universal. Esto reduce drásticamente la fricción para crear agentes verdaderamente útiles que puedan interactuar con el mundo real sin necesidad de integraciones custom para cada servicio.</p>
+    </div>
+
+    <!-- Navegación final -->
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

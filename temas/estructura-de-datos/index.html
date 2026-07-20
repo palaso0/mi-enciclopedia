@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructuras de Datos — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* ========== Visuales de estructuras ========== */
+    .ds-visual {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      overflow-x: auto;
+    }
+    .ds-visual-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+
+    /* --- Array --- */
+    .array-row {
+      display: flex;
+      gap: 0;
+      margin: var(--space-2) 0;
+    }
+    .array-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 72px;
+    }
+    .array-cell .index {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      margin-bottom: 4px;
+    }
+    .array-cell .value {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      min-width: 60px;
+    }
+    .array-cell .value.highlight {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.08);
+    }
+    .array-cell .value.new-item {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.08);
+      color: #2d7d46;
+    }
+    .array-arrow {
+      display: flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      padding: 0 var(--space-2);
+    }
+    .array-pointer {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-accent);
+      text-align: center;
+      margin-top: var(--space-1);
+    }
+
+    /* --- Stack --- */
+    .stack-container {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-4);
+    }
+    .stack-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .stack-item {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      text-align: center;
+      min-width: 120px;
+    }
+    .stack-item:first-child {
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+    .stack-item:last-child {
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+    .stack-item.stack-top {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.08);
+    }
+    .stack-item.stack-entering {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.08);
+    }
+    .stack-item.stack-removing {
+      border-color: #9a2a2a;
+      background: rgba(154, 42, 42, 0.15);
+    }
+    .stack-side-labels {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      padding: var(--space-2) 0;
+    }
+    .stack-side-labels span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    /* --- Queue --- */
+    .queue-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    .queue-visual {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .queue-item {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      text-align: center;
+      min-width: 80px;
+    }
+    .queue-item:first-child {
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+    .queue-item:last-child {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .queue-item.queue-exit {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.08);
+    }
+    .queue-item.queue-enter {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.08);
+    }
+    .queue-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    /* --- Linked List --- */
+    .linked-list {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ll-node {
+      display: flex;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--color-bg);
+    }
+    .ll-node.ll-highlight {
+      border-color: var(--color-accent);
+    }
+    .ll-node.ll-new {
+      border-color: #2d7d46;
+    }
+    .ll-data {
+      padding: var(--space-2) var(--space-3);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-right: 1px solid var(--color-border);
+    }
+    .ll-ptr {
+      padding: var(--space-2) var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+    }
+    .ll-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-text-muted);
+      padding: 0 var(--space-1);
+      display: flex;
+      align-items: center;
+    }
+    .ll-null {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      padding: var(--space-2);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    /* --- Hash Table --- */
+    .hash-table {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 400px;
+    }
+    .hash-row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .hash-row:last-child {
+      border-bottom: none;
+    }
+    .hash-index {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      min-width: 32px;
+      text-align: center;
+      padding: var(--space-2);
+    }
+    .hash-slot {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: var(--space-2) var(--space-3);
+      border-left: 1px solid var(--color-border);
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+    }
+    .hash-slot.occupied {
+      background: rgba(45, 125, 70, 0.05);
+      font-weight: 600;
+    }
+    .hash-slot.highlight {
+      background: rgba(154, 42, 42, 0.08);
+      border-color: var(--color-accent);
+      font-weight: 600;
+    }
+    .hash-slot.empty {
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    .hash-arrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      padding: 0 var(--space-2);
+      min-width: 60px;
+    }
+
+    /* --- Tree --- */
+    .tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-4) 0;
+    }
+    .tree-level {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-3);
+      position: relative;
+    }
+    .tree-node {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.9rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color-border);
+      border-radius: 50%;
+      background: var(--color-bg);
+      position: relative;
+    }
+    .tree-node.tree-root {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.08);
+    }
+    .tree-node.tree-found {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.1);
+    }
+    .tree-node.tree-miss {
+      border-color: #9a2a2a;
+      background: rgba(154, 42, 42, 0.15);
+    }
+    .tree-connector {
+      display: flex;
+      justify-content: center;
+      padding: var(--space-1) 0;
+    }
+    .tree-connector span {
+      display: inline-block;
+      width: 2px;
+      height: 16px;
+      background: var(--color-border);
+    }
+    .tree-branches {
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      position: relative;
+    }
+    .tree-branches::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: calc(50% - 40px);
+      width: 80px;
+      height: 2px;
+      background: var(--color-border);
+    }
+
+    /* --- Graph --- */
+    .graph-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 240px;
+      position: relative;
+    }
+    .graph-canvas {
+      position: relative;
+      width: 300px;
+      height: 220px;
+    }
+    .graph-node {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--color-border);
+      border-radius: 50%;
+      background: var(--color-bg);
+      z-index: 2;
+    }
+    .graph-node.graph-visited {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.1);
+    }
+    .graph-node.graph-current {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.1);
+    }
+    .graph-edge {
+      position: absolute;
+      height: 2px;
+      background: var(--color-border);
+      z-index: 1;
+      transform-origin: left center;
+    }
+    .graph-edge.graph-path {
+      background: var(--color-accent);
+      height: 3px;
+    }
+
+    /* --- Comparativas --- */
+    .ds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .ds-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .ds-card h4 {
+      margin-top: 0;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+    .ds-card p {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .ds-analogy {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+      padding: var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .ds-analogy-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .ds-complexity {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .ds-complexity.fast {
+      background: rgba(45, 125, 70, 0.1);
+      color: #2d7d46;
+    }
+    .ds-complexity.slow {
+      background: rgba(154, 42, 42, 0.1);
+      color: #9a2a2a;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Computer Science</span>
+      <time datetime="2026-07-19">19 de julio de 2026</time>
+    </div>
+    
+    <h1>Estructuras de Datos</h1>
+    
+    <p>Imagina que vas a un supermercado. Si el dependiente tiene todos los productos apilados en un solo monton, encontrar lo que necesitas sera un caos. Pero si todo esta organizado en estantes, pasillos y categorias, la busqueda se vuelve instantanea.</p>
+
+    <p>Las estructuras de datos son exactamente eso: <strong>formas de organizar la informacion dentro de una computadora</strong> para que pueda usarse de manera eficiente. No es solo guardar datos; es guardarlos de la forma correcta segun lo que vayas a hacer con ellos.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla de oro:</strong> No existe una estructura de datos perfecta para todo. Elegir la correcta depende de que operaciones necesitas hacer rapido: buscar, insertar, ordenar o recorrer. Cada estructura tiene sus fortalezas y debilidades.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 1. ARRAY -->
+    <!-- ============================================ -->
+    <h2>1. El Array (Arreglo)</h2>
+
+    <p>Un array es como una hilera de casillas numeradas. Cada casilla contiene un dato, y puedes acceder a cualquier casilla directamente si conoces su numero de posicion.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Array en memoria — frutas</div>
+      <div class="array-pointer">indice ↓</div>
+      <div class="array-row">
+        <div class="array-cell">
+          <span class="index">0</span>
+          <span class="value">manzana</span>
+        </div>
+        <div class="array-cell">
+          <span class="index">1</span>
+          <span class="value">platano</span>
+        </div>
+        <div class="array-cell">
+          <span class="index">2</span>
+          <span class="value highlight">naranja</span>
+        </div>
+        <div class="array-cell">
+          <span class="index">3</span>
+          <span class="value">uva</span>
+        </div>
+        <div class="array-cell">
+          <span class="index">4</span>
+          <span class="value">cereza</span>
+        </div>
+      </div>
+      <div class="array-pointer" style="margin-top: var(--space-2);">↑ accedo directo con frutas[2]</div>
+    </div>
+
+    <div class="ds-analogy reveal-element">
+      <span class="ds-analogy-icon">📍</span>
+      <div>
+        <strong>Analogia:</strong> Piensa en los apartamentos de un edificio. Si alguien te dice "departamento 5", vas directo ahi sin tener que recorrer todos los pisos. Acceso directo en tiempo constante O(1).
+      </div>
+    </div>
+
+    <p><strong>El problema:</strong> Si quieres insertar un elemento en medio, todo lo que esta despues se tiene que mover.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Insertar "fresa" en la posicion 1</div>
+      <div class="array-row" style="margin-bottom: var(--space-2);">
+        <div class="array-cell"><span class="index">0</span><span class="value">manzana</span></div>
+        <div class="array-cell"><span class="index">1</span><span class="value new-item">fresa</span></div>
+        <div class="array-cell"><span class="index">2</span><span class="value">platano</span></div>
+        <div class="array-cell"><span class="index">3</span><span class="value">naranja</span></div>
+        <div class="array-cell"><span class="index">4</span><span class="value">uva</span></div>
+        <div class="array-cell"><span class="index">5</span><span class="value">cereza</span></div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted);">
+        ↑ platano, naranja, uva y cereza se movieron una posicion → O(n)
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+frutas = ["manzana", "platano", "naranja", "uva", "cereza"]
+
+# Acceso directo por indice — O(1)
+print(frutas[2])  # → "naranja"
+
+# Insertar en medio — O(n), hay que mover elementos
+frutas.insert(1, "fresa")
+# → ["manzana", "fresa", "platano", "naranja", "uva", "cereza"]
+    </pre>
+
+    <!-- ============================================ -->
+    <!-- 2. STACK Y QUEUE -->
+    <!-- ============================================ -->
+    <h2>2. Stack (Pila) y Cola (Queue)</h2>
+
+    <p>Estas dos estructuras son las mas simples: solo puedes agregar y quitar elementos de un extremo.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Stack (Pila) — LIFO: Last In, First Out</div>
+      <div class="stack-container">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 4px;">push (meter) ↓</div>
+          <div class="stack-visual">
+            <div class="stack-item stack-entering">libro3 ← TOPE</div>
+            <div class="stack-item">libro2</div>
+            <div class="stack-item">libro1</div>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px;">↑ pop (sacar)</div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.8;">
+          <div>1. push("libro1") → [libro1]</div>
+          <div>2. push("libro2") → [libro1, libro2]</div>
+          <div>3. push("libro3") → [libro1, libro2, libro3]</div>
+          <div style="color: var(--color-accent);">4. pop() → libro3</div>
+          <div style="color: var(--color-text-muted);">   Solo saca el ultimo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Queue (Cola) — FIFO: First In, First Out</div>
+      <div class="queue-container">
+        <div class="queue-labels">
+          <span>← dequeue (salir)</span>
+          <span>enqueue (entrar) →</span>
+        </div>
+        <div class="queue-visual">
+          <div class="queue-item queue-exit">ana</div>
+          <div class="queue-item">luis</div>
+          <div class="queue-item">pedro</div>
+          <div class="queue-item queue-enter">maria</div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted);">
+          ana entro primero → sale primero | maria entro ultimo → sale ultimo
+        </div>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+# PILA — como una pila de platos
+pila = []
+pila.append("libro1")   # push
+pila.append("libro2")
+pila.append("libro3")
+print(pila.pop())        # → "libro3" (el ultimo en entrar sale primero)
+
+# COLA — como una fila de supermercado
+from collections import deque
+cola = deque()
+cola.append("ana")        # enqueue
+cola.append("luis")
+cola.append("pedro")
+print(cola.popleft())     # → "ana" (el primero en entrar sale primero)
+    </pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Usos reales:</strong> Las pilas se usan para el "deshacer" (Ctrl+Z), evaluar expresiones matematicas y el call stack de funciones. Las colas se usan en colas de impresion, mensajes pendientes y sistemas de atencion al cliente.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 3. LINKED LIST -->
+    <!-- ============================================ -->
+    <h2>3. Linked List (Lista Enlazada)</h2>
+
+    <p>Un array tiene todos los datos juntos en memoria. Una lista enlazada es diferente: cada elemento (nodo) contiene su dato mas un puntero que apunta al siguiente.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Lista enlazada simple: A → B → C → D</div>
+      <div class="linked-list">
+        <div class="ll-node">
+          <div class="ll-data">A</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">B</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">C</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">D</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">None</div>
+      </div>
+    </div>
+
+    <p><strong>La ventaja:</strong> Insertar entre B y C es rapido. Solo cambias los punteros, no mueves nada.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Insertar nodo "X" entre B y C</div>
+      <div class="linked-list">
+        <div class="ll-node">
+          <div class="ll-data">A</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">B</div>
+          <div class="ll-ptr" style="color: #2d7d46; font-weight: 600;">→X</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node ll-new">
+          <div class="ll-data">X</div>
+          <div class="ll-ptr" style="color: #2d7d46; font-weight: 600;">→C</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">C</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-node">
+          <div class="ll-data">D</div>
+          <div class="ll-ptr">ptr</div>
+        </div>
+        <div class="ll-arrow">→</div>
+        <div class="ll-null">None</div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #2d7d46; margin-top: var(--space-2);">
+        Solo se modificaron los punteros de B y X — No se movio ningun dato
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+class Nodo:
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None  # Puntero al siguiente nodo
+
+# Creando: A → B → C
+a = Nodo("A")
+b = Nodo("B")
+c = Nodo("C")
+a.siguiente = b   # A apunta a B
+b.siguiente = c   # B apunta a C
+
+# Insertar X entre B y C
+x = Nodo("X")
+x.siguiente = c   # X apunta a C
+b.siguiente = x   # B ahora apunta a X
+
+# Resultado: A → B → X → C
+    </pre>
+
+    <!-- ============================================ -->
+    <!-- 4. HASH TABLE -->
+    <!-- ============================================ -->
+    <h2>4. Hash Table (Tabla Hash)</h2>
+
+    <p>Una tabla hash convierte una clave en un numero que determina la posicion donde guardar el dato. Es como un archivador con etiquetas numeradas.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Tabla hash: email → posicion</div>
+      <div style="display: flex; gap: var(--space-4); align-items: flex-start; flex-wrap: wrap;">
+        <div class="hash-table">
+          <div class="hash-row">
+            <div class="hash-index">0</div>
+            <div class="hash-slot empty">—</div>
+          </div>
+          <div class="hash-row">
+            <div class="hash-index">1</div>
+            <div class="hash-slot occupied highlight">ana@mail.com → Ana, 28</div>
+          </div>
+          <div class="hash-row">
+            <div class="hash-index">2</div>
+            <div class="hash-slot empty">—</div>
+          </div>
+          <div class="hash-row">
+            <div class="hash-index">3</div>
+            <div class="hash-slot occupied">carlos@mail.com → Carlos, 41</div>
+          </div>
+          <div class="hash-row">
+            <div class="hash-index">4</div>
+            <div class="hash-slot occupied">luis@mail.com → Luis, 35</div>
+          </div>
+          <div class="hash-row">
+            <div class="hash-index">5</div>
+            <div class="hash-slot empty">—</div>
+          </div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.8;">
+          <div>hash("ana@mail.com") → <strong style="color: var(--color-accent);">posicion 1</strong></div>
+          <div>hash("luis@mail.com") → posicion 4</div>
+          <div>hash("carlos@mail.com") → posicion 3</div>
+          <div style="margin-top: var(--space-2); color: #2d7d46;">Buscar ana: va directo a 1 — O(1)</div>
+        </div>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+# Python: los diccionarios son tablas hash
+usuarios = {}
+
+usuarios["ana@mail.com"] = {"nombre": "Ana", "edad": 28}
+usuarios["luis@mail.com"] = {"nombre": "Luis", "edad": 35}
+
+# Busqueda instantanea — O(1)
+print(usuarios["ana@mail.com"]["nombre"])  # → "Ana"
+
+# Verificar si existe
+if "pedro@mail.com" in usuarios:
+    print("Encontrado")
+else:
+    print("No existe")  # ← Esto se ejecuta
+    </pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Colisiones:</strong> A veces dos claves generan la misma posicion. Se resuelve con encadenamiento (una lista en ese slot) o direccion abierta (buscar el siguiente slot libre). En la practica, las colisiones son raras con una buena funcion hash.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5. ARBOL -->
+    <!-- ============================================ -->
+    <h2>5. Arbol (Tree)</h2>
+
+    <p>Un arbol es una estructura jerarquica donde cada nodo puede tener multiples hijos. Es como un organigrama: una raiz en la cima, con ramas que se dividen hacia abajo.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Arbol binario de busqueda — Izquierda menor, derecha mayor</div>
+      <div class="tree">
+        <div class="tree-node tree-root">8</div>
+        <div class="tree-connector"><span></span></div>
+        <div class="tree-branches">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="tree-node">3</div>
+            <div class="tree-connector"><span></span></div>
+            <div style="display: flex; gap: var(--space-3);">
+              <div class="tree-node">1</div>
+              <div class="tree-node tree-found">6</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="tree-node">10</div>
+            <div class="tree-connector"><span></span></div>
+            <div style="display: flex; gap: var(--space-3);">
+              <div class="tree-node" style="visibility: hidden;">_</div>
+              <div class="tree-node">14</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); text-align: center; margin-top: var(--space-2);">
+        Buscar 6: 8 → 3 → 6 (3 pasos) | Buscar 14: 8 → 10 → 14 (3 pasos)
+      </div>
+    </div>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Comparacion: Buscar en lista vs. arbol</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+        <div style="text-align: center;">
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #9a2a2a; font-weight: 600;">Lista lineal</div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin: var(--space-2) 0;">1M de elementos</div>
+          <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #9a2a2a;">1,000,000</div>
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos maximo</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #2d7d46; font-weight: 600;">Arbol balanceado</div>
+          <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin: var(--space-2) 0;">1M de elementos</div>
+          <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: #2d7d46;">~20</div>
+          <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted);">pasos maximo</div>
+        </div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; text-align: center; margin-top: var(--space-2);">
+        <span class="ds-complexity slow">Lista: O(n)</span> &nbsp;&nbsp; vs &nbsp;&nbsp; <span class="ds-complexity fast">Arbol: O(log n)</span>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+class NodoArbol:
+    def __init__(self, valor):
+        self.valor = valor
+        self.izquierdo = None   # Hijo izquierdo (menores)
+        self.derecho = None     # Hijo derecho (mayores)
+
+# Construir el arbol
+raiz = NodoArbol(8)
+raiz.izquierdo = NodoArbol(3)
+raiz.derecho = NodoArbol(10)
+raiz.izquierdo.izquierdo = NodoArbol(1)
+raiz.izquierdo.derecho = NodoArbol(6)
+raiz.derecho.derecho = NodoArbol(14)
+
+# Buscar — cada paso descarta la mitad
+def buscar(nodo, valor):
+    if nodo is None: return False
+    if valor == nodo.valor: return True
+    if valor < nodo.valor:
+        return buscar(nodo.izquierdo, valor)
+    return buscar(nodo.derecho, valor)
+
+print(buscar(raiz, 6))   # → True
+print(buscar(raiz, 99))  # → False
+    </pre>
+
+    <!-- ============================================ -->
+    <!-- 6. GRAFO -->
+    <!-- ============================================ -->
+    <h2>6. Grafo (Graph)</h2>
+
+    <p>Un grafo es la estructura mas flexible: nodos conectados por aristas. Puede representar redes sociales, mapas, dependencias de software, o cualquier relacion entre entidades.</p>
+
+    <div class="ds-visual reveal-element">
+      <div class="ds-visual-label">Grafo — estaciones de metro</div>
+      <div class="graph-visual">
+        <div class="graph-canvas">
+          <!-- Edges -->
+          <div class="graph-edge graph-path" style="left: 48px; top: 38px; width: 70px; transform: rotate(30deg);"></div>
+          <div class="graph-edge" style="left: 48px; top: 38px; width: 80px; transform: rotate(70deg);"></div>
+          <div class="graph-edge graph-path" style="left: 110px; top: 60px; width: 60px; transform: rotate(80deg);"></div>
+          <div class="graph-edge" style="left: 48px; top: 38px; width: 120px; transform: rotate(0deg);"></div>
+          <div class="graph-edge" style="left: 165px; top: 38px; width: 80px; transform: rotate(50deg);"></div>
+          <div class="graph-edge" style="left: 130px; top: 130px; width: 60px; transform: rotate(-20deg);"></div>
+          <div class="graph-edge" style="left: 190px; top: 130px; width: 50px; transform: rotate(90deg);"></div>
+          <!-- Nodes -->
+          <div class="graph-node graph-visited" style="left: 20px; top: 15px;">A</div>
+          <div class="graph-node graph-visited" style="left: 90px; top: 15px;">B</div>
+          <div class="graph-node graph-current" style="left: 160px; top: 15px;">C</div>
+          <div class="graph-node" style="left: 40px; top: 100px;">D</div>
+          <div class="graph-node" style="left: 120px; top: 100px;">E</div>
+          <div class="graph-node" style="left: 180px; top: 170px;">F</div>
+        </div>
+      </div>
+      <div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); text-align: center;">
+        Camino mas corto de A a F: A → C → F | <span style="color: #2d7d46;">verde = visitado</span> | <span style="color: var(--color-accent);">rojo = actual</span>
+      </div>
+    </div>
+
+    <pre class="code-block reveal-element">
+# Grafo: diccionario de adyacencia
+grafo = {
+    "A": ["B", "C"],      # A conectado con B y C
+    "B": ["A", "D", "E"], # B conectado con A, D, E
+    "C": ["A", "F"],      # C conectado con A y F
+    "D": ["B"],           # D solo con B
+    "E": ["B", "F"],      # E con B y F
+    "F": ["C", "E"]       # F con C y E
+}
+
+# BFS: encontrar camino mas corto
+from collections import deque
+
+def bfs(grafo, inicio, objetivo):
+    visitados = set()
+    cola = deque([[inicio]])
+    visitados.add(inicio)
+    while cola:
+        camino = cola.popleft()
+        nodo = camino[-1]
+        if nodo == objetivo:
+            return camino
+        for vecino in grafo[nodo]:
+            if vecino not in visitados:
+                visitados.add(vecino)
+                cola.append(camino + [vecino])
+    return None
+
+print(bfs(grafo, "A", "F"))  # → ['A', 'C', 'F']
+    </pre>
+
+    <!-- ============================================ -->
+    <!-- 7. COMPARATIVA -->
+    <!-- ============================================ -->
+    <h2>7. Comparativa: Que elegir y cuando</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Estructura</th>
+          <th>Busqueda</th>
+          <th>Insercion</th>
+          <th>Cuando usarla</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Array</strong></td>
+          <td><span class="ds-complexity fast">O(1) indice</span> <span class="ds-complexity slow">O(n) valor</span></td>
+          <td><span class="ds-complexity slow">O(n)</span></td>
+          <td>Datos fijos, acceso por posicion</td>
+        </tr>
+        <tr>
+          <td><strong>Linked List</strong></td>
+          <td><span class="ds-complexity slow">O(n)</span></td>
+          <td><span class="ds-complexity fast">O(1)*</span></td>
+          <td>Insercion frecuente en medio</td>
+        </tr>
+        <tr>
+          <td><strong>Hash Table</strong></td>
+          <td><span class="ds-complexity fast">O(1)</span></td>
+          <td><span class="ds-complexity fast">O(1)</span></td>
+          <td>Busqueda por clave, conteo, caches</td>
+        </tr>
+        <tr>
+          <td><strong>Arbol (BST)</strong></td>
+          <td><span class="ds-complexity fast">O(log n)</span></td>
+          <td><span class="ds-complexity fast">O(log n)</span></td>
+          <td>Datos ordenados, busqueda eficiente</td>
+        </tr>
+        <tr>
+          <td><strong>Grafo</strong></td>
+          <td><span class="ds-complexity slow">O(V+E)</span></td>
+          <td><span class="ds-complexity fast">O(1)</span></td>
+          <td>Relaciones, rutas, redes</td>
+        </tr>
+        <tr>
+          <td><strong>Pila / Cola</strong></td>
+          <td><span class="ds-complexity slow">O(n)</span></td>
+          <td><span class="ds-complexity fast">O(1)</span></td>
+          <td>Undo, impresion, mensajes</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ============================================ -->
+    <!-- 8. RESUMEN -->
+    <!-- ============================================ -->
+    <h2>8. Resumen</h2>
+
+    <div class="ds-grid reveal-element">
+      <div class="ds-card">
+        <h4>Acceso rapido por posicion</h4>
+        <p>→ Usa un <strong>Array</strong></p>
+      </div>
+      <div class="ds-card">
+        <h4>Busqueda por clave o nombre</h4>
+        <p>→ Usa una <strong>Hash Table</strong></p>
+      </div>
+      <div class="ds-card">
+        <h4>Datos jerarquicos o con orden</h4>
+        <p>→ Usa un <strong>Arbol</strong></p>
+      </div>
+      <div class="ds-card">
+        <h4>Relaciones entre entidades</h4>
+        <p>→ Usa un <strong>Grafo</strong></p>
+      </div>
+      <div class="ds-card">
+        <h4>Procesar en orden de llegada</h4>
+        <p>→ Usa una <strong>Cola</strong></p>
+      </div>
+      <div class="ds-card">
+        <h4>Deshacer /回溯</h4>
+        <p>→ Usa una <strong>Pila</strong></p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Consejo practico:</strong> En la mayoria de lenguajes modernos, la estructura por defecto es una lista (array dinamico). Si tu programa es lento, antes de optimizar algoritmos, preguntate si estas usando la estructura correcta. Cambiar de array a hash table puede reducir el tiempo de horas a milisegundos.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/transformers/index.html" class="btn btn-primary">Siguiente: Transformers →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scaling Laws y el aprendizaje few-shot — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para Scaling Laws */
+    .scaling-curve-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .scaling-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .scaling-bar-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      width: 120px;
+      text-align: right;
+      color: var(--color-text-muted);
+    }
+    .scaling-bar-track {
+      flex: 1;
+      height: 24px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+    }
+    .scaling-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      transition: width 0.6s ease;
+    }
+    .scaling-bar-fill.bar-small {
+      width: 15%;
+      background: var(--color-accent);
+    }
+    .scaling-bar-fill.bar-medium {
+      width: 45%;
+      background: #2d7d46;
+    }
+    .scaling-bar-fill.bar-large {
+      width: 80%;
+      background: #366A9C;
+    }
+    .scaling-bar-fill.bar-massive {
+      width: 98%;
+      background: #A34E78;
+    }
+    .scaling-bar-value {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      width: 60px;
+    }
+    .few-shot-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .shot-example {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .shot-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .shot-content {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .shot-prompt {
+      color: var(--color-text-muted);
+    }
+    .shot-response {
+      color: #2d7d46;
+      font-weight: 600;
+    }
+    .analogy-box {
+      background: var(--color-surface);
+      border-left: 4px solid #366A9C;
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .analogy-box strong {
+      color: #366A9C;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Entrenamiento</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Scaling Laws y el aprendizaje few-shot</h1>
+
+    <p>Imagina una escuela. En una clase con 10 alumnos y un profesor decente, los resultados son aceptables. Pero si multiplicas la clase a 10,000 alumnos con el mismo profesor, la calidad no mejora mucho. Ahora bien, si en vez de más alumnos contratas a un <strong>mejor profesor</strong>, los resultados se disparan. Este es, en esencia, el descubrimiento que cambió la carrera por la inteligencia artificial: el rendimiento de los modelos de lenguaje no escala linealmente con más datos o más parámetros, sino que sigue <strong>leyes de potencia predecibles</strong>.</p>
+
+    <h2>1. Las leyes de potencia: Más no es mejor, sino más inteligente</h2>
+
+    <p>En 2020, el equipo de OpenAI liderado por Jared Kaplan publicó un paper titulado <em>"Scaling Laws for Neural Language Models"</em>. Su conclusión fue elegante y demoledora: el rendimiento de un modelo de lenguaje (medido en pérdida de predicción) mejora de forma predecible cuando escalas tres factores: <strong>el cómputo total (C)</strong>, <strong>el tamaño del dataset (D)</strong> y <strong>el número de parámetros (N)</strong>.</p>
+
+    <p>La relación es una <strong>ley de potencia</strong> (power law): cuando duplicas el cómputo, la pérdida baja un porcentaje fijo. No es lineal, no es exponencial, sino que sigue una curva de potencia suave y consistente.</p>
+
+    <div class="scaling-curve-box reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-3);">Ley de potencia: Pérdida ∝ C^(-0.05)</p>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^18 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-small"></div></div>
+        <span class="scaling-bar-value">Pérdida: 3.12</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^19 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-medium"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.87</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^20 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-large"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.65</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^21 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-massive"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.45</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-3);">Cada incremento de 10x en cómputo reduce la pérdida de manera consistente. La curva nunca se estanca.</p>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Descubrimiento clave:</strong> Kaplan et al. encontraron que la arquitectura específica (número de capas, cabezas de atención, etc.) importa mucho menos que el simple hecho de tener <strong>más parámetros, más datos y más cómputo</strong>. Esto simplificó radicalmente el diseño de modelos: basta con escalar.</p>
+    </div>
+
+    <h2>2. La analogía del estudiante vs. el profesor</h2>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Piensa en dos estrategias para mejorar las notas de un colegio. La <strong>estrategia A</strong> es meter más alumnos en cada salón (más datos). La <strong>estrategia B</strong> es contratar profesores con doctorados y metodologías innovadoras (más parámetros y más cómputo). Los Scaling Laws demostraron que la estrategia B escala de manera mucho más predecible y poderosa. Un modelo más grande con el mismo dataset <em>siempre</em> rendirá mejor que un modelo pequeño con más datos.</p>
+    </div>
+
+    <p>Esto fue revolucionario porque antes se creía que el diseño de la arquitectura era lo más importante. Los Scaling Laws dijeron: no, lo que importa es <strong>escalar de manera inteligente</strong>. Los investigadores dejaron de buscar la arquitectura perfecta y empezaron a buscar la manera de hacer modelos más grandes, con más datos, durante más tiempo.</p>
+
+    <h2>3. GPT-3 y el aprendizaje few-shot</h2>
+
+    <p>Con esta nueva filosofía de escalado, OpenAI construyó GPT-3 en 2020: un modelo con <strong>175 mil millones de parámetros</strong>, entrenado con cientos de miles de millones de tokens de texto de internet. Pero lo verdaderamente revolucionario no fue el tamaño, sino lo que este tamaño <strong>habilitó</strong>: el <strong>aprendizaje few-shot</strong>.</p>
+
+    <p>En lugar de necesitar miles de ejemplos etiquetados para cada tarea (como los modelos anteriores), GPT-3 podía aprender a realizar una tarea con tan solo <strong>3 a 5 ejemplos</strong> incluidos en el prompt. Sin cambiar un solo parámetro del modelo.</p>
+
+    <div class="few-shot-demo reveal-element">
+      <div class="shot-example">
+        <div class="shot-label">1-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Traduce al inglés: "El gato duerme en el sofá"</p>
+          <p class="shot-response">→ "The cat sleeps on the sofa"</p>
+        </div>
+      </div>
+      <div class="shot-example">
+        <div class="shot-label">3-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Feliz → Happy</p>
+          <p class="shot-prompt">Triste → Sad</p>
+          <p class="shot-prompt">Cansado →</p>
+          <p class="shot-response">→ "Tired"</p>
+        </div>
+      </div>
+      <div class="shot-example">
+        <div class="shot-label">Zero-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Clasifica el sentimiento: "Me encanta este producto"</p>
+          <p class="shot-response">→ Positivo</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>¿Por qué funciona?</strong> El modelo tan grande ha visto tantos patrones en su entrenamiento que puede <strong>inferir la tarea</strong> a partir de la estructura del prompt. No "aprende" en el sentido tradicional; más bien, <strong>activa conocimientos latentes</strong> que ya adquirió durante el preentrenamiento masivo.</p>
+    </div>
+
+    <h2>4. La relación entre tamaño y capacidad de generalización</h2>
+
+    <p>Un hallazgo sorprendente de GPT-3 fue que los modelos más grandes no solo eran mejores en las tareas en las que fueron evaluados, sino que mostraban habilidades que <strong>nadie entrenó explícitamente</strong>: sumar números, escribir código, traducir entre idiomas, y hasta razonar con sentido común.</p>
+
+    <p>Esta propiedad se conoce como <strong>emergencia</strong> (emergence): habilidades que aparecen solo cuando el modelo alcanza cierto umbral de tamaño. Un modelo de 10 millones de parámetros no puede sumar. Un modelo de 175 mil millones de parámetros sí puede. No se entrenó para eso; la capacidad <strong>emergió</strong> del escalado.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Parámetros</th>
+          <th>Año</th>
+          <th>Capacidad few-shot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GPT-2</td>
+          <td>1.5B</td>
+          <td>2019</td>
+          <td>Limitada, inestable</td>
+        </tr>
+        <tr>
+          <td>GPT-3</td>
+          <td>175B</td>
+          <td>2020</td>
+          <td>Sólida, generaliza bien</td>
+        </tr>
+        <tr>
+          <td>GPT-4</td>
+          <td>~1.8T (estimado)</td>
+          <td>2023</td>
+          <td>Excepcional en múltiples dominios</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Los Scaling Laws predicen que este patrón continuará: con suficiente cómputo y datos, los modelos seguirán mejorando de manera predecible. La pregunta ya no es <em>"¿mejorará?"</em> sino <em>"¿cuánto costará llegar al siguiente nivel?"</em></p>
+
+    <h2>5. El costo del escalado: La paradoja de la eficiencia</h2>
+
+    <p>Los Scaling Laws también revelaron un problema práctico: <strong>escalar es caro</strong>. GPT-3 costó aproximadamente $12 millones en cómputo. GPT-4 costó estimadamente $100 millones. Cada salto de rendimiento requiere una inversión exponencialmente mayor.</p>
+
+    <p>Esto creó una tensión fundamental en la industria: las leyes de potencia dicen que más cómputo siempre ayuda, pero el costo crece rápido. La solución fue una segunda ola de investigación centrada en la <strong>eficiencia</strong>: modelos más pequeños pero mejor entrenados, técnicas como LoRA para fine-tuning eficiente, y arquitecturas sparse como Mixture-of-Experts.</p>
+
+    <pre class="code-block reveal-element">
+# Simulación del concepto de few-shot learning con GPT-3
+# El modelo NO se re-entrena; solo recibe ejemplos en el prompt
+
+def few_shot_classify(prompt_ejemplos, texto_nuevo):
+    """
+    Simula cómo GPT-3 clasifica texto usando few-shot prompting.
+    El modelo ya 'sabe' clasificar gracias a su entrenamiento masivo.
+    Solo necesita ver 3-5 ejemplos para activar esa capacidad.
+    """
+    prompt_completo = prompt_ejemplos + "\n" + texto_nuevo
+    # En la realidad, esto sería una llamada a la API de OpenAI
+    # respuesta = openai.Completion.create(
+    #     model="gpt-3.5-turbo",
+    #     prompt=prompt_completo,
+    #     temperature=0
+    # )
+    return respuesta_gpt3
+
+# Ejemplo con 3-shot (3 ejemplos de entrenamiento)
+ejemplos = """
+Texto: 'El producto es excelente, lo recomiendo' → Positivo
+Texto: 'Terrible experiencia, nunca más' → Negativo
+Texto: 'El envío llegó a tiempo' → Neutro
+"""
+
+nuevo_texto = "Texto: 'No estoy nada satisfecho con el servicio' →"
+resultado = few_shot_classify(ejemplos, nuevo_texto)
+print(resultado)  # Salida: "Negativo"
+
+# El modelo clasificó correctamente sin haber visto
+# este ejemplo específico durante el entrenamiento.
+# Solo necesitó 3 ejemplos para entender la tarea.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Legado de los Scaling Laws:</strong> Establecieron la filosofía de diseño que dominó la industria del 2020 al 2024: construye el modelo más grande posible con los mejores datos disponibles. Este paradigma solo comenzó a cuestionarse con la llegada de modelos como Phi-2 y Gemma, que demostraron que datos de alta calidad pueden compensar parámetros faltantes.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/lora-finetuning/index.html" class="btn btn-primary">Siguiente: LoRA →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

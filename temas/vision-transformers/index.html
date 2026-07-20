@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vision Transformers (ViT) — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para la explicación visual de parches */
+    .image-puzzle-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      max-width: 180px;
+      margin: var(--space-4) auto;
+      background: var(--color-border);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+    }
+    .puzzle-piece {
+      aspect-ratio: 1;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .flatten-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      margin: var(--space-4) 0;
+    }
+    .flatten-vector {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      gap: 4px;
+    }
+    .vector-token {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Deep Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Vision Transformers (ViT)</h1>
+    
+    <p>¿Puede una arquitectura diseñada para procesar texto clasificar imágenes de manera eficiente? En 2020, investigadores de Google demostraron con el paper <em>"An Image is Worth 16x16 Words"</em> que sí es posible. Al tratar una imagen como una secuencia de palabras, los Vision Transformers (ViT) desafiaron el reinado de las Redes Convolucionales (CNNs).</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Concepto clave:</strong> En lugar de rediseñar el Transformer para visión, ViT adapta la imagen para que encaje exactamente en un Transformer estándar de procesamiento de texto.</p>
+    </div>
+
+    <h2>1. La intuición: Lupa local vs. Rompecabezas global</h2>
+    <p>La diferencia principal entre las redes convolucionales tradicionales y un ViT radica en cómo "miran" la imagen:</p>
+
+    <ul>
+      <li><strong>Red Convolucional (CNN):</strong> Es como examinar una foto con una lupa pequeña, buscando patrones locales (bordes, texturas) y combinándolos gradualmente. Sabe por diseño que los píxeles cercanos están relacionados.</li>
+      <li><strong>Vision Transformer (ViT):</strong> Corta la foto en piezas de rompecabezas (típicamente de 16x16 píxeles), las aplana y las analiza simultáneamente usando autoatención. No asume por diseño qué pieza está al lado de cuál; aprende la relación espacial analizando los datos.</li>
+    </ul>
+
+    <h2>2. El Pipeline: ¿Cómo se convierte una imagen en "palabras"?</h2>
+    
+    <p>Para alimentar a un Transformer, necesitamos pasar de una imagen tridimensional a una secuencia de vectores lineales:</p>
+
+    <div class="image-puzzle-box reveal-element">
+      <div class="puzzle-piece">P1</div>
+      <div class="puzzle-piece">P2</div>
+      <div class="puzzle-piece">P3</div>
+      <div class="puzzle-piece">P4</div>
+      <div class="puzzle-piece">P5</div>
+      <div class="puzzle-piece">P6</div>
+      <div class="puzzle-piece">P7</div>
+      <div class="puzzle-piece">P8</div>
+      <div class="puzzle-piece">P9</div>
+    </div>
+    
+    <p class="reveal-element" style="text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">1. Dividimos la imagen en "parches" (Patches) rígidos.</p>
+
+    <div class="flatten-pipeline reveal-element">
+      <div class="flatten-vector">Patch 1 → <span class="vector-token">[v1, v2, v3, ...]</span></div>
+      <div class="flatten-vector">Patch 2 → <span class="vector-token">[v4, v5, v6, ...]</span></div>
+      <div class="flatten-vector">...</div>
+    </div>
+    
+    <p class="reveal-element" style="text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">2. Aplanamos cada parche en un vector y lo proyectamos al tamaño deseado (Embeddings).</p>
+
+    <h2>3. Los componentes críticos de ViT</h2>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Función</th>
+          <th>Por qué es necesario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Patches (16x16)</strong></td>
+          <td>Divide la imagen en fragmentos.</td>
+          <td>Reduce la cantidad de tokens. Analizar píxel por píxel con atención sería computacionalmente imposible (complejidad cuadrática).</td>
+        </tr>
+        <tr>
+          <td><strong>Linear Projection</strong></td>
+          <td>Transforma los parches aplanados en vectores (embeddings).</td>
+          <td>Mapea los píxeles a un espacio dimensional que el Transformer entiende.</td>
+        </tr>
+        <tr>
+          <td><strong>Positional Embedding</strong></td>
+          <td>Suma coordenadas de posición a cada embedding.</td>
+          <td>Al no tener recurrencia ni convolución, el modelo no sabe en qué parte de la imagen va cada parche si no se lo indicamos.</td>
+        </tr>
+        <tr>
+          <td><strong>Class Token [CLS]</strong></td>
+          <td>Un vector extra que se añade al inicio de la secuencia.</td>
+          <td>Este token acumula la información de atención de toda la imagen y se usa al final para hacer la predicción (ej. "gato" o "perro").</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Simulación en código: De imagen a embeddings</h2>
+    <p>Este script de Python demuestra matemáticamente cómo se descompone y proyecta una imagen en parches antes de entrar al Transformer:</p>
+
+    <div class="code-block reveal-element">
+# Simulación conceptual de preparación de parches para ViT
+import numpy as np
+
+# Configuración básica
+H, W, C = 224, 224, 3   # Altura, ancho, canales (RGB) de la imagen
+patch_size = 16          # Cada parche será de 16x16 píxeles
+d_model = 768            # Dimensión del embedding de salida
+
+# 1. Simular una imagen cargada
+imagen = np.random.rand(H, W, C)
+
+# 2. Calcular número de parches
+n_patches = (H // patch_size) * (W // patch_size)  # (224/16) * (224/16) = 196 parches
+print(f"Número de parches generados: {n_patches}")
+
+# 3. Dividir la imagen conceptualmente y aplanar los parches
+# Cada parche tiene un tamaño de: 16 * 16 * 3 = 768 valores
+parches_aplanados = np.random.rand(n_patches, patch_size * patch_size * C)
+print(f"Dimensiones de los parches aplanados: {parches_aplanados.shape}") # (196, 768)
+
+# 4. Proyección Lineal (matriz de pesos W_p)
+W_p = np.random.rand(patch_size * patch_size * C, d_model)
+patch_embeddings = np.dot(parches_aplanados, W_p)
+print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196, 768)
+    </div>
+
+    <h2>5. El dilema de los datos: Inductive Bias</h2>
+    <p>A diferencia de las CNNs, los Transformers no tienen **sesgo inductivo (inductive bias)** sobre las imágenes. Una CNN "sabe" implícitamente que los píxeles vecinos son importantes y que los patrones se mantienen iguales si se desplazan (invarianza de traslación).</p>
+    
+    <p>El ViT tiene que aprender todo esto desde cero analizando millones de ejemplos. Por eso:</p>
+    <ul>
+      <li>Si se entrena en conjuntos de datos pequeños (como ImageNet-1k), ViT rinde **peor** que una CNN.</li>
+      <li>Si se pre-entrena en conjuntos masivos de datos (como el set de datos privado de Google JFT-300M), ViT **supera con creces** a cualquier CNN tradicional.</li>
+    </ul>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/flash-attention/index.html" class="btn btn-primary">Siguiente: Flash Attention →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

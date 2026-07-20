@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RLHF: Aprendizaje por refuerzo con retroalimentación humana — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para RLHF */
+    .rlhf-pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .rlhf-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      position: relative;
+    }
+    .rlhf-step-number {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-2);
+    }
+    .rlhf-step-number.step-sft { color: #366A9C; }
+    .rlhf-step-number.step-reward { color: #B25E35; }
+    .rlhf-step-number.step-ppo { color: #2d7d46; }
+    .rlhf-step-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+    .rlhf-step-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+    }
+    .rlhf-arrow {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-accent);
+    }
+    .reward-viz {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .reward-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .reward-row:last-child { margin-bottom: 0; }
+    .reward-text {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: var(--space-2);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .reward-score {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      min-width: 48px;
+      text-align: center;
+    }
+    .reward-high {
+      background: rgba(45, 125, 70, 0.1);
+      color: #2d7d46;
+      border: 1px solid #2d7d46;
+    }
+    .reward-low {
+      background: rgba(178, 94, 53, 0.1);
+      color: #B25E35;
+      border: 1px solid #B25E35;
+    }
+    .reward-mid {
+      background: rgba(163, 78, 120, 0.1);
+      color: #A34E78;
+      border: 1px solid #A34E78;
+    }
+    .analogy-box {
+      background: var(--color-surface);
+      border-left: 4px solid #B25E35;
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .analogy-box strong {
+      color: #B25E35;
+    }
+    .constitutonal-box {
+      background: var(--color-surface);
+      border: 1px dashed var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Entrenamiento</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>RLHF: Aprendizaje por refuerzo con retroalimentación humana</h1>
+
+    <p>Un modelo de lenguaje pre-entrenado puede generar texto fluido, pero no sabe si lo que genera es útil, seguro o apropiado. Es como un niño muy leído que ha memorizado millones de libros pero nunca ha recibido una retroalimentación sobre qué comportamientos son aceptables. RLHF (Reinforcement Learning from Human Feedback) es el proceso que enseña al modelo a <strong>generar respuestas que los humanos realmente valoran</strong>.</p>
+
+    <h2>1. La analogía: Niño con calcomanías</h2>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Imagina un niño que sabe hablar fluidamente pero dice cosas sin filtro. Para enseñarle buen comportamiento, le das <strong>calcomanías doradas</strong> cuando dice algo amable y <strong>quitas calcomanías</strong> cuando dice algo grosero. Con el tiempo, el niño aprende a generar automáticamente frases que le ganan más calcomanías. Eso es RLHF: el modelo aprende a generar respuestas que maximizan la "recompensa" humana.</p>
+    </div>
+
+    <h2>2. Los tres pasos del RLHF</h2>
+
+    <p>RLHF no es un solo proceso; son tres etapas secuenciales, cada una con un objetivo distinto:</p>
+
+    <div class="rlhf-pipeline reveal-element">
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-sft">Paso 1 de 3</div>
+        <div class="rlhf-step-title">SFT — Supervised Fine-Tuning</div>
+        <div class="rlhf-step-desc">Entrenadores humanos crean un dataset de ejemplos de alta calidad (pregunta → respuesta ideal). El modelo pre-entrenado se ajusta con estos ejemplos para aprender el formato y el estilo de una conversación útil.</div>
+      </div>
+
+      <div class="rlhf-arrow">↓</div>
+
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-reward">Paso 2 de 3</div>
+        <div class="rlhf-step-title">Modelo de Recompensa (Reward Model)</div>
+        <div class="rlhf-step-desc">Humanos evalúan múltiples respuestas del modelo para la misma pregunta, ranqueándolas de mejor a peor. Con estos datos se entrena un <strong>modelo separado</strong> que aprende a predecir qué respuesta preferiría un humano. Este modelo de recompensa asigna un puntaje (reward) a cada respuesta.</div>
+      </div>
+
+      <div class="rlhf-arrow">↓</div>
+
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-ppo">Paso 3 de 3</div>
+        <div class="rlhf-step-title">PPO — Proximal Policy Optimization</div>
+        <div class="rlhf-step-desc">El modelo generador produce respuestas, el modelo de recompensa las puntúa, y el algoritmo PPO ajusta los parámetros del generador para maximizar la recompensa. El truco es que PPO limita cuánto puede cambiar el modelo en cada paso, evitando que "haga trampas" para obtener puntos altos sin realmente mejorar.</div>
+      </div>
+    </div>
+
+    <h2>3. El modelo de recompensa: Cómo aprende a puntuar</h2>
+
+    <p>El corazón del RLHF es el <strong>modelo de recompensa</strong>. Este modelo recibe una pregunta y una respuesta, y genera un número que representa cuán "buena" es esa respuesta según los estándares humanos.</p>
+
+    <div class="reward-viz reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-3);">Modelo de Recompensa — Evaluación de respuestas</p>
+      <div class="reward-row">
+        <div class="reward-text">"La fotosíntesis es el proceso por el cual las plantas convierten la luz solar en energía química..."</div>
+        <div class="reward-score reward-high">+0.92</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"Las plantas comen sol y hacen comida supongo"</div>
+        <div class="reward-score reward-mid">+0.35</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"No sé, pregunta a un biólogo"</div>
+        <div class="reward-score reward-low">+0.08</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"La fotosíntesis es un mito propagado por los ecologistas"</div>
+        <div class="reward-score reward-low">-0.85</div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Problema del reward hacking:</strong> Si el modelo de recompensa no es robusto, el generador puede aprender a "engañarlo". Por ejemplo, generar respuestas muy largas y verbosas que el reward model confunda con respuestas completas y útiles. Este fenómeno se llama <strong>reward hacking</strong> y es uno de los mayores desafíos del RLHF.</p>
+    </div>
+
+    <h2>4. PPO: Aprender sin descontrolarse</h2>
+
+    <p>El algoritmo PPO (Proximal Policy Optimization) es el que realmente ajusta los pesos del modelo generador. La idea clave es: <strong>mejora poco a poco</strong>. En cada paso, PPO calcula cuánto cambió el comportamiento del modelo y penaliza los cambios demasiado grandes.</p>
+
+    <p>Esto es importante porque sin esta restricción, el modelo podría encontrar "atajos" para obtener recompensas altas sin realmente aprender a generar mejores respuestas. PPO asegura que cada actualización sea un paso moderado en la dirección correcta.</p>
+
+    <ul>
+      <li><strong>Ratio de probabilidad:</strong> Mide cuánto cambió la probabilidad de generar una respuesta después del ajuste.</li>
+      <li><strong>Clip (recorte):</strong> Si el ratio se desvía demasiado de 1.0, PPO lo recorta, impidiendo cambios drásticos.</li>
+      <li><strong>Coeficiente KL:</strong> Una penalización que mantiene al modelo cerca de su comportamiento original, evitando que se desvíe demasiado del SFT.</li>
+    </ul>
+
+    <h2>5. Constitutional AI: RLHF sin humanos</h2>
+
+    <p>RLHF tiene un problema de escala: necesita humanos evaluando respuestas continuamente, lo cual es caro y lento. <strong>Constitutional AI</strong> (CAI), propuesto por Anthropic, reemplaza parte de la retroalimentación humana con un conjunto de principios escritos (una "constitución") que el propio modelo usa para auto-evaluarse.</p>
+
+    <div class="constitutonal-box reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-2);">Ejemplo de constitución:</p>
+      <ul style="font-size: 0.95rem;">
+        <li>"Elige la respuesta que sea más útil, honesta e inofensiva."</li>
+        <li>"Evita generar contenido que promueva odio o violencia."</li>
+        <li>"Si no sabes la respuesta, di que no la sabes en vez de inventar."</li>
+        <li>"Respeta la privacidad y no reveles información personal."</li>
+      </ul>
+    </div>
+
+    <p>En CAI, el modelo genera respuestas, luego se auto-critica usando la constitución, y luego genera una versión mejorada. Este ciclo de auto-mejora reduce drásticamente la necesidad de evaluadores humanos, manteniendo resultados de alta calidad.</p>
+
+    <pre class="code-block reveal-element">
+# Simulación simplificada del pipeline de RLHF
+# Paso 1: SFT (Supervised Fine-Tuning) - ya completado
+# Paso 2: Entrenar modelo de recompensa
+# Paso 3: Optimizar con PPO
+
+class RewardModel:
+    def __init__(self):
+        # En la práctica, esto es una red neuronal
+        # Aquí simulamos con una función de puntuación
+        self.peso_utilidad = 0.4
+        self.peso_seguridad = 0.35
+        self.peso_honestidad = 0.25
+
+    def puntuar(self, respuesta, es_util, es_segura, es_honesta):
+        score = (
+            self.peso_utilidad * es_util +
+            self.peso_seguridad * es_segura +
+            self.peso_honestidad * es_honesta
+        )
+        return round(score, 2)
+
+# Simular 3 respuestas a la misma pregunta
+rm = RewardModel()
+
+respuestas = [
+    {"texto": "La Tierra gira alrededor del Sol en ~365 días",
+     "util": 0.95, "segura": 1.0, "honesta": 0.98},
+    {"texto": "Creo que es al revés, el Sol gira alrededor de la Tierra",
+     "util": 0.1, "segura": 1.0, "honesta": 0.05},
+    {"texto": "No estoy seguro, pero déjame inventar algo",
+     "util": 0.3, "segura": 0.8, "honesta": 0.1}
+]
+
+print("Puntuaciones del Modelo de Recompensa:")
+print("-" * 50)
+for i, r in enumerate(respuestas, 1):
+    score = rm.puntuar(r["texto"], r["util"], r["segura"], r["honesta"])
+    print(f"Respuesta {i}: {score:+.2f}")
+    print(f"  → \"{r['texto'][:50]}...\"")
+
+# El modelo de recompensa guía al generador:
+# respuestas precisas y honestas reciben recompensa alta,
+# respuestas incorrectas o deshonestas reciben penalización.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Impacto:</strong> RLHF fue lo que transformó a GPT-3 en ChatGPT. El modelo base podía generar texto, pero RLHF lo hizo <strong>seguro, útil y conversacional</strong>. Sin este paso, los modelos generan contenido ofensivo, inventan datos, o simplemente no entienden qué se espera de ellos en una interacción real.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/que-es-un-llm/index.html" class="btn btn-primary">Siguiente: ¿Qué es un LLM? →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

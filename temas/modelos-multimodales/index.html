@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelos Multimodales: Texto, imagen, audio y video — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para modelos multimodales */
+    .modality-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+    }
+
+    @media (max-width: 480px) {
+      .modality-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .modality-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      text-align: center;
+      transition: border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .modality-card:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+
+    .modality-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-2);
+      display: block;
+    }
+
+    .modality-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+
+    .modality-desc {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .architecture-flow {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: stretch;
+      gap: var(--space-3);
+    }
+
+    .flow-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 32px;
+      flex-shrink: 0;
+    }
+
+    .flow-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      border: 2px solid var(--color-bg);
+      flex-shrink: 0;
+    }
+
+    .flow-line {
+      width: 2px;
+      flex: 1;
+      background: var(--color-border);
+    }
+
+    .flow-content {
+      flex: 1;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+
+    .flow-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+
+    .flow-text {
+      font-size: 0.95rem;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .model-comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-5) 0;
+      font-size: 0.9rem;
+    }
+
+    .model-comparison-table th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .model-comparison-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+
+    .model-comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .model-comparison-table .model-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .feature-check {
+      color: #3E8453;
+      font-weight: 600;
+    }
+
+    .feature-partial {
+      color: #B25E35;
+      font-weight: 600;
+    }
+
+    .feature-none {
+      color: var(--color-text-muted);
+    }
+
+    .encoding-visual {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+
+    .encoding-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .encoding-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .encoding-type {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      min-width: 80px;
+    }
+
+    .encoding-vector {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+
+    .vector-cell {
+      width: 20px;
+      height: 20px;
+      border-radius: 2px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--color-text-muted);
+    }
+
+    .vector-cell.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    .unified-bridge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+
+    .bridge-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .bridge-arrow {
+      font-size: 1.5rem;
+      color: var(--color-accent);
+    }
+
+    .analogy-box {
+      background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+
+    .analogy-box-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Modelos GenAI</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Modelos Multimodales: Texto, imagen, audio y video</h1>
+    
+    <p>Imagina una persona que puede leer un libro, mirar una pintura, escuchar una canción, y luego hablarte sobre todo eso en una sola conversación. Eso es un modelo multimodal: un sistema de inteligencia artificial que no se limita a un solo tipo de información, sino que puede procesar y generar múltiples modalidades — texto, imágenes, audio y, cada vez más, video — todo dentro de una misma arquitectura.</p>
+
+    <div class="analogy-box reveal-element">
+      <div class="analogy-box-label">Analogía central</div>
+      <p>Un modelo de texto tradicional es como una persona que solo puede leer. Un modelo multimodal es como una persona que puede <strong>ver, leer, escuchar y hablar todo a la vez</strong>. Cuando le muestras una foto y le preguntas "¿qué está pasando aquí?", no solo describe la imagen: entiende el contexto, las relaciones entre objetos, el estado emocional de las personas, y puede responder preguntas complejas sobre todo ello.</p>
+    </div>
+
+    <h2 class="reveal-element">1. ¿Qué significa "multimodal"?</h2>
+    <p>En el contexto de la inteligencia artificial, <strong>modalidad</strong> se refiere a un tipo de información. Los humanos procesamos múltiples modalidades simultáneamente: vemos texto e imágenes, escuchamos sonidos, y generamos habla y escritura. Los modelos multimodales buscan acercarse a esta capacidad.</p>
+
+    <div class="modality-grid reveal-element">
+      <div class="modality-card">
+        <span class="modality-icon">📝</span>
+        <div class="modality-name">Texto</div>
+        <div class="modality-desc">El modal base de los LLMs. Generación y comprensión de lenguaje natural.</div>
+      </div>
+      <div class="modality-card">
+        <span class="modality-icon">🖼️</span>
+        <div class="modality-name">Imagen</div>
+        <div class="modality-desc">Comprensión visual: describir, analizar, detectar objetos, leer texto en imágenes.</div>
+      </div>
+      <div class="modality-card">
+        <span class="modality-icon">🔊</span>
+        <div class="modality-name">Audio</div>
+        <div class="modality-desc">Transcripción, generación de voz, análisis de tono y música.</div>
+      </div>
+      <div class="modality-card">
+        <span class="modality-icon">🎬</span>
+        <div class="modality-name">Video</div>
+        <div class="modality-desc">Comprensión de secuencias temporales, acción y movimiento.</div>
+      </div>
+    </div>
+
+    <p>La verdadera revolución no está en que un modelo pueda manejar cada modalidad por separado, sino en que puede <strong>cruzar información entre modalidades</strong>: ver una imagen y generar una descripción en texto, o escuchar audio y responder preguntas sobre su contenido.</p>
+
+    <h2 class="reveal-element">2. La arquitectura: Visión + Lenguaje bajo un mismo techo</h2>
+    <p>La mayoría de los modelos multimodales actuales siguen una arquitectura de dos componentes principales que se unen en un espacio compartido:</p>
+
+    <div class="architecture-flow reveal-element">
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-label">Entrada multimodal</div>
+          <p class="flow-text">El usuario proporciona una imagen (o audio/video) junto con una pregunta en texto.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-label">Vision Encoder (Codificador de Visión)</div>
+          <p class="flow-text">Un modelo como ViT (Vision Transformer) o CLIP procesa la imagen y la convierte en una serie de vectores numéricos (embeddings).</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-label">Proyección al espacio del lenguaje</div>
+          <p class="flow-text">Una capa de proyección alinea los vectores visuales con el espacio de embeddings del modelo de lenguaje.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+          <div class="flow-line"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-label">Language Model (Modelo de Lenguaje)</div>
+          <p class="flow-text">Un LLM como LLaMA o GPT procesa tanto los tokens de texto como los tokens visuales en una misma secuencia de atención.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-connector">
+          <div class="flow-dot"></div>
+        </div>
+        <div class="flow-content">
+          <div class="flow-label">Respuesta unificada</div>
+          <p class="flow-text">El modelo genera una respuesta en texto que integra información visual y lingüística.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">3. Cómo se unen las modalidades: Espacios de embedding compartidos</h2>
+    <p>El desafío central de los modelos multimodales es hacer que diferentes tipos de datos "hablen el mismo idioma". La solución es convertir todo a <strong>vectores numéricos</strong> (embeddings) en un espacio compartido.</p>
+
+    <div class="encoding-visual reveal-element">
+      <div class="encoding-row">
+        <span class="encoding-type">Texto:</span>
+        <div class="encoding-vector">
+          <span class="vector-cell active">0.8</span>
+          <span class="vector-cell">0.1</span>
+          <span class="vector-cell active">-0.5</span>
+          <span class="vector-cell">0.3</span>
+          <span class="vector-cell active">0.9</span>
+          <span class="vector-cell">-0.2</span>
+          <span class="vector-cell">0.4</span>
+          <span class="vector-cell active">0.7</span>
+        </div>
+      </div>
+      <div class="encoding-row">
+        <span class="encoding-type">Imagen:</span>
+        <div class="encoding-vector">
+          <span class="vector-cell active">0.7</span>
+          <span class="vector-cell">0.2</span>
+          <span class="vector-cell active">-0.4</span>
+          <span class="vector-cell">0.5</span>
+          <span class="vector-cell active">0.8</span>
+          <span class="vector-cell">-0.1</span>
+          <span class="vector-cell">0.3</span>
+          <span class="vector-cell active">0.6</span>
+        </div>
+      </div>
+      <div class="encoding-row">
+        <span class="encoding-type">Audio:</span>
+        <div class="encoding-vector">
+          <span class="vector-cell active">0.6</span>
+          <span class="vector-cell">0.3</span>
+          <span class="vector-cell active">-0.3</span>
+          <span class="vector-cell">0.4</span>
+          <span class="vector-cell active">0.7</span>
+          <span class="vector-cell">-0.3</span>
+          <span class="vector-cell">0.5</span>
+          <span class="vector-cell active">0.8</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>La clave:</strong> Si una imagen de un gato y la palabra "gato" terminan cerca en el espacio vectorial, el modelo puede asociar ambos conceptos. Entrenar estos espacios compartidos es el corazón del aprendizaje multimodal. Proyectos como <strong>CLIP</strong> de OpenAI demostraron que es posible alinear texto e imágenes de manera efectiva mediante entrenamiento con millones de pares de imagen-texto de internet.</p>
+    </div>
+
+    <h2 class="reveal-element">4. Los grandes modelos multimodales</h2>
+    <p>Diversas organizaciones han desarrollado modelos multimodales con diferentes enfoques y capacidades:</p>
+
+    <div class="reveal-element" style="overflow-x: auto;">
+      <table class="model-comparison-table">
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Creador</th>
+            <th>Texto</th>
+            <th>Imagen</th>
+            <th>Audio</th>
+            <th>Video</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="model-name">GPT-4V</td>
+            <td>OpenAI</td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-partial">○</span></td>
+            <td><span class="feature-none">—</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Gemini</td>
+            <td>Google</td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Claude 3</td>
+            <td>Anthropic</td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-none">—</span></td>
+            <td><span class="feature-none">—</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">LLaVA</td>
+            <td>Open Source</td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-check">✓</span></td>
+            <td><span class="feature-none">—</span></td>
+            <td><span class="feature-none">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Gemini</strong> de Google es el más completo en términos de modalidades nativas, siendo entrenado desde cero con texto, imagen, audio y video. <strong>GPT-4V</strong> y <strong>Claude 3</strong> destacan en comprensión visual profunda. <strong>LLaVA</strong> demuestra que la arquitectura multimodal puede ser replicada en el ecosistema de código abierto.</p>
+
+    <h2 class="reveal-element">5. Simulación: Arquitectura multimodal simplificada</h2>
+    <p>Para entender cómo estos componentes trabajan juntos, veamos una simulación simplificada del flujo de información:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación simplificada de un modelo multimodal
+import numpy as np
+
+# ============ ENCODER DE IMAGEN (Vision Transformer simplificado) ============
+def vision_encoder(imagen):
+    """
+    Convierte una imagen en una secuencia de vectores.
+    En la práctica, usa ViT o CLIP.
+    """
+    # Dividir la imagen en parches y embeber cada uno
+    parches = dividir_en_parches(imagen, tamano=16)
+    vectores_visuales = []
+    for parche in parches:
+        vector = red_neuronal_vision(parche)  # [768 dim]
+        vectores_visuales.append(vector)
+    return vectores_visuales  # Lista de vectores, uno por parche
+
+# ============ ENCODER DE TEXTO ============
+def text_encoder(pregunta):
+    """
+    Convierte el texto en tokens embebidos.
+    """
+    tokens = tokenizar(pregunta)
+    vectores_texto = []
+    for token in tokens:
+        vector = embedding_layer(token)  # [768 dim]
+        vectores_texto.append(vector)
+    return vectores_texto
+
+# ============ CAPA DE PROYECCIÓN ============
+def proyectar_a_espacio_comun(vectores_visuales, vectores_texto):
+    """
+    Alinea los vectores visuales con el espacio del lenguaje.
+    En la práctica, es una capa lineal o MLP entrenada.
+    """
+    vectores_visuales_proyectados = []
+    for v in vectores_visuales:
+        v_proyectado = capa_lineal(v)  # Mapea de espacio visual a espacio LLM
+        vectores_visuales_proyectados.append(v_proyectado)
+    # Concatenar ambos tipos de vectores
+    return vectores_visuales_proyectados + vectores_texto
+
+# ============ MODELO DE LENGUAJE UNIFICADO ============
+def modelo_unificado(secuencia_unificada):
+    """
+    Procesa la secuencia combinada de tokens visuales y de texto.
+    """
+    # El Transformer procesa todo junto — no distingue
+    # entre "tokens de imagen" y "tokens de texto"
+    salida = transformer.forward(secuencia_unificada)
+    respuesta = decoder(salida)
+    return respuesta  # "Esta imagen muestra un gato naranja durmiendo"
+
+# ============ PIPELINE COMPLETO ============
+def responder_con_imagen(imagen, pregunta):
+    vectores_img = vision_encoder(imagen)      # Imagen → vectores
+    vectores_txt = text_encoder(pregunta)       # Texto → vectores
+    secuencia = proyectar_a_espacio_comun(      # Unificar
+        vectores_img, vectores_txt
+    )
+    return modelo_unificado(secuencia)          # Generar respuesta</pre>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>Observación clave:</strong> Una vez que la imagen y el texto están en el mismo espacio vectorial, el Transformer los procesa de exactamente la misma manera que procesa cualquier secuencia de tokens. No hay un "código especial" para las imágenes — simplemente son otro tipo de token que el modelo aprendió a interpretar.</p>
+    </div>
+
+    <h2 class="reveal-element">El futuro: Modelos verdaderamente unificados</h2>
+    <p>La tendencia apunta hacia modelos que no solo procesan múltiples modalidades, sino que las generan todas nativamente. Mientras que hoy la mayoría de modelos multimodales solo <em>leen</em> imágenes y audio pero solo <em>escriben</em> texto, los próximos modelos podrán generar imágenes, voz y video de la misma forma que hoy generan texto.</p>
+
+    <p>Esto nos acerca a sistemas de IA que pueden comunicarse con los humanos en cualquier formato: mostrando, explicando, narrando y demostrando — todo a la vez, como lo haría una persona completa.</p>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/embeddings-bases-vectoriales/index.html" class="btn btn-primary">Siguiente: Embeddings →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embeddings y Bases de Datos Vectoriales — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para embeddings y bases vectoriales */
+    .embedding-space {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .embedding-point {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+    .embedding-point:hover {
+      transform: scale(1.05);
+      border-color: var(--color-accent);
+    }
+    .embedding-point.cluster-a {
+      border-left: 3px solid var(--color-accent);
+    }
+    .embedding-point.cluster-b {
+      border-left: 3px solid #366A9C;
+    }
+    .embedding-point.cluster-c {
+      border-left: 3px solid #3E8453;
+    }
+    .embedding-point .word {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: var(--space-1);
+      display: block;
+    }
+    .embedding-point .vector {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      display: block;
+    }
+    .similarity-matrix {
+      display: grid;
+      grid-template-columns: 120px repeat(4, 1fr);
+      gap: 2px;
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .matrix-cell {
+      padding: var(--space-2);
+      text-align: center;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .matrix-header {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      background: var(--color-bg);
+    }
+    .matrix-high {
+      background: rgba(62, 132, 83, 0.12);
+      color: #3E8453;
+      font-weight: 600;
+    }
+    .matrix-medium {
+      background: rgba(178, 94, 53, 0.08);
+    }
+    .matrix-low {
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+    }
+    .vector-db-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .vector-db-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .vector-db-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+      color: var(--color-accent);
+    }
+    .vector-db-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .index-comparison {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .index-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .index-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--color-text);
+    }
+    .index-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    @media (max-width: 600px) {
+      .embedding-space {
+        grid-template-columns: 1fr;
+      }
+      .vector-db-grid {
+        grid-template-columns: 1fr;
+      }
+      .index-comparison {
+        grid-template-columns: 1fr;
+      }
+      .similarity-matrix {
+        grid-template-columns: 80px repeat(4, 1fr);
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">RAG & Vectores</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Embeddings y Bases de Datos Vectoriales</h1>
+    
+    <p>Imagina que entras a una biblioteca donde los libros no están ordenados alfabéticamente, sino por tema y similitud conceptual. Los libros sobre astronomía están junto a los de astrofísica, los de cocina mexicana con los de cocina latinoamericana, y un libro de "inteligencia artificial para médicos" aparecería cerca tanto de libros de IA como de libros de medicina. Eso es exactamente lo que hacen los embeddings: transforman texto en números de manera que la similitud semántica se convierte en cercanía matemática.</p>
+
+    <h2>1. ¿Qué son los embeddings?</h2>
+    <p>Un embedding es un vector numérico de alta dimensión (típicamente 384 a 3072 números) que captura el significado de una palabra, frase o documento. A diferencia de las representaciones simples (como one-hot encoding, donde cada palabra es un vector con un solo 1), los embeddings comprimen el significado semántico en un espacio continuo donde:</p>
+
+    <ul>
+      <li>Palabras con significados similares quedan cerca entre sí.</li>
+      <li>Las relaciones semánticas se preservan matemáticamente.</li>
+      <li>Se pueden calcular distancias y similitudes.</li>
+    </ul>
+
+    <div class="embedding-space reveal-element">
+      <div class="embedding-point cluster-a">
+        <span class="word">gato</span>
+        <span class="vector">[0.82, 0.15, -0.34, ...]</span>
+      </div>
+      <div class="embedding-point cluster-a">
+        <span class="word">felino</span>
+        <span class="vector">[0.79, 0.18, -0.31, ...]</span>
+      </div>
+      <div class="embedding-point cluster-a">
+        <span class="word">gatito</span>
+        <span class="vector">[0.84, 0.12, -0.36, ...]</span>
+      </div>
+      <div class="embedding-point cluster-b">
+        <span class="word">perro</span>
+        <span class="vector">[0.71, 0.22, -0.45, ...]</span>
+      </div>
+      <div class="embedding-point cluster-b">
+        <span class="word">can</span>
+        <span class="vector">[0.68, 0.25, -0.42, ...]</span>
+      </div>
+      <div class="embedding-point cluster-c">
+        <span class="word">coche</span>
+        <span class="vector">[-0.12, 0.88, 0.56, ...]</span>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía de la biblioteca temática:</strong> Un embedding es como asignar a cada libro una direcciónGPS tridimensional en una biblioteca infinita. Los libros sobre "cooking Italian pasta" y "recetas de pizza napolitana" tendrían coordenadas muy cercanas. Un lector que busca "comida mediterránea" encontrará ambos. Un libro sobre "astrofísica cuántica" estaría en una zona completamente diferente. Los embeddings permiten a las computadoras navegar esta "biblioteca del significado" usando matemática en lugar de reglas escritas.</p>
+    </div>
+
+    <h2>2. ¿Cómo se entrenan?</h2>
+    <p>Los embeddings modernos se entrenan con redes neuronales que procesan enormes cantidades de texto. El modelo aprende a predecir el contexto de una palabra a partir de sus vecinas (como Word2Vec y GloVe originalmente) o a distinguir textos similares de textos diferentes (como los modelos contrastivos modernos).</p>
+
+    <p>La arquitectura dominante hoy son los <strong>transformers</strong> bidireccionales. Modelos como <code>text-embedding-3-small</code> (OpenAI), <code>sentence-transformers</code> (Hugging Face), y <code>embed-v3</code> (Cohere) se entrenan con:</p>
+
+    <ol>
+      <li><strong>Datos masivos:</strong> Billones de tokens de internet, libros, código, etc.</li>
+      <li><strong>Tarea contrastiva:</strong> Emparejar documentos que son semánticamente similares y alejar los que no lo son.</li>
+      <li><strong>Instrucciones:</strong> Los modelos más recientes (como GTE-Qwen2 o E5-Mistral) se entrenan para responder a instrucciones específicas del usuario.</li>
+    </ol>
+
+    <div class="callout reveal-element" style="border-left-color: #366A9C;">
+      <p><strong>El truco del entrenamiento contrastivo:</strong> Piensa en un estudiante que ve miles de pares de pregunta-respuesta. Algunos pares son correctos (el estudiante aprende a asociarlos), otros son incorrectos (aprende a distinguirlos). Con el tiempo, desarrolla una intuición de qué respuestas van con qué preguntas. Los modelos de embedding hacen exactamente esto: aprenden un espacio donde preguntas similares quedan cerca de sus respuestas correspondientes.</p>
+    </div>
+
+    <h2>3. Similitud semántica: Medir qué tan parecidos son dos textos</h2>
+    <p>Una vez que tenemos los embeddings, la pregunta clave es: ¿cómo medimos la similitud entre dos vectores? La métrica más común es la <strong>similitud coseno</strong>, que mide el ángulo entre dos vectores (no su magnitud).</p>
+
+    <p>La fórmula es simple: cos(θ) = (A · B) / (||A|| × ||B||). Un resultado de 1.0 significa idénticos, 0.0 significa ortogonales (sin relación), y -1.0 significa opuestos. En la práctica, embeddings de textos similares suelen tener similitudes coseno de 0.7 a 0.95.</p>
+
+    <div class="similarity-matrix reveal-element">
+      <div class="matrix-cell matrix-header">Término</div>
+      <div class="matrix-cell matrix-header">gato</div>
+      <div class="matrix-cell matrix-header">felino</div>
+      <div class="matrix-cell matrix-header">perro</div>
+      <div class="matrix-cell matrix-header">coche</div>
+
+      <div class="matrix-cell matrix-header">gato</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-high">0.91</div>
+      <div class="matrix-cell matrix-medium">0.72</div>
+      <div class="matrix-cell matrix-low">0.15</div>
+
+      <div class="matrix-cell matrix-header">felino</div>
+      <div class="matrix-cell matrix-high">0.91</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-medium">0.68</div>
+      <div class="matrix-cell matrix-low">0.12</div>
+
+      <div class="matrix-cell matrix-header">perro</div>
+      <div class="matrix-cell matrix-medium">0.72</div>
+      <div class="matrix-cell matrix-medium">0.68</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-low">0.22</div>
+
+      <div class="matrix-cell matrix-header">coche</div>
+      <div class="matrix-cell matrix-low">0.15</div>
+      <div class="matrix-cell matrix-low">0.12</div>
+      <div class="matrix-cell matrix-low">0.22</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+    </div>
+
+    <p>Observa que "gato" y "felino" tienen una similitud muy alta (0.91) porque son casi sinónimos. "Gato" y "perro" son ambos mascotas (0.72), pero "coche" está lejos de todos (0.15). Esta estructura refleja el significado real de las palabras.</p>
+
+    <h2>4. Bases de datos vectoriales: Buscar en milisegundos</h2>
+    <p>Si tienes millones de documentos, cada uno representado como un vector de 1536 dimensiones, y quieres encontrar los más similares a una consulta, no puedes comparar uno por uno (sería demasiado lento). Las bases de datos vectoriales resuelven este problema con indexación inteligente.</p>
+
+    <div class="vector-db-grid reveal-element">
+      <div class="vector-db-card">
+        <h4>Pinecone</h4>
+        <p>Base de datos vectorial gestionada (cloud). Optimizada para producción. Soporta filtros por metadata, namespaces, y escala horizontal automática.</p>
+      </div>
+      <div class="vector-db-card">
+        <h4>Weaviate</h4>
+        <p>Open source, soporta búsqueda híbrida (vectorial + keyword). Módulos integrados para embeddings de OpenAI, Cohere, etc. GraphQL API.</p>
+      </div>
+      <div class="vector-db-card">
+        <h4>Chroma</h4>
+        <p>Liviano y fácil de integrar. Ideal para desarrollo local y prototipos. Se ejecuta como librería Python sin servidor separado.</p>
+      </div>
+    </div>
+
+    <p>Otras opciones importantes incluyen <strong>Qdrant</strong> (alto rendimiento en Rust), <strong>Milvus</strong> (diseñado para escala masiva), <strong>pgvector</strong> (extensión de PostgreSQL), y <strong>LanceDB</strong> (basado en formato Lance, serverless).</p>
+
+    <h2>5. Métodos de indexación: HNSW, IVF y más</h2>
+    <p>Las bases vectoriales no hacen búsqueda exhaustiva (brute force). Usan estructuras de datos inteligentes para aproximaciones cercanas a la búsqueda exacta, pero mucho más rápidas.</p>
+
+    <div class="index-comparison reveal-element">
+      <div class="index-card">
+        <h4>HNSW (Hierarchical Navigable Small World)</h4>
+        <p>Crea un grafo jerárquico donde cada punto está conectado a sus vecinos más cercanos en múltiples capas. La búsqueda empieza en la capa superior (puntos muy dispersos) y desciende gradualmente. Excelente precisión, alto uso de memoria.</p>
+      </div>
+      <div class="index-card">
+        <h4>IVF (Inverted File Index)</h4>
+        <p>Divide el espacio en clusters usando k-means. Solo busca en los clusters más cercanos al query, no en todos los datos. Más rápido que HNSW para conjuntos masivos, pero puede perder resultados en los bordes de los clusters.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía de la búsqueda:</strong> HNSW es como tener un mapa de carreteras con autopistas (capas altas) y calles locales (capas bajas). Para llegar a un destino, primero tomas la autopista más cercana, luego bajas a carreteras secundarias, y finalmente a calles locales. IVF es como tener un directorio telefónico organizado por ciudad: no buscas en todas las ciudades, solo en la más cercana a tu consulta.</p>
+    </div>
+
+    <p>Otros métodos incluyen:</p>
+    <ul>
+      <li><strong>PQ (Product Quantization):</strong> Comprime los vectores para ahorrar memoria, agrupando dimensiones en centroides. Útil cuando la memoria es limitada.</li>
+      <li><strong>ScaNN (Google):</strong> Usa cuantización anisotrópica para máxima eficiencia con alta precisión.</li>
+      <li><strong>LSH (Locality-Sensitive Hashing):</strong> Usa funciones hash que preservan la cercanía para agrupar vectores similares.</li>
+    </ul>
+
+    <h2>6. La maldición de la dimensionalidad</h2>
+    <p>A medida que aumentan las dimensiones de los embeddings, algo contraintuitivo sucede: todos los puntos empiezan a parecer igual de lejos entre sí. Esto se llama la "maldición de la dimensionalidad". En 1536 dimensiones, la distancia entre el par más cercano y el par más lejano puede ser muy similar.</p>
+
+    <p>Para contrarrestar esto, las bases vectoriales usan técnicas como:</p>
+    <ul>
+      <li><strong>Reducción de dimensionalidad:</strong> PCA o truncamiento para reducir de 1536 a 256 dimensiones sin perder demasiada información.</li>
+      <li><strong>Cuantización:</strong> Convertir floats de 32 bits a 8 bits o usar códigos de producto para comprimir.</li>
+      <li><strong>Re-ranking:</strong> Buscar rápidamente con vectores comprimidos, luego re-rankear los top-K con los vectores originales completos.</li>
+    </ul>
+
+    <h2>7. Simulación: Búsqueda de similitud en código</h2>
+    <p>El siguiente código simula el proceso completo: crear embeddings de documentos, almacenarlos, y buscar los más similares a una consulta:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación de un sistema de embeddings y búsqueda vectorial
+import numpy as np
+
+def crear_embedding(palabras_clave):
+    """Simula crear un embedding a partir de palabras clave"""
+    vocab = {"gato": 0, "perro": 1, "coche": 2, "ciencia": 3,
+             "física": 4, "programación": 5, "comida": 6, "receta": 7}
+    vector = np.zeros(len(vocab))
+    for palabra in palabras_clave:
+        if palabra in vocab:
+            vector[vocab[palabra]] = np.random.uniform(0.6, 1.0)
+    ruido = np.random.randn(len(vocab)) * 0.05
+    vector = vector + ruido
+    return vector / np.linalg.norm(vector)
+
+def similitud_coseno(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+# Base de datos de documentos
+documentos = {
+    "doc1": {"texto": "Cómo entrenar a tu gato", "embedding": crear_embedding(["gato", "comida"])},
+    "doc2": {"texto": "Guía de cuidado canino", "embedding": crear_embedding(["perro", "comida"])},
+    "doc3": {"texto": "Introducción a la física cuántica", "embedding": crear_embedding(["ciencia", "física"])},
+    "doc4": {"texto": "Receta de paella valenciana", "embedding": crear_embedding(["receta", "comida"])},
+    "doc5": {"texto": "Programación en Python", "embedding": crear_embedding(["programación", "ciencia"])},
+}
+
+# Consulta del usuario
+consulta = crear_embedding(["gato", "comida"])
+print("Consulta: 'alimentación para gatos'\n")
+
+# Búsqueda por similitud
+resultados = []
+for doc_id, doc in documentos.items():
+    sim = similitud_coseno(consulta, doc["embedding"])
+    resultados.append((doc_id, doc["texto"], sim))
+
+# Ordenar por similitud descendente
+resultados.sort(key=lambda x: x[2], reverse=True)
+
+print("Resultados ordenados por relevancia:")
+print("-" * 50)
+for i, (doc_id, texto, sim) in enumerate(resultados, 1):
+    barra = "█" * int(sim * 30)
+    print(f"  {i}. [{sim:.3f}] {barra} {texto}")
+
+print(f"\nDocumento más relevante: {resultados[0][1]}")
+    </pre>
+
+    <div class="callout reveal-element">
+      <p><strong>En producción real:</strong> Los embeddings se calculan con modelos como <code>text-embedding-3-small</code> de OpenAI (1536 dims), <code>all-MiniLM-L6-v2</code> de Sentence Transformers (384 dims), o <code>embed-v3</code> de Cohere (1024 dims). La búsqueda vectorial en bases como Pinecone o Weaviate puede encontrar los 10 más relevantes entre millones de vectores en menos de 10 milisegundos.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/rag/index.html" class="btn btn-primary">Siguiente: RAG →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Códice — Archivo de Aprendizaje</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="container site-header">
+    <div>
+      <h1 class="site-title">Códice</h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+    <div class="search-container">
+      <input type="text" id="search-input" class="search-input" placeholder="Buscar por tema o categoría..." autocomplete="off">
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="view-toggle-container reveal-element">
+      <button id="view-grid-btn" class="view-tab active">Recientes</button>
+      <button id="view-categories-btn" class="view-tab">Categorías</button>
+    </div>
+
+    <div class="topics-grid" id="topics-container">
+      <!-- Cards rendered via JS -->
+    </div>
+  </main>
+
+  <script src="assets/data/temas.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitecturas híbridas (Mamba y SSM) — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para visual de Mamba vs Transformer */
+    .arch-comparison-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    @media (min-width: 768px) {
+      .arch-comparison-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .arch-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      background: var(--color-surface);
+    }
+    .arch-card-header {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+      text-transform: uppercase;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin: 4px 0;
+    }
+    .flow-badge {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Deep Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Arquitecturas híbridas (Mamba y SSM)</h1>
+    
+    <p>Aunque los Transformers dominan la IA actual, tienen un defecto de diseño fundamental: su costo de procesamiento crece de forma **cuadrática** con el largo del texto. Para solucionarlo, en 2023 se presentaron los **State Space Models (SSMs)** como Mamba. Hoy, los modelos más eficientes combinan ambas arquitecturas en diseños híbridos para obtener lo mejor de los dos mundos.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>El problema del Transformer:</strong> Para calcular la atención de un texto de 100,000 palabras, el modelo debe hacer comparaciones cruzadas entre todas las palabras, lo que equivale a \(100,000 \times 100,000\) operaciones. El procesamiento en tiempo lineal es el gran reto de la IA.</p>
+    </div>
+
+    <h2>1. La intuición: El escritorio lleno vs. La taza de té</h2>
+    <p>Compara cómo mantienen el contexto estas dos arquitecturas mientras leen un libro:</p>
+
+    <div class="arch-comparison-container reveal-element">
+      <div class="arch-card">
+        <div class="arch-card-header">Transformer (Atención)</div>
+        <p style="font-size: 0.9rem; margin-bottom: 8px;">Mantiene **todas las páginas abiertas** en su escritorio. Puede mirar cualquier palabra del pasado con total precisión, pero a medida que el libro crece, se queda sin espacio físico en la mesa.</p>
+        <div class="flow-step"><span class="flow-badge">KV Cache</span><span>Crece sin límite</span></div>
+        <div class="flow-step"><span class="flow-badge">Complejidad</span><span style="color: #9a2a2a;">O(N²) (Cuadrática)</span></div>
+      </div>
+      
+      <div class="arch-card">
+        <div class="arch-card-header">Mamba / SSM (Estado de Espacio)</div>
+        <p style="font-size: 0.9rem; margin-bottom: 8px;">Mantiene **una sola taza de té**. Al leer cada página, toma un sorbo y el té absorbe la esencia de la historia. No guarda las páginas abiertas, solo actualiza el sabor del té constantemente.</p>
+        <div class="flow-step"><span class="flow-badge">Estado oculto</span><span>Tamaño fijo</span></div>
+        <div class="flow-step"><span class="flow-badge">Complejidad</span><span style="color: #2d7d46;">O(N) (Lineal)</span></div>
+      </div>
+    </div>
+
+    <h2>2. ¿Cómo funciona un Modelo de Estado de Espacio (SSM)?</h2>
+    <p>Inspirados en la teoría de sistemas de control en física e ingeniería, los SSMs procesan la información de manera matemática secuencial, similar a una Red Recurrente (RNN) pero con la capacidad de entrenarse en paralelo. Su ecuación matemática básica actualiza un **estado oculto (hidden state)** interno continuo:</p>
+    
+    <div class="code-block reveal-element">
+# Ecuación básica de actualización de estado
+h(t) = A * h(t-1) + B * x(t)
+y(t) = C * h(t)
+    </div>
+
+    <ul>
+      <li>\(x(t)\): El token o palabra de entrada actual.</li>
+      <li>\(h(t)\): El estado interno (la "taza de té") que condensa la memoria del pasado.</li>
+      <li>\(y(t)\): La predicción o salida resultante.</li>
+      <li>\(A, B, C\): Matrices de transición que determinan cuánta memoria retener y qué ignorar. En **Mamba**, estas matrices cambian dinámicamente según la palabra de entrada (mecanismo de selección).</li>
+    </ul>
+
+    <h2>3. Arquitecturas Híbridas: Lo mejor de dos mundos</h2>
+    <p>Modelos recientes de código abierto (como *Jamba* de AI21 o *RecurrentGemma* de Google) demuestran que no es necesario elegir uno. Se pueden intercalar capas de ambos en un solo modelo:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Capa</th>
+          <th>Función</th>
+          <th>Ventaja que aporta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Capas Mamba (SSM)</strong></td>
+          <td>Procesan la gran mayoría del texto en tiempo lineal \(O(N)\).</td>
+          <td>Permite digerir contextos gigantescos a velocidades extremadamente altas.</td>
+        </tr>
+        <tr>
+          <td><strong>Capas Transformer (Atención)</strong></td>
+          <td>Se activan ocasionalmente (ej: cada 4 u 8 capas).</td>
+          <td>Aporta capacidad de recuperación exacta y razonamiento complejo (como recordar un número específico en la página 500).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Simulación conceptual: El bucle lineal vs. cuadrático</h2>
+    <p>Este código en Python simula conceptualmente la diferencia en operaciones necesarias para procesar un documento a medida que se hace más largo:</p>
+
+    <div class="code-block reveal-element">
+# Simulación del incremento de costo computacional
+# N = número de tokens en el documento
+
+def procesar_transformer(N):
+    # Cuadrático: cada token se compara con todos los anteriores
+    operaciones = 0
+    for i in range(N):
+        operaciones += i  # Comparación con tokens pasados
+    return operaciones
+
+def procesar_mamba(N, d_state=128):
+    # Lineal: cada token solo actualiza el estado interno de tamaño fijo
+    operaciones = 0
+    for i in range(N):
+        operaciones += d_state  # Multiplicación por matriz de estado fijo
+    return operaciones
+
+# Simulación con un libro de 5,000 palabras
+tokens = 5000
+ops_trans = procesar_transformer(tokens)
+ops_mamba = procesar_mamba(tokens)
+
+print(f"Costo de Atención (Transformer): {ops_trans:,} operaciones")
+print(f"Costo de Estado (Mamba/SSM):    {ops_mamba:,} operaciones")
+print(f"Mamba es ~{ops_trans / ops_mamba:.1f} veces más eficiente en computación")
+    </div>
+
+    <h2>5. Estado actual</h2>
+    <p>El diseño híbrido se está convirtiendo en el estándar para modelos de contexto masivo de nueva generación. Al comprimir la información histórica en un estado oculto de tamaño constante, estos modelos reducen drásticamente el consumo de memoria RAM de video (VRAM) en inferencia, haciendo viable correr modelos potentes localmente en computadoras portátiles o teléfonos móviles.</p>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/scaling-laws-gpt3/index.html" class="btn btn-primary">Siguiente: Scaling Laws →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

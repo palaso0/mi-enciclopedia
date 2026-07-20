@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Function Calling: Uso de herramientas — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    .restaurant-flow {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: var(--space-5) 0;
+      max-width: 520px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .flow-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .flow-text {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+    }
+    .flow-text strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+    .flow-arrow-down {
+      text-align: center;
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+      margin-left: 24px;
+    }
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-4) 0;
+      font-size: 0.9rem;
+    }
+    .param-table th {
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .param-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+    .param-table code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--color-bg);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+    .step-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+    }
+    .chain-visual {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+    .chain-block {
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .chain-block.accent {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.05);
+    }
+    .chain-arrow {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta reveal-element">
+      <span class="topic-badge">Agentes &amp; Protocolos</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1 class="reveal-element">Function Calling: Uso de herramientas</h1>
+    
+    <p class="reveal-element">Un LLM por sí solo solo puede generar texto. Function calling es el mecanismo que le permite decir "necesito usar esta herramienta con estos datos" en lugar de simplemente inventar una respuesta. Es la diferencia entre un modelo que te dice "hace calor hoy" y uno que consulta una API del clima y te da la temperatura exacta de tu ciudad.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía del restaurante:</strong> Piensa en un LLM como un cliente en un restaurante. El cliente sabe qué quiere comer (el objetivo), pero no puede cocinar. Le dice al mesero (el sistema): "Quiero una pasta al pesto sin frutos secos". El mesero traduce eso a una orden específica (function call) para la cocina (API externa), la cocina prepara el plato, y el mesero regresa con el resultado (la respuesta de la función). El cliente nunca entra a la cocina — solo recibe el resultado.</p>
+    </div>
+
+    <h2 class="reveal-element">1. ¿Cómo funciona el mecanismo?</h2>
+    <p class="reveal-element">El proceso de function calling sigue un flujo preciso entre el usuario, el LLM y las herramientas externas:</p>
+
+    <div class="restaurant-flow reveal-element">
+      <div class="flow-row">
+        <div class="flow-icon">👤</div>
+        <div class="flow-text">
+          <strong>Usuario</strong>
+          "¿Qué tiempo hace en Buenos Aires mañana?"
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-text">
+          <strong>LLM analiza</strong>
+          Identifica que necesita datos externos. Decide llamar a <code>obtener_clima(ciudad="Buenos Aires", fecha="mañana")</code>
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">⚡</div>
+        <div class="flow-text">
+          <strong>Sistema ejecuta</strong>
+          Envía la llamada a la API del clima con los parámetros exactos
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">📡</div>
+        <div class="flow-text">
+          <strong>API responde</strong>
+          Retorna: <code>{"temp": 22, "condicion": "parcialmente nublado", "lluvia": 30}</code>
+        </div>
+      </div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-text">
+          <strong>LLM integra</strong>
+          "Mañana en Buenos Aires habrá 22°C con cielo parcialmente nublado. Hay 30% de probabilidad de lluvia, llevá paraguas."
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Punto clave:</strong> El LLM nunca ejecuta la función directamente. Solo <em>genera</em> la llamada con el nombre correcto y los parámetros correctos. Es el sistema externo (el runtime del agente) quien realmente conecta con la API y ejecuta la operación.</p>
+    </div>
+
+    <h2 class="reveal-element">2. Formato de la llamada: Request y Response</h2>
+    <p class="reveal-element">Cada function call tiene un formato estructurado. Primero, el desarrollador define las herramientas disponibles para el modelo. Luego, cuando el modelo decide usar una herramienta, genera un JSON con la estructura esperada:</p>
+
+    <span class="step-badge reveal-element">Paso 1: Definición de herramientas</span>
+    <pre class="code-block reveal-element">{
+  "nombre": "obtener_clima",
+  "descripcion": "Obtiene el pronóstico del clima para una ciudad",
+  "parametros": {
+    "type": "object",
+    "properties": {
+      "ciudad": {
+        "type": "string",
+        "description": "Nombre de la ciudad"
+      },
+      "fecha": {
+        "type": "string",
+        "enum": ["hoy", "mañana", "pasado"],
+        "description": "Para qué día se consulta"
+      }
+    },
+    "required": ["ciudad"]
+  }
+}</pre>
+
+    <span class="step-badge reveal-element">Paso 2: Respuesta del modelo (function call)</span>
+    <pre class="code-block reveal-element">{
+  "tool_calls": [
+    {
+      "id": "call_abc123",
+      "function": {
+        "name": "obtener_clima",
+        "arguments": "{\"ciudad\": \"Buenos Aires\", \"fecha\": \"mañana\"}"
+      }
+    }
+  ]
+}</pre>
+
+    <span class="step-badge reveal-element">Paso 3: Resultado devuelto al modelo</span>
+    <pre class="code-block reveal-element">{
+  "tool_call_id": "call_abc123",
+  "output": {
+    "ciudad": "Buenos Aires",
+    "temperatura": 22,
+    "condicion": "parcialmente nublado",
+    "probabilidad_lluvia": 30,
+    "viento_kmh": 15
+  }
+}</pre>
+
+    <h2 class="reveal-element">3. Validación de parámetros</h2>
+    <p class="reveal-element">El sistema valida que los parámetros generados por el modelo coincidan con el esquema definido. Esto previene errores en tiempo de ejecución:</p>
+
+    <table class="param-table reveal-element">
+      <thead>
+        <tr>
+          <th>Parámetro</th>
+          <th>Tipo</th>
+          <th>Requerido</th>
+          <th>Validación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>ciudad</code></td>
+          <td>string</td>
+          <td>Sí</td>
+          <td>No puede estar vacío</td>
+        </tr>
+        <tr>
+          <td><code>fecha</code></td>
+          <td>enum</td>
+          <td>No</td>
+          <td>Debe ser "hoy", "mañana" o "pasado"</td>
+        </tr>
+        <tr>
+          <td><code>unidades</code></td>
+          <td>enum</td>
+          <td>No</td>
+          <td>Debe ser "celsius" o "fahrenheit"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">Si el modelo genera un parámetro inválido (por ejemplo, una fecha fuera del enum), el sistema puede rechazar la llamada antes de ejecutarla, o devolver un error que el modelo puede usar para corregir su respuesta.</p>
+
+    <h2 class="reveal-element">4. Llamadas encadenadas y ejecución paralela</h2>
+    <p class="reveal-element">Las tareas complejas suelen requerir múltiples llamadas a herramientas. Hay dos patrones principales:</p>
+
+    <p class="reveal-element"><strong>Encadenamiento secuencial:</strong> Cada llamada depende del resultado de la anterior. El modelo genera una llamada, recibe el resultado, decide la siguiente, y así sucesivamente.</p>
+
+    <div class="chain-visual reveal-element">
+      <div class="chain-block accent">buscar_usuario("pablo")</div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-block">obtener_pedidos(id=42)</div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-block">calcular_total(pedidos)</div>
+    </div>
+
+    <p class="reveal-element"><strong>Ejecución paralela:</strong> Cuando las llamadas son independientes, el modelo puede generar múltiples tool calls en una sola respuesta. El sistema las ejecuta simultáneamente y devuelve todos los resultados juntos.</p>
+
+    <div class="chain-visual reveal-element">
+      <div class="chain-block accent">obtener_clima("Buenos Aires")</div>
+      <span class="chain-arrow">+</span>
+      <div class="chain-block accent">obtener_clima("Córdoba")</div>
+      <span class="chain-arrow">+</span>
+      <div class="chain-block accent">obtener_clima("Mendoza")</div>
+    </div>
+
+    <h2 class="reveal-element">5. Ejemplo real: Consulta a una base de datos</h2>
+    <p class="reveal-element">Veamos un ejemplo completo de cómo un asistente de e-commerce usa function calling para responder preguntas sobre pedidos:</p>
+
+    <pre class="code-block reveal-element">import json
+
+# Herramientas disponibles para el asistente
+herramientas = [
+    {
+        "nombre": "buscar_producto",
+        "descripcion": "Busca productos por nombre o categoría",
+        "parametros": {
+            "consulta": "string (requerido)",
+            "categoria": "string (opcional)",
+            "precio_maximo": "number (opcional)"
+        }
+    },
+    {
+        "nombre": "consultar_stock",
+        "descripcion": "Verifica disponibilidad de un producto",
+        "parametros": {
+            "producto_id": "string (requerido)",
+            "sucursal": "string (opcional)"
+        }
+    },
+    {
+        "nombre": "crear_pedido",
+        "descripcion": "Crea un nuevo pedido con los productos indicados",
+        "parametros": {
+            "productos": "array de {id, cantidad} (requerido)",
+            "direccion_envio": "string (requerido)"
+        }
+    }
+]
+
+# Simulación: el usuario hace una pregunta
+pregunta = "¿Tienen auriculares bluetooth por menos de $50.000?"
+
+# El LLM decide qué herramienta usar
+decision_llm = {
+    "tool_calls": [{
+        "function": {
+            "name": "buscar_producto",
+            "arguments": json.dumps({
+                "consulta": "auriculares bluetooth",
+                "precio_maximo": 50000
+            })
+        }
+    }]
+}
+
+# El sistema ejecuta la función
+resultado_real = buscar_producto(
+    consulta="auriculares bluetooth",
+    precio_maximo=50000
+)
+# → [{"id": "AUR001", "nombre": "Sony WH-CH520", "precio": 35000},
+#    {"id": "AUR002", "nombre": "JBL Tune 510BT", "precio": 28000}]
+
+# El LLM integra el resultado en una respuesta natural
+respuesta = "Sí, tenemos dos opciones por debajo de $50.000:
+  1. Sony WH-CH520 — $35.000
+  2. JBL Tune 510BT — $28.000
+  ¿Querés que verifique el stock de alguno?"</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>La ventaja de function calling:</strong> El LLM no "inventa" precios ni inventarios. Consulta datos reales del sistema y genera una respuesta precisa y actualizada. Si no encuentra resultados, simplemente lo informa en lugar de fabricar información.</p>
+    </div>
+
+    <h2 class="reveal-element">6. Consideraciones importantes</h2>
+    <p class="reveal-element">Function calling no es infalible. Hay varios aspectos a tener en cuenta al diseñar un sistema con herramientas:</p>
+
+    <ul class="reveal-element">
+      <li><strong>El modelo puede equivocarse:</strong> A veces genera parámetros incorrectos o elige la herramienta equivocada. Siempre validar las llamadas antes de ejecutarlas.</li>
+      <li><strong>Seguridad:</strong> Si una función puede modificar datos o ejecutar código, el agente necesita permisos bien definidos. Nunca expongas funciones destructivas sin validación humana.</li>
+      <li><strong>Latencia:</strong> Cada llamada a herramienta agrega tiempo. Las llamadas paralelas mitigan esto, pero el encadenamiento secuencial puede ser lento.</li>
+      <li><strong>Límites de la ventana:</strong> El resultado de cada función consume tokens en la ventana de contexto. Si los resultados son muy grandes, el modelo puede perder información importante.</li>
+    </ul>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/skills-contexto-agentes/index.html" class="btn btn-primary">Siguiente: Skills →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

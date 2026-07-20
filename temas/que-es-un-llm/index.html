@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Qué es un LLM? — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para ¿Qué es un LLM? */
+    .token-prediction-viz {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .token-chain {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: var(--space-3);
+    }
+    .token-item {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+    }
+    .token-item.processed {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.05);
+    }
+    .token-item.predicted {
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.08);
+      color: #2d7d46;
+      font-weight: 600;
+      border-style: dashed;
+    }
+    .prob-bars {
+      margin-top: var(--space-3);
+    }
+    .prob-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: 6px;
+    }
+    .prob-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      width: 100px;
+      text-align: right;
+    }
+    .prob-track {
+      flex: 1;
+      height: 18px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .prob-fill {
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: var(--radius-sm);
+      transition: width 0.4s ease;
+    }
+    .prob-value {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      width: 40px;
+    }
+    .emergence-table {
+      margin: var(--space-4) 0;
+    }
+    .analogy-box {
+      background: var(--color-surface);
+      border-left: 4px solid var(--color-text);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .analogy-box strong {
+      color: var(--color-text);
+    }
+    .limitation-list {
+      list-style: none;
+      margin: var(--space-3) 0;
+    }
+    .limitation-list li {
+      padding: var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-2);
+      font-size: 0.95rem;
+    }
+    .limitation-list li:last-child { margin-bottom: 0; }
+    .limitation-icon {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      margin-right: var(--space-2);
+    }
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+    }
+    .arch-block {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    .arch-block.highlight {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.03);
+      font-weight: 600;
+    }
+    .arch-arrow {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Modelos GenAI</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>¿Qué es un LLM?</h1>
+
+    <p>Un LLM (Large Language Model) es, en su forma más simple, <strong>el autocompletado más sofisticado jamás creado</strong>. Ha leído millones de páginas de texto de internet, libros, código y conversaciones, y ha aprendido los patrones estadísticos del lenguaje humano con una precisión asombrosa. Cuando le escribes "El cielo es de color", el modelo no "entiende" el cielo; simplemente sabe, con alta probabilidad, que la siguiente palabra debería ser "azul". Pero de esa mecánica aparentemente simple emergen comportamientos que parecen inteligencia.</p>
+
+    <h2>1. La base: La arquitectura Transformer</h2>
+
+    <p>Todo LLM moderno se construye sobre la arquitectura <strong>Transformer</strong>, introducida en 2017 por Google. Su componente fundamental es el <strong>mecanismo de autoatención</strong>, que permite al modelo procesar todas las palabras de una secuencia simultáneamente y aprender qué palabras se relacionan entre sí.</p>
+
+    <div class="arch-flow reveal-element">
+      <div class="arch-block">Texto de entrada: "La inteligencia artificial"</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-block">Tokenización → [La, intelig, encia, artificial]</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-block highlight">Capas del Transformer (12 a 96+ capas)</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-block">Distribución de probabilidades sobre el vocabulario</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-block">Siguiente token predicho: "es" (prob: 0.34)</div>
+    </div>
+
+    <p>Un LLM típico tiene entre 7 mil millones (7B) y más de 1 billón de parámetros. Cada parámetro es un número que el modelo ajusta durante el entrenamiento para capturar patrones del lenguaje.</p>
+
+    <h2>2. Cómo se entrena: Preentrenamiento + ajuste</h2>
+
+    <p>El entrenamiento de un LLM ocurre en dos grandes fases:</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Fase 1 — Preentrenamiento:</strong> El modelo lee billones de tokens (palabras/subpalabras) de internet y aprende a predecir la siguiente palabra en cada secuencia. No tiene "objetivo" más allá de completar texto. Este proceso toma meses y cuesta millones de dólares en cómputo. El resultado es un modelo que puede generar texto coherente pero que no sabe cómo ser "útil" o "seguro".</p>
+    </div>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>Fase 2 — Ajuste (Fine-tuning + RLHF):</strong> Humanos crean ejemplos de conversaciones ideales y dan retroalimentación sobre las respuestas del modelo. Esto ajusta el comportamiento del modelo para que sea útil, seguro y conversacional. Es lo que separa a un generador de texto crudo de un asistente como ChatGPT.</p>
+    </div>
+
+    <h2>3. ¿Qué significa "entender" para un LLM?</h2>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Piensa en un LLM como <strong>un autocompletado que ha leído todo lo que existe</strong>. No "entiende" como tú entiendes. No tiene conciencia, no tiene experiencias, no tiene creencias. Pero ha visto tantos patrones del lenguaje que puede generar texto que <em>parece</em> indicar comprensión profunda. Cuando un LLM te explica la relatividad, no está "repensando" la teoría de Einstein; está generando la secuencia de palabras que, estadísticamente, es la continuación más probable dado su entrenamiento masivo.</p>
+    </div>
+
+    <p>Esto plantea una pregunta filosófica fascinante: si un sistema puede generar respuestas indistinguibles de las de alguien que entiende, ¿importa si realmente "entiende"? Para fines prácticos, lo que importa es que el modelo <strong>captura las relaciones semánticas</strong> del lenguaje con suficiente precisión como para ser útil.</p>
+
+    <h2>4. Predicción de tokens en acción</h2>
+
+    <p>El corazón mecánico de todo LLM es la predicción del siguiente token. Veamos cómo funciona:</p>
+
+    <div class="token-prediction-viz reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-2);">Predicción del siguiente token</p>
+      <div class="token-chain">
+        <span class="token-item processed">La</span>
+        <span class="token-item processed">capital</span>
+        <span class="token-item processed">de</span>
+        <span class="token-item processed">Francia</span>
+        <span class="token-item processed">es</span>
+        <span class="token-item predicted">¿?</span>
+      </div>
+      <p style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: var(--space-2);">Top-5 candidatos con sus probabilidades:</p>
+      <div class="prob-bars">
+        <div class="prob-row">
+          <span class="prob-label">"París"</span>
+          <div class="prob-track"><div class="prob-fill" style="width: 89%; background: #2d7d46;"></div></div>
+          <span class="prob-value">89.2%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-label">"Lyon"</span>
+          <div class="prob-track"><div class="prob-fill" style="width: 4%; background: var(--color-accent);"></div></div>
+          <span class="prob-value">3.8%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-label">"una ciudad"</span>
+          <div class="prob-track"><div class="prob-fill" style="width: 2%; background: var(--color-accent);"></div></div>
+          <span class="prob-value">2.1%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-label">"Marsella"</span>
+          <div class="prob-track"><div class="prob-fill" style="width: 1.5%; background: var(--color-accent);"></div></div>
+          <span class="prob-value">1.5%</span>
+        </div>
+        <div class="prob-row">
+          <span class="prob-label">"el centro"</span>
+          <div class="prob-track"><div class="prob-fill" style="width: 0.8%; background: var(--color-accent);"></div></div>
+          <span class="prob-value">0.8%</span>
+        </div>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-3);">El modelo genera "París" porque tiene la mayor probabilidad. El parámetro <strong>temperature</strong> controla si siempre elige el más probable o si explora opciones menos obvias.</p>
+    </div>
+
+    <pre class="code-block reveal-element">
+# Simulación de la predicción de tokens en un LLM
+import random
+
+def predecir_siguiente_token(historial, vocabulario_probabilidades):
+    """
+    Simula cómo un LLM predice el siguiente token.
+    Recibe el historial de tokens y devuelve un token
+    basado en las probabilidades aprendidas.
+    """
+    candidatos = vocabulario_probabilidades
+
+    # Temperature controla la "creatividad" del modelo
+    # temperature=0: siempre elige el más probable (determinista)
+    # temperature=1.0: respeta las probabilidades originales
+    # temperature>1.0: más aleatorio y creativo
+    temperature = 0.7
+
+    # Aplicar temperature a las probabilidades
+    logits_simulados = [p ** (1/temperature) for p in candidatos.values()]
+    total = sum(logits_simulados)
+    probs_normalizadas = [x / total for x in logits_simulados]
+
+    # Muestrear según las probabilidades ajustadas
+    tokens = list(candidatos.keys())
+    token_elegido = random.choices(tokens, weights=probs_normalizadas, k=1)[0]
+    return token_elegido
+
+# Ejemplo: Predicción después de "La capital de Francia es"
+historial = "La capital de Francia es"
+vocabulario = {
+    "París": 0.892,
+    "Lyon": 0.038,
+    "una ciudad": 0.021,
+    "Marsella": 0.015,
+    "conocida": 0.008,
+    "el centro": 0.006
+}
+
+print(f"Entrada: \"{historial}\"")
+print(f"Predicción: \"{predecir_siguiente_token(historial, vocabulario)}\"")
+print()
+
+# Ahora generamos una secuencia completa (autoregresivo)
+secuencia = ["La", "capital", "de", "Francia"]
+for _ in range(5):
+    # Cada predicción se añade a la entrada para la siguiente
+    nuevo = predecir_siguiente_token(secuencia, vocabulario)
+    secuencia.append(nuevo)
+
+print(f"Secuencia generada: {' '.join(secuencia)}")
+# Ejemplo de salida: "La capital de Francia es conocida París una"</pre>
+
+    <h2>5. La emergencia: Cuando más datos crean nuevas capacidades</h2>
+
+    <p>Uno de los fenómenos más fascinantes de los LLMs es la <strong>emergencia</strong> (emergence). A medida que los modelos crecen en tamaño, de repente desarrollan habilidades que los modelos más pequeños simplemente no tienen. No es una mejora gradual; es un <strong>saltos cualitativos</strong> que aparecen al superar ciertos umbrales.</p>
+
+    <div class="emergence-table reveal-element">
+      <table>
+        <thead>
+          <tr>
+            <th>Habilidad</th>
+            <th>~100M params</th>
+            <th>~1B params</th>
+            <th>~10B params</th>
+            <th>~100B+ params</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Completar frases</td>
+            <td>✅ Básico</td>
+            <td>✅ Bueno</td>
+            <td>✅ Sólido</td>
+            <td>✅ Excelente</td>
+          </tr>
+          <tr>
+            <td>Traducción simple</td>
+            <td>❌</td>
+            <td>✅ Básico</td>
+            <td>✅ Bueno</td>
+            <td>✅ Natural</td>
+          </tr>
+          <tr>
+            <td>Resolución de problemas lógicos</td>
+            <td>❌</td>
+            <td>❌</td>
+            <td>✅ Incierto</td>
+            <td>✅ Confiado</td>
+          </tr>
+          <tr>
+            <td>Generación de código funcional</td>
+            <td>❌</td>
+            <td>❌</td>
+            <td>✅ Básico</td>
+            <td>✅ Complejo</td>
+          </tr>
+          <tr>
+            <td>Razonamiento chain-of-thought</td>
+            <td>❌</td>
+            <td>❌</td>
+            <td>❌</td>
+            <td>✅ Emergente</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>La emergencia desafió la intuición de que "más grande es simplemente mejor de la misma manera". Resulta que ciertas capacidades son <strong>cualitativamente distintas</strong> y solo aparecen cuando el modelo tiene suficiente capacidad para representarlas.</p>
+
+    <h2>6. Limitaciones: Alucinaciones y más allá</h2>
+
+    <p>A pesar de su poder, los LLMs tienen limitaciones fundamentales que es importante entender:</p>
+
+    <ul class="limitation-list reveal-element">
+      <li>
+        <span class="limitation-icon" style="color: #B25E35;">⚠</span>
+        <strong>Alucinaciones:</strong> El modelo puede generar información completamente inventada con total confianza. Como solo predice probabilidades, no tiene manera de saber si algo es "verdadero"; solo sabe si es "probable".
+      </li>
+      <li>
+        <span class="limitation-icon" style="color: #366A9C;">◆</span>
+        <strong>Sin memoria persistente:</strong> Cada conversación empieza de cero. El modelo no recuerda interacciones anteriores (a menos que se le proporcione explícitamente en el contexto).
+      </li>
+      <li>
+        <span class="limitation-icon" style="color: #A34E78;">▲</span>
+        <strong>Sin acceso a tiempo real:</strong> Su conocimiento está congelado en el momento del entrenamiento. No sabe qué pasó ayer.
+      </li>
+      <li>
+        <span class="limitation-icon" style="color: #2d7d46;">●</span>
+        <strong>Sesgos del entrenamiento:</strong> El modelo refleja los sesgos presentes en los datos de internet, que pueden incluir información incorrecta, sesgada o inapropiada.
+      </li>
+      <li>
+        <span class="limitation-icon" style="color: var(--color-text-muted);">○</span>
+        <strong>Sin razonamiento verdadero:</strong> Aunque puede simular razonamiento lógico, no tiene capacidad de deducción genuina. Funciona por patrones, no por comprensión causal.
+      </li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>En resumen:</strong> Un LLM es una máquina de predicción estadística extraordinariamente potente. No piensa, no siente, no entiende en el sentido humano. Pero ha capturado suficientes patrones del lenguaje humano como para ser una herramienta de productividad revolucionaria. Comprender tanto su poder como sus limitaciones es clave para usarlo de manera responsable.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/modelos-difusion/index.html" class="btn btn-primary">Siguiente: Modelos de Difusión →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

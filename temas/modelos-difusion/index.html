@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelos de Difusión: Cómo se generan imágenes — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para la lección de modelos de difusión */
+    .noise-pipeline {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+      flex-wrap: wrap;
+    }
+    .pipeline-step {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .pipeline-step.clean {
+      border-color: #3E8453;
+      background: rgba(62, 132, 83, 0.04);
+    }
+    .pipeline-step.noisy {
+      border-color: #B25E35;
+      background: rgba(178, 94, 53, 0.04);
+    }
+    .pipeline-step.pure-noise {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.04);
+      font-weight: 600;
+    }
+    .pipeline-arrow {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+    }
+    .diffusion-visual {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+    }
+    .diffusion-cell {
+      aspect-ratio: 1;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 4px;
+      transition: transform var(--transition-fast);
+    }
+    .diffusion-cell:hover {
+      transform: scale(1.05);
+    }
+    .diffusion-cell.img-clean {
+      background: rgba(62, 132, 83, 0.06);
+      border-color: #3E8453;
+      color: #3E8453;
+    }
+    .diffusion-cell.img-step1 {
+      background: rgba(62, 132, 83, 0.03);
+      border-color: #6B8F71;
+    }
+    .diffusion-cell.img-step2 {
+      background: rgba(178, 94, 53, 0.03);
+      border-color: #B25E35;
+    }
+    .diffusion-cell.img-step3 {
+      background: rgba(178, 94, 53, 0.05);
+      border-color: #A34E78;
+    }
+    .diffusion-cell.img-pure-noise {
+      background: rgba(154, 42, 42, 0.06);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+    .model-comparison {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .model-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+      text-align: center;
+    }
+    .model-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+      color: var(--color-accent);
+    }
+    .model-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+    @media (max-width: 600px) {
+      .model-comparison {
+        grid-template-columns: 1fr;
+      }
+      .diffusion-visual {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Modelos GenAI</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Modelos de Difusión: Cómo se generan imágenes</h1>
+    
+    <p>Imagina que tienes una fotografía perfecta y decides gradualmente agregarle puntos de pintura aleatoria hasta que la imagen original desaparezca completamente bajo una capa de ruido puro. Ahora imagina que entrenas a un artista para que observe ese proceso al revés: dado un lienzo lleno de ruido, aprenda paso a paso a eliminar el ruido hasta reconstruir la imagen original. Eso es, en esencia, un modelo de difusión. Herramientas como DALL-E, Stable Diffusion y Midjourney utilizan esta idea para transformar texto en imágenes impresionantes.</p>
+
+    <h2>1. El proceso directo: Destruir una imagen paso a paso</h2>
+    <p>El primer ingrediente del modelo de difusión es un proceso simple y completamente determinista: tomar una imagen real y añadirle ruido gradualmente. En cada paso, se inyecta un poco de ruido gaussiano (puntos aleatorios) sobre la imagen. Después de suficientes pasos, la imagen se convierte en puro ruido estático, irreconocible.</p>
+
+    <div class="noise-pipeline reveal-element">
+      <div class="pipeline-step clean">
+        x₀<br><small>Imagen limpia</small>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step noisy">
+        x₁<br><small>Poco ruido</small>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step noisy">
+        x₂<br><small>Más ruido</small>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step noisy">
+        x₃<br><small>Mucho ruido</small>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step pure-noise">
+        xₜ<br><small>Ruido puro</small>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía del escultor:</strong> Piensa en el proceso directo como esculpir mármol. Empiezas con un bloque perfecto (la imagen real) y vas golpeando el cincel para ir eliminando material. Pero aquí el proceso es al revés: empiezas con una imagen hermosa y vas "ensuciándola" con ruido hasta que solo queda polvo blanco. El reto es entrenar a la computadora para que aprenda a reversar ese proceso: que, dada una pila de polvo, sepa reconstruir la escultura original.</p>
+    </div>
+
+    <p>Este proceso se describe matemáticamente como una cadena de Markov. Cada paso <code>x_t</code> depende solo del paso anterior <code>x_{t-1}</code> y una cantidad fija de ruido. El schedule de ruido controla cuánto se añade en cada paso — comúnmente se usa un schedule lineal o el schedule coseno que distribuye el ruido de manera más suave.</p>
+
+    <h2>2. El proceso inverso: Aprender a eliminar ruido</h2>
+    <p>El proceso directo es trivial — solo suma ruido. El verdadero poder está en el proceso inverso. Se entrena una red neuronal (típicamente una U-Net) para que, dado un paso con ruido <code>x_t</code> y el número de paso <code>t</code>, prediga cuánto ruido se añadió. Si la red predice correctamente el ruido, se puede sustraer para obtener una versión menos ruidosa.</p>
+
+    <div class="diffusion-visual reveal-element">
+      <div class="diffusion-cell img-clean">Gato 🐱<br><small>Original</small></div>
+      <div class="diffusion-cell img-step1">Gato...<br><small>x₁</small></div>
+      <div class="diffusion-cell img-step2">¿Gato?<br><small>x₃</small></div>
+      <div class="diffusion-cell img-step3">Ruido...<br><small>x₇</small></div>
+      <div class="diffusion-cell img-pure-noise">▓░▓░▓<br><small>xₜ</small></div>
+    </div>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>La analogía inversa:</strong> Es como un restaurador de arte que recibe una pintura cubierta de mugre y manchas. El restaurador aprende a identificar qué partes son mugre (ruido) y qué partes son pintura original. En cada pasada elimina una capa de mugre hasta que la obra maestra emerge de nuevo. Los modelos de difusión hacen exactamente esto, pero con miles de pasos refinados.</p>
+    </div>
+
+    <p>El entrenamiento consiste en: tomar una imagen limpia, agregarle ruido en un paso aleatorio, y pedirle a la red que prediga ese ruido. Se compara la predicción con el ruido real usando MSE loss (error cuadrático medio). Tras millones de ejemplos, la red aprende a eliminar ruido de cualquier imagen.</p>
+
+    <h2>3. Guía por texto: Cómo el prompt dirige la generación</h2>
+    <p>Un modelo de difusión puro generaría imágenes aleatorias. Para que responda a un texto como "un gato astronauta en la luna", necesitamos un mecanismo de condicionamiento. Aquí es donde entran los modelos de lenguaje como CLIP.</p>
+
+    <p>CLIP (Contrastive Language-Image Pre-training) fue entrenado por OpenAI con millones de pares de imagen-texto. Aprende a representar tanto imágenes como texto en un mismo espacio vectorial. Cuando escribes un prompt, CLIP lo convierte en un embedding (un vector numérico) que guía el proceso de denoising.</p>
+
+    <ul>
+      <li><strong>Cross-attention:</strong> En cada paso de denoising, la U-Net hace "atención cruzada" entre los mapas de características de la imagen y el embedding del texto. Esto permite que cada región de la imagen "escuche" el prompt.</li>
+      <li><strong>Classifier-Free Guidance:</strong> Para hacer que la imagen se alinee más con el texto, se ejecuta la denoising dos veces: una con el prompt y una sin él. La diferencia se amplifica con un parámetro <code>guidance_scale</code> (típicamente 7-15).</li>
+      <li><strong>Negative prompts:</strong> También se puede usar un prompt negativo para alejar la generación de ciertos conceptos.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía de la pintura asistida:</strong> Imagina que estás pintando con un amigo ciego que solo puede escuchar tus indicaciones. Tú le dices "más azul aquí", "una forma redonda arriba", "algo que parezca un cohete". En cada pincelada, tu amigo ajusta su trabajo basándose en lo que le describes. El modelo de difusión con condicionamiento funciona igual: el prompt es la guía verbal que dirige cada paso de la creación.</p>
+    </div>
+
+    <h2>4. La arquitectura U-Net: El corazón del denoising</h2>
+    <p>La U-Net es la red neuronal que predice el ruido en cada paso. Se llama "U-Net" por su forma de U: tiene un camino de codificación (encoder) que reduce la imagen a características abstractas y un camino de decodificación (decoder) que reconstruye la imagen. Las conexiones de salto (skip connections) permiten que los detalles finos de cada escala se preserven.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Función</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Encoder (Contracting path)</strong></td>
+          <td>Reduce la resolución espacial, extrae características cada vez más abstractas de la imagen ruidosa</td>
+        </tr>
+        <tr>
+          <td><strong>Bottleneck</strong></td>
+          <td>Representación latent más comprimida, donde se integra la información del texto (cross-attention)</td>
+        </tr>
+        <tr>
+          <td><strong>Decoder (Expanding path)</strong></td>
+          <td>Reconstruye la imagen paso a paso, combinando características de baja y alta resolución</td>
+        </tr>
+        <tr>
+          <td><strong>Skip connections</strong></td>
+          <td>Conectan directamente capas del encoder con capas del decoder a la misma resolución</td>
+        </tr>
+        <tr>
+          <td><strong>Time embedding</strong></td>
+          <td>Inyecta el número de paso <code>t</code> para que la red sepa cuánto ruido queda</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Cada bloque de la U-Net contiene capas de convolución, normalización de grupo (GroupNorm), activaciones SiLU, y bloques de atención (self-attention y cross-attention). Los bloques ResNet permiten gradientes profundos y aprendizaje estable.</p>
+
+    <h2>5. Difusión latente: Hacerlo todo más rápido</h2>
+    <p>Los modelos de difusión originales operaban directamente en píxeles, lo que era enormemente costoso: una imagen de 512x512 tiene 786,432 dimensiones. La difusión latente (Latent Diffusion Models, LDM), la base de Stable Diffusion, resuelve esto con un truco elegante.</p>
+
+    <div class="model-comparison reveal-element">
+      <div class="model-card">
+        <h4>DALL-E 2</h4>
+        <p>OpenAI. Usa un prior de CLIP para mapear texto a embeddings, luego un decoder de difusión condicionado.</p>
+      </div>
+      <div class="model-card">
+        <h4>Stable Diffusion</h4>
+        <p>Stability AI. Difusión latente con VAE. Open source, ejecutable en GPUs de consumo.</p>
+      </div>
+      <div class="model-card">
+        <h4>Midjourney</h4>
+        <p>Midjourney Inc. Conocido por estética artística. Optimizado para calidad visual sobre precisión literal.</p>
+      </div>
+    </div>
+
+    <p>La idea central: en lugar de difundir en el espacio de píxeles (alto costo), se entrena un autoencoder variacional (VAE) que comprime la imagen a un espacio latente mucho más pequeño (por ejemplo, 64x64x4 en lugar de 512x512x3). La difusión ocurre en este espacio comprimido, y al final el decoder VAE reconstruye la imagen de alta resolución.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía del dibujo en miniatura:</strong> En lugar de pintar en un lienzo gigante, haces primero un boceto pequeño y detallado. Una vez satisfecho con el boceto, un asistente lo amplía a tamaño completo con todos los detalles. Eso es exactamente la difusión latente: trabajar en un "boceto comprimido" y luego ampliarlo. Esto reduce el tiempo de generación de minutos a segundos.</p>
+    </div>
+
+    <p>El pipeline completo de Stable Diffusion funciona así:</p>
+    <ol>
+      <li>El prompt se codifica con el modelo CLIP Text Encoder → embedding condicional.</li>
+      <li>Se genera ruido aleatorio en el espacio latente (64×64×4).</li>
+      <li>La U-Net realiza T pasos de denoising prediciendo el ruido, guiada por el embedding del prompt.</li>
+      <li>El resultado latente se decodifica con el decoder VAE → imagen final 512×512.</li>
+    </ol>
+
+    <h2>6. Simulación: El concepto de denoising en código</h2>
+    <p>El siguiente código Python simula conceptualmente el proceso de denoising, mostrando cómo se elimina ruido paso a paso de una señal:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación simplificada del proceso de denoising
+import numpy as np
+
+def agregar_ruido(signal, timestep, total_steps):
+    """Proceso directo: agrega ruido proporcional al timestep"""
+    noise = np.random.randn(*signal.shape)
+    alpha = 1.0 - (timestep / total_steps)
+    noisy_signal = np.sqrt(alpha) * signal + np.sqrt(1 - alpha) * noise
+    return noisy_signal, noise
+
+def predecir_ruido(noisy_signal, signal_real, alpha):
+    """Simula la predicción de ruido (lo que la U-Net aprendería)"""
+    ruido_estimado = (noisy_signal - np.sqrt(alpha) * signal_real) / np.sqrt(1 - alpha)
+    return ruido_estimado
+
+# Imagen original representada como un vector (simplificado)
+imagen_original = np.array([0.8, 0.6, 0.9, 0.3, 0.7, 0.5, 0.4, 0.8])
+print(f"Original:    {np.round(imagen_original, 2)}")
+
+total_pasos = 20
+
+# Proceso directo: agregar ruido gradualmente
+signal = imagen_original.copy()
+for t in range(1, total_pasos + 1):
+    signal, ruido_real = agregar_ruido(signal, t, total_pasos)
+
+print(f"Ruido puro:  {np.round(signal, 2)}")
+
+# Proceso inverso: eliminar ruido paso a paso
+signal_denoised = signal.copy()
+for t in range(total_pasos, 0, -1):
+    alpha = 1.0 - (t / total_pasos)
+    ruido_estimado = predecir_ruido(signal_denoised, imagen_original, alpha)
+    signal_denoised = signal_denoised - 0.8 * ruido_estimado
+
+print(f"Reconstruido:{np.round(signal_denoised, 2)}")
+
+error = np.mean((imagen_original - signal_denoised) ** 2)
+print(f"\nError de reconstrucción (MSE): {error:.6f}")
+    </pre>
+
+    <p>Este ejemplo es una simplificación extrema. En un modelo real, la predicción de ruido la hace una U-Net con millones de parámetros entrenada sobre millones de imágenes, y el proceso usa 20-50 pasos con programación diferenciable completa.</p>
+
+    <h2>7. Frontiers recientes: Consistencia, rectified flows y video</h2>
+    <p>Los modelos de difusión están evolucionando rápidamente. Algunas líneas importantes:</p>
+
+    <ul>
+      <li><strong>Consistency Models</strong> (OpenAI, 2023): Saltan directamente del ruido a la imagen limpia en 1-2 pasos, aprendiendo mapas de consistencia.</li>
+      <li><strong>Rectified Flows / SDXL Turbo</strong>: Reemplazan el schedule de ruido con traysectorias rectas en el espacio latente, generando en 1-4 pasos.</li>
+      <li><strong>Difusión de video:</strong> Modelos como Sora (OpenAI) y Runway Gen-3 extienden la difusión a secuencias temporales, generando videos coherentes.</li>
+      <li><strong>Difusión 3D:</strong> Generación de modelos tridimensionales a partir de texto, usando representaciones como NeRFs o Gaussian Splatting.</li>
+      <li><strong>ControlNet:</strong> Permiten guiar la generación con mapas de bordes, poses, segmentación o bocetos, dando control preciso sobre la composición.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>La tendencia clave:</strong> La industria se mueve hacia modelos de difusión cada vez más rápidos (de 50 pasos a 1-4 pasos), más eficientes en memoria (difusión latente, cuantización), y con mayor capacidad multimodal (texto→imagen→video→3D→Audio).</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/modelos-razonamiento/index.html" class="btn btn-primary">Siguiente: Modelos de Razonamiento →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

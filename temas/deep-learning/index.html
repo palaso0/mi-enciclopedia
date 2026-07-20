@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Learning: Arquitecturas de Redes — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales combinados de todos los subtemas */
+
+    /* --- Transformers --- */
+    .word-relation-box {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .word-chain {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .word-token {
+      font-family: var(--font-mono);
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      position: relative;
+    }
+    .word-token.active {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.05);
+      font-weight: 600;
+    }
+    .word-token.highlight-strong {
+      border-color: var(--color-text);
+      background: rgba(44, 44, 43, 0.1);
+    }
+    .relation-line {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-2);
+    }
+
+    /* --- Vision Transformers --- */
+    .image-puzzle-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      max-width: 180px;
+      margin: var(--space-4) auto;
+      background: var(--color-border);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+    }
+    .puzzle-piece {
+      aspect-ratio: 1;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .flatten-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      margin: var(--space-4) 0;
+    }
+    .flatten-vector {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      gap: 4px;
+    }
+    .vector-token {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* --- Flash Attention --- */
+    .memory-visual-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .memory-block-box {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .memory-header {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: var(--space-2);
+      color: var(--color-text-muted);
+    }
+    .memory-hbm {
+      background: rgba(154, 42, 42, 0.03);
+      border-color: var(--color-accent);
+    }
+    .memory-sram {
+      background: rgba(45, 125, 70, 0.03);
+      border-color: #2d7d46;
+    }
+    .memory-grid {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .memory-cell {
+      padding: 6px 12px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+    .memory-arrow-flow {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-accent);
+      margin: -5px 0;
+    }
+
+    /* --- Mixture-of-Experts --- */
+    .moe-pipeline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-4);
+      border-radius: var(--radius-sm);
+    }
+    .token-box {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .router-box {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    .experts-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .expert-card {
+      border: 2px solid var(--color-border);
+      padding: var(--space-3);
+      text-align: center;
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      opacity: 0.4;
+      transition: all var(--transition-fast);
+    }
+    .expert-card.active {
+      opacity: 1;
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.03);
+      color: #2d7d46;
+    }
+
+    /* --- Arquitecturas híbridas --- */
+    .arch-comparison-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    @media (min-width: 768px) {
+      .arch-comparison-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .arch-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      background: var(--color-surface);
+    }
+    .arch-card-header {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+      text-transform: uppercase;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin: 4px 0;
+    }
+    .flow-badge {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* --- Estilos de mega-página --- */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--color-border);
+      margin: var(--space-6) 0;
+    }
+    .section-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .section-toc h3 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+    }
+    .section-toc ol {
+      margin: 0;
+      padding-left: var(--space-4);
+    }
+    .section-toc li {
+      margin-bottom: var(--space-2);
+      font-size: 0.95rem;
+    }
+    .section-toc a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .section-toc a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Deep Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Deep Learning: Arquitecturas de Redes</h1>
+    
+    <p>Esta página funciona como una ruta de aprendizaje estructurada sobre las arquitecturas fundamentales del Deep Learning moderno. Aquí encontrarás 5 subtemas que cubren desde el mecanismo de atención que revolucionó el procesamiento de lenguaje, pasando por su adaptación al mundo de la visión por computadora, las optimizaciones de hardware que hacen posible entrenar modelos gigantescos, las arquitecturas dispersas que reducen costos de cómputo, y las alternativas híbridas que apuntan al futuro del procesamiento de secuencias.</p>
+
+    <div class="section-toc reveal-element">
+      <h3>Contenidos</h3>
+      <ol>
+        <li><a href="#transformers">Transformers y el mecanismo de atención</a></li>
+        <li><a href="#vision-transformers">Vision Transformers (ViT)</a></li>
+        <li><a href="#flash-attention">Flash Attention</a></li>
+        <li><a href="#mixture-of-experts">Mixture-of-Experts (MoE)</a></li>
+        <li><a href="#arquitecturas-hibridas">Arquitecturas híbridas (Mamba y SSM)</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN 1: TRANSFORMERS                                      -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <h2 id="transformers">1. Transformers y el mecanismo de atención</h2>
+    
+    <p>Si alguna vez usaste ChatGPT, usaste un Transformer. Esta arquitectura, creada en 2017 por Google, cambió por completo cómo las computadoras entienden nuestro lenguaje. En lugar de procesar la información palabra por palabra, aprendieron a mirar todo el contexto a la vez.</p>
+
+    <h3>1.1 La diferencia clave: Leer con lupa vs. Mirar la foto completa</h3>
+    <p>Para entender por qué son especiales, comparemos cómo leían los modelos antiguos frente a cómo lee un Transformer:</p>
+
+    <div class="callout reveal-element">
+      <p><strong>El modelo antiguo (Redes Recurrentes / RNNs):</strong> Imagina que lees un libro con una lupa, viendo solo una palabra a la vez. Para entender la palabra 10, tienes que recordar las 9 anteriores en orden. Si la oración es muy larga, para cuando llegas al final ya te olvidaste de cómo empezó.</p>
+    </div>
+
+    <div class="callout reveal-element" style="border-left-color: var(--color-text);">
+      <p><strong>El Transformer:</strong> En lugar de una lupa, toma una fotografía de toda la página a la vez. No lee en orden secuencial; analiza todas las palabras al mismo tiempo e identifica qué palabras se relacionan entre sí para darles sentido.</p>
+    </div>
+
+    <h3>1.2 El poder del contexto: El problema de la palabra "banco"</h3>
+    <p>El lenguaje humano está lleno de palabras con múltiples significados (polisemia). Una computadora necesita contexto para saber de qué estamos hablando.</p>
+    
+    <p>Analicemos estas dos oraciones con el concepto de <strong>Atención</strong>:</p>
+
+    <div class="word-relation-box reveal-element">
+      <p><strong>Caso A:</strong></p>
+      <div class="word-chain">
+        <span class="word-token">El</span>
+        <span class="word-token active">banco</span>
+        <span class="word-token">de</span>
+        <span class="word-token">la</span>
+        <span class="word-token highlight-strong">plaza</span>
+        <span class="word-token">estaba</span>
+        <span class="word-token">roto</span>
+      </div>
+      <p class="relation-line">→ Aquí, la palabra <strong>banco</strong> "presta atención" a <strong>plaza</strong> y <strong>roto</strong>. El modelo deduce que se refiere a un <em>asiento físico</em>.</p>
+    </div>
+
+    <div class="word-relation-box reveal-element">
+      <p><strong>Caso B:</strong></p>
+      <div class="word-chain">
+        <span class="word-token">El</span>
+        <span class="word-token active">banco</span>
+        <span class="word-token highlight-strong">central</span>
+        <span class="word-token">subió</span>
+        <span class="word-token">las</span>
+        <span class="word-token highlight-strong">tasas</span>
+      </div>
+      <p class="relation-line">→ Aquí, la palabra <strong>banco</strong> "presta atención" a <strong>central</strong> y <strong>tasas</strong>. El modelo deduce que se trata de una <em>institución financiera</em>.</p>
+    </div>
+
+    <h3>1.3 ¿Cómo calcula esto la computadora? (Query, Key y Value)</h3>
+    <p>Para decidir qué palabra se relaciona con cuál, el Transformer usa una fórmula matemática que funciona de manera muy similar a **hacer una búsqueda en YouTube**:</p>
+
+    <ul>
+      <li><strong>Query (Búsqueda):</strong> Es lo que la palabra actual está buscando. *(Ejemplo: "Busco palabras que definan mi significado físico o institucional")*.</li>
+      <li><strong>Key (Etiqueta):</strong> Es la etiqueta que ofrecen todas las demás palabras de la oración. *(Ejemplo: "plaza" tiene la etiqueta "lugar/exterior", "central" tiene la etiqueta "finanzas")*.</li>
+      <li><strong>Value (Contenido):</strong> Si la búsqueda (Query) coincide con una etiqueta (Key), se extrae la información de esa palabra para ajustar el significado final.</li>
+    </ul>
+
+    <p>Este cruce de búsquedas y etiquetas se realiza mediante multiplicaciones de matrices muy veloces que se pueden procesar en paralelo, lo que permite entrenar modelos con millones de textos de internet.</p>
+
+    <h3>1.4 Un ejemplo simplificado en código</h3>
+    <p>Para ver cómo se traduce esto a lógica, imagina que calculamos la fuerza de relación (atención) entre las palabras de la oración: <em>"El banco de la plaza"</em>.</p>
+
+    <pre class="code-block reveal-element"># Simulación de la matriz de atención para la palabra "banco"
+palabras = ["El", "banco", "de", "la", "plaza"]
+
+# Valores calculados por el modelo que miden la relación (de 0 a 1)
+atencion_para_banco = {
+    "El": 0.05,
+    "banco": 1.00,  # Relación consigo mismo
+    "de": 0.05,
+    "la": 0.05,
+    "plaza": 0.85   # ¡Fuerte conexión contextual!
+}
+
+# El modelo aprende que "banco" y "plaza" forman un bloque de significado</pre>
+
+    <h3>1.5 El truco final: Positional Encoding</h3>
+    <p>Como el Transformer lee todo al mismo tiempo, no sabe qué palabra va primero y cuál va después. Para él, estas dos oraciones serían idénticas:</p>
+    
+    <ol>
+      <li>"El gato se comió al ratón"</li>
+      <li>"El ratón se comió al gato"</li>
+    </ol>
+
+    <p>Para solucionar esto, el Transformer añade una **coordenada de posición** a cada palabra antes de procesarla. Es como darle a cada palabra una etiqueta con su número de orden (Posición 1, Posición 2, etc.), asegurando que entienda la estructura de la oración sin sacrificar la velocidad de lectura paralela.</p>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN 2: VISION TRANSFORMERS                               -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <h2 id="vision-transformers">2. Vision Transformers (ViT)</h2>
+    
+    <p>¿Puede una arquitectura diseñada para procesar texto clasificar imágenes de manera eficiente? En 2020, investigadores de Google demostraron con el paper <em>"An Image is Worth 16x16 Words"</em> que sí es posible. Al tratar una imagen como una secuencia de palabras, los Vision Transformers (ViT) desafiaron el reinado de las Redes Convolucionales (CNNs).</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Concepto clave:</strong> En lugar de rediseñar el Transformer para visión, ViT adapta la imagen para que encaje exactamente en un Transformer estándar de procesamiento de texto.</p>
+    </div>
+
+    <h3>2.1 La intuición: Lupa local vs. Rompecabezas global</h3>
+    <p>La diferencia principal entre las redes convolucionales tradicionales y un ViT radica en cómo "miran" la imagen:</p>
+
+    <ul>
+      <li><strong>Red Convolucional (CNN):</strong> Es como examinar una foto con una lupa pequeña, buscando patrones locales (bordes, texturas) y combinándolos gradualmente. Sabe por diseño que los píxeles cercanos están relacionados.</li>
+      <li><strong>Vision Transformer (ViT):</strong> Corta la foto en piezas de rompecabezas (típicamente de 16x16 píxeles), las aplana y las analiza simultáneamente usando autoatención. No asume por diseño qué pieza está al lado de cuál; aprende la relación espacial analizando los datos.</li>
+    </ul>
+
+    <h3>2.2 El Pipeline: ¿Cómo se convierte una imagen en "palabras"?</h3>
+    
+    <p>Para alimentar a un Transformer, necesitamos pasar de una imagen tridimensional a una secuencia de vectores lineales:</p>
+
+    <div class="image-puzzle-box reveal-element">
+      <div class="puzzle-piece">P1</div>
+      <div class="puzzle-piece">P2</div>
+      <div class="puzzle-piece">P3</div>
+      <div class="puzzle-piece">P4</div>
+      <div class="puzzle-piece">P5</div>
+      <div class="puzzle-piece">P6</div>
+      <div class="puzzle-piece">P7</div>
+      <div class="puzzle-piece">P8</div>
+      <div class="puzzle-piece">P9</div>
+    </div>
+    
+    <p class="reveal-element" style="text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">1. Dividimos la imagen en "parches" (Patches) rígidos.</p>
+
+    <div class="flatten-pipeline reveal-element">
+      <div class="flatten-vector">Patch 1 → <span class="vector-token">[v1, v2, v3, ...]</span></div>
+      <div class="flatten-vector">Patch 2 → <span class="vector-token">[v4, v5, v6, ...]</span></div>
+      <div class="flatten-vector">...</div>
+    </div>
+    
+    <p class="reveal-element" style="text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">2. Aplanamos cada parche en un vector y lo proyectamos al tamaño deseado (Embeddings).</p>
+
+    <h3>2.3 Los componentes críticos de ViT</h3>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Función</th>
+          <th>Por qué es necesario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Patches (16x16)</strong></td>
+          <td>Divide la imagen en fragmentos.</td>
+          <td>Reduce la cantidad de tokens. Analizar píxel por píxel con atención sería computacionalmente imposible (complejidad cuadrática).</td>
+        </tr>
+        <tr>
+          <td><strong>Linear Projection</strong></td>
+          <td>Transforma los parches aplanados en vectores (embeddings).</td>
+          <td>Mapea los píxeles a un espacio dimensional que el Transformer entiende.</td>
+        </tr>
+        <tr>
+          <td><strong>Positional Embedding</strong></td>
+          <td>Suma coordenadas de posición a cada embedding.</td>
+          <td>Al no tener recurrencia ni convolución, el modelo no sabe en qué parte de la imagen va cada parche si no se lo indicamos.</td>
+        </tr>
+        <tr>
+          <td><strong>Class Token [CLS]</strong></td>
+          <td>Un vector extra que se añade al inicio de la secuencia.</td>
+          <td>Este token acumula la información de atención de toda la imagen y se usa al final para hacer la predicción (ej. "gato" o "perro").</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>2.4 Simulación en código: De imagen a embeddings</h3>
+    <p>Este script de Python demuestra matemáticamente cómo se descompone y proyecta una imagen en parches antes de entrar al Transformer:</p>
+
+    <pre class="code-block reveal-element"># Simulación conceptual de preparación de parches para ViT
+import numpy as np
+
+# Configuración básica
+H, W, C = 224, 224, 3   # Altura, ancho, canales (RGB) de la imagen
+patch_size = 16          # Cada parche será de 16x16 píxeles
+d_model = 768            # Dimensión del embedding de salida
+
+# 1. Simular una imagen cargada
+imagen = np.random.rand(H, W, C)
+
+# 2. Calcular número de parches
+n_patches = (H // patch_size) * (W // patch_size)  # (224/16) * (224/16) = 196 parches
+print(f"Número de parches generados: {n_patches}")
+
+# 3. Dividir la imagen conceptualmente y aplanar los parches
+# Cada parche tiene un tamaño de: 16 * 16 * 3 = 768 valores
+parches_aplanados = np.random.rand(n_patches, patch_size * patch_size * C)
+print(f"Dimensiones de los parches aplanados: {parches_aplanados.shape}") # (196, 768)
+
+# 4. Proyección Lineal (matriz de pesos W_p)
+W_p = np.random.rand(patch_size * patch_size * C, d_model)
+patch_embeddings = np.dot(parches_aplanados, W_p)
+print(f"Dimensión final para el Transformer: {patch_embeddings.shape}") # (196, 768)</pre>
+
+    <h3>2.5 El dilema de los datos: Inductive Bias</h3>
+    <p>A diferencia de las CNNs, los Transformers no tienen **sesgo inductivo (inductive bias)** sobre las imágenes. Una CNN "sabe" implícitamente que los píxeles vecinos son importantes y que los patrones se mantienen iguales si se desplazan (invarianza de traslación).</p>
+    
+    <p>El ViT tiene que aprender todo esto desde cero analizando millones de ejemplos. Por eso:</p>
+    <ul>
+      <li>Si se entrena en conjuntos de datos pequeños (como ImageNet-1k), ViT rinde **peor** que una CNN.</li>
+      <li>Si se pre-entrena en conjuntos masivos de datos (como el set de datos privado de Google JFT-300M), ViT **supera con creces** a cualquier CNN tradicional.</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN 3: FLASH ATTENTION                                   -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <h2 id="flash-attention">3. Flash Attention</h2>
+    
+    <p>Publicada en 2022 por Tri Dao e investigadores de Stanford, Flash Attention no cambia la matemática de la autoatención del Transformer; cambia **cómo se ejecuta en el hardware de la GPU**. Al reestructurar los accesos a la memoria, logró acelerar el entrenamiento hasta 3 veces y permitió que los modelos procesen secuencias de texto masivamente más largas.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>El problema real:</strong> El cuello de botella en las GPUs modernas no es la velocidad de cálculo (FLOPS), sino la velocidad a la que se transfieren los datos entre la memoria lenta de la GPU y los núcleos rápidos de procesamiento.</p>
+    </div>
+
+    <h3>3.1 La física del hardware: HBM vs. SRAM</h3>
+    <p>Para entender Flash Attention, debemos entender la GPU como un escritorio de trabajo:</p>
+
+    <div class="memory-visual-container reveal-element">
+      <div class="memory-block-box memory-hbm">
+        <div class="memory-header">HBM (High Bandwidth Memory) — El Sótano</div>
+        <div class="memory-grid">
+          <span class="memory-cell">Matriz Q</span>
+          <span class="memory-cell">Matriz K</span>
+          <span class="memory-cell">Matriz V</span>
+          <span class="memory-cell" style="opacity: 0.5;">Matriz de Atención (Gigante)</span>
+        </div>
+        <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-muted);">Memoria principal de la GPU. Es enorme (80GB+), pero el acceso a ella es muy **lento**.</p>
+      </div>
+
+      <div class="memory-arrow-flow">⇅ Transferencia (Cuello de Botella)</div>
+
+      <div class="memory-block-box memory-sram">
+        <div class="memory-header">SRAM (Static RAM) — El Escritorio</div>
+        <div class="memory-grid">
+          <span class="memory-cell" style="border-color: #2d7d46; font-weight: 600;">Núcleo Tensor (Cálculo)</span>
+        </div>
+        <p style="font-size: 0.85rem; margin-top: 8px; color: var(--color-text-muted);">Memoria ultra rápida al lado del procesador. Es muy pequeña (solo unos MBs).</p>
+      </div>
+    </div>
+
+    <p>En el mecanismo de atención tradicional, el modelo calcula la matriz de atención de tamaño \(N \times N\) (donde \(N\) es la longitud del texto). Esta matriz es tan gigante que no cabe en la SRAM (el escritorio), por lo que la GPU debe escribirla y leerla constantemente desde la HBM (el sótano) para aplicar operaciones como Softmax. Esta transferencia es lenta e ineficiente.</p>
+
+    <h3>3.2 El truco de Flash Attention: "Tiling" (Partición en Bloques)</h3>
+    <p>Flash Attention evita almacenar la gigantesca matriz intermedia de atención. En su lugar, utiliza una técnica llamada **Tiling** (mosaicos):</p>
+    
+    <ul>
+      <li>Divide las matrices Query, Key y Value en pequeños bloques que sí caben en la SRAM.</li>
+      <li>Carga un bloque de la HBM a la SRAM.</li>
+      <li>Realiza los cálculos del Softmax de manera parcial sobre ese bloque.</li>
+      <li>Utiliza un truco matemático de re-escalado para unir los resultados Softmax parciales sin perder precisión.</li>
+      <li>Escribe directamente el resultado final en la HBM, evitando escribir la matriz de atención temporal.</li>
+    </ul>
+
+    <h3>3.3 Comparativa de operaciones en memoria</h3>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Operación</th>
+          <th>Atención Tradicional</th>
+          <th>Flash Attention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Complejidad en memoria</strong></td>
+          <td>\(O(N^2)\) (Cuadrática)</td>
+          <td>\(O(N)\) (Lineal respecto a escrituras HBM)</td>
+        </tr>
+        <tr>
+          <td><strong>Escrituras en HBM</strong></td>
+          <td>Muy altas (guarda la matriz intermedia)</td>
+          <td>Mínimas (solo lee Q, K, V y escribe la salida)</td>
+        </tr>
+        <tr>
+          <td><strong>Límite de Contexto</strong></td>
+          <td>Corto (se queda sin memoria rápidamente)</td>
+          <td>Muy largo (ej: 32k, 128k tokens o más)</td>
+        </tr>
+        <tr>
+          <td><strong>Velocidad</strong></td>
+          <td>Lenta por accesos a memoria (Memory-bound)</td>
+          <td>Hasta 3x más rápida (Compute-bound)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.4 Simulación conceptual: El costo de los accesos a memoria</h3>
+    <p>El siguiente código simula conceptualmente la cantidad de lecturas y escrituras de memoria (I/O) requeridas por ambos algoritmos para procesar una secuencia larga:</p>
+
+    <pre class="code-block reveal-element"># Simulación del costo de acceso a memoria (I/O Complexity)
+# N = Longitud de secuencia, d = Dimensión de embedding, M = Tamaño de la SRAM
+
+def costo_memoria_clasico(N, d):
+    # Lee Q, K (2Nd) -> Calcula y escribe S (N^2) -> Lee S, V (N^2 + Nd) -> Escribe salida (Nd)
+    lecturas = 2 * N * d + N**2 + N * d
+    escrituras = N**2 + N * d
+    return lecturas + escrituras
+
+def costo_memoria_flash(N, d, M):
+    # Divide en bloques de tamaño ~ M/d. Evita escribir la matriz N^2.
+    # Costo dominado por leer Q, K, V y re-escribir salidas varias veces
+    costo_io = (N**2 * d**2) / M  # Simplificación matemática del paper
+    return costo_io
+
+# Pruebas con secuencia de 8000 tokens
+N_seq = 8000
+d_emb = 64
+M_sram = 100000  # Capacidad pequeña en unidades relativas
+
+io_clasico = costo_memoria_clasico(N_seq, d_emb)
+io_flash = costo_memoria_flash(N_seq, d_emb, M_sram)
+
+print(f"Accesos a HBM (Tradicional): {io_clasico:,} lecturas/escrituras")
+print(f"Accesos a HBM (Flash):       {int(io_flash):,} lecturas/escrituras")
+print(f"Reducción de I/O de memoria: ~{io_clasico / io_flash:.1f}x")</pre>
+
+    <h3>3.5 Impacto en los modelos modernos</h3>
+    <p>Gracias a Flash Attention, la industria pudo dar el salto de los 2,048 tokens de contexto originales de GPT-3 a los 128k o 1M de tokens que manejan los modelos actuales. Al no consumir memoria en almacenar la matriz intermedia de atención, las GPUs pueden procesar documentos enteros, libros o códigos fuente masivos de una sola vez.</p>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN 4: MIXTURE-OF-EXPERTS                                -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <h2 id="mixture-of-experts">4. Mixture-of-Experts (MoE)</h2>
+    
+    <p>Modelos como Mixtral 8x7B o el propio GPT-4 no son un solo bloque de redes masivas. Utilizan una arquitectura **Mixture-of-Experts (MoE)**, un diseño en el que se dividen las capas del modelo en múltiples "expertos" especializados, y un enrutador inteligente decide qué expertos deben procesar cada palabra. Esto permite tener modelos gigantescos pero consumiendo una fracción del costo de cómputo.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Dato clave:</strong> MoE implementa un tipo de **activación dispersa (sparse)**. A diferencia de un modelo denso tradicional, en el cual se activan todos los parámetros para cada palabra, MoE solo activa un porcentaje pequeño (ej: 10-20%).</p>
+    </div>
+
+    <h3>4.1 La intuición: La clínica médica</h3>
+    <p>Compara el procesamiento de una consulta en estas dos estructuras:</p>
+
+    <ul>
+      <li><strong>Modelo Denso:</strong> Entras a una clínica y para darte un diagnóstico, te atienden **todos** los médicos del hospital (el cardiólogo, el dermatólogo, el pediatra, etc.) al mismo tiempo. Es sumamente ineficiente y caro.</li>
+      <li><strong>Modelo Mixture-of-Experts (MoE):</strong> Llegas a recepción (el **Router**). El recepcionista evalúa tu síntoma y te deriva únicamente con el traumatólogo y el radiólogo (los **Expertos**). El resto de médicos siguen descansando.</li>
+    </ul>
+
+    <h3>4.2 El Flujo de Trabajo de un Token en MoE</h3>
+
+    <div class="moe-pipeline reveal-element">
+      <div class="token-box">Token: "código"</div>
+      <div style="font-family: var(--font-mono); color: var(--color-text-muted);">↓</div>
+      <div class="router-box">Gating Network (Router)</div>
+      <div style="font-family: var(--font-mono); color: var(--color-text-muted);">↓ (Top-2 Experts Selected)</div>
+      <div class="experts-container">
+        <div class="expert-card active">Experto 1<br>(Programación)</div>
+        <div class="expert-card">Experto 2<br>(Finanzas)</div>
+        <div class="expert-card active">Experto 3<br>(Gramática)</div>
+      </div>
+    </div>
+
+    <p>Por cada capa MoE de la red:</p>
+    <ol>
+      <li>El token de entrada llega a la red de enrutamiento (**Gating Network**).</li>
+      <li>El Router calcula una distribución de probabilidad sobre los \(N\) expertos usando una función Softmax.</li>
+      <li>Se seleccionan los **Top-K expertos** con mayor puntuación (típicamente \(K=1\) o \(K=2\)).</li>
+      <li>El token se envía y procesa únicamente por los expertos seleccionados.</li>
+      <li>Las salidas de los expertos se combinan multiplicándose por la probabilidad que les asignó el Router.</li>
+    </ol>
+
+    <h3>4.3 Parámetros Totales vs. Parámetros Activos</h3>
+    <p>Esta es la magia matemática que permite hacer viables los modelos de billones de parámetros:</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Tipo</th>
+          <th>Parámetros Totales</th>
+          <th>Parámetros Activos por Token</th>
+          <th>Costo de Cómputo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Llama 3 70B</td>
+          <td>Denso</td>
+          <td>70 Billones</td>
+          <td>70 Billones (100%)</td>
+          <td>Muy Alto</td>
+        </tr>
+        <tr>
+          <td>Mixtral 8x7B</td>
+          <td>MoE (Sparse)</td>
+          <td>47 Billones</td>
+          <td>13 Billones (~27%)</td>
+          <td>Equivalente a un modelo de 13B</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Beneficio:</strong> Mixtral tiene la capacidad y el conocimiento de un modelo de 47B de parámetros, pero su velocidad de generación (latencia) y requisitos de cómputo en inferencia son los de un modelo pequeño de 13B.</p>
+
+    <h3>4.4 Simulación conceptual: El Router MoE</h3>
+    <p>Este fragmento de Python simula la toma de decisiones del Router para asignar un token a los mejores 2 expertos de un pool de 4:</p>
+
+    <pre class="code-block reveal-element"># Simulación del Router (Gating Network) en una capa MoE
+import numpy as np
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
+# 1. Definir nombres de expertos en nuestro pool
+expertos = ["Experto Matemático", "Experto Programación", "Experto Creativo", "Experto Traductor"]
+
+# 2. Simular un token de entrada (vector) y los pesos del Router
+# Digamos que el token tiene que ver con escribir código de Python
+vector_token = np.array([0.1, 0.9, 0.2, 0.4]) 
+pesos_router = np.random.rand(4, 4)  # Pesos entrenados del Router
+
+# 3. Calcular afinidad del token con cada experto
+logits = np.dot(vector_token, pesos_router)
+probabilidades = softmax(logits)
+
+# 4. Seleccionar los mejores K=2 expertos (Top-2 Routing)
+top_k_indices = np.argsort(probabilidades)[::-1][:2]
+
+print("Probabilidades asignadas por el Router:")
+for idx, prob in enumerate(probabilidades):
+    print(f" - {expertos[idx]}: {prob:.2%}")
+
+print("\nExpertos ACTIVADOS para este token:")
+for idx in top_k_indices:
+    print(f" -> {expertos[idx]} (Prob: {probabilidades[idx]:.2%})")</pre>
+
+    <h3>4.5 Los desafíos de MoE</h3>
+    <ul>
+      <li><strong>Memoria RAM / VRAM:</strong> Aunque solo actives 13B de parámetros por token, **tienes que cargar los 47B de parámetros en la memoria de la tarjeta de video**. Por tanto, MoE requiere tanta o más memoria RAM/VRAM de hardware que un modelo denso de su tamaño total.</li>
+      <li><strong>Inestabilidad en el entrenamiento:</strong> Si no se cuida, el Router puede aprender a enviar todos los tokens a un solo experto ("experto favorito"), dejando al resto sin entrenar. Se requieren pérdidas matemáticas de "balanceo" para forzar al Router a distribuir la carga uniformemente.</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <!-- SECCIÓN 5: ARQUITECTURAS HÍBRIDAS                            -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <h2 id="arquitecturas-hibridas">5. Arquitecturas híbridas (Mamba y SSM)</h2>
+    
+    <p>Aunque los Transformers dominan la IA actual, tienen un defecto de diseño fundamental: su costo de procesamiento crece de forma **cuadrática** con el largo del texto. Para solucionarlo, en 2023 se presentaron los **State Space Models (SSMs)** como Mamba. Hoy, los modelos más eficientes combinan ambas arquitecturas en diseños híbridos para obtener lo mejor de los dos mundos.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>El problema del Transformer:</strong> Para calcular la atención de un texto de 100,000 palabras, el modelo debe hacer comparaciones cruzadas entre todas las palabras, lo que equivale a \(100,000 \times 100,000\) operaciones. El procesamiento en tiempo lineal es el gran reto de la IA.</p>
+    </div>
+
+    <h3>5.1 La intuición: El escritorio lleno vs. La taza de té</h3>
+    <p>Compara cómo mantienen el contexto estas dos arquitecturas mientras leen un libro:</p>
+
+    <div class="arch-comparison-container reveal-element">
+      <div class="arch-card">
+        <div class="arch-card-header">Transformer (Atención)</div>
+        <p style="font-size: 0.9rem; margin-bottom: 8px;">Mantiene **todas las páginas abiertas** en su escritorio. Puede mirar cualquier palabra del pasado con total precisión, pero a medida que el libro crece, se queda sin espacio físico en la mesa.</p>
+        <div class="flow-step"><span class="flow-badge">KV Cache</span><span>Crece sin límite</span></div>
+        <div class="flow-step"><span class="flow-badge">Complejidad</span><span style="color: #9a2a2a;">O(N²) (Cuadrática)</span></div>
+      </div>
+      
+      <div class="arch-card">
+        <div class="arch-card-header">Mamba / SSM (Estado de Espacio)</div>
+        <p style="font-size: 0.9rem; margin-bottom: 8px;">Mantiene **una sola taza de té**. Al leer cada página, toma un sorbo y el té absorbe la esencia de la historia. No guarda las páginas abiertas, solo actualiza el sabor del té constantemente.</p>
+        <div class="flow-step"><span class="flow-badge">Estado oculto</span><span>Tamaño fijo</span></div>
+        <div class="flow-step"><span class="flow-badge">Complejidad</span><span style="color: #2d7d46;">O(N) (Lineal)</span></div>
+      </div>
+    </div>
+
+    <h3>5.2 ¿Cómo funciona un Modelo de Estado de Espacio (SSM)?</h3>
+    <p>Inspirados en la teoría de sistemas de control en física e ingeniería, los SSMs procesan la información de manera matemática secuencial, similar a una Red Recurrente (RNN) pero con la capacidad de entrenarse en paralelo. Su ecuación matemática básica actualiza un **estado oculto (hidden state)** interno continuo:</p>
+    
+    <pre class="code-block reveal-element"># Ecuación básica de actualización de estado
+h(t) = A * h(t-1) + B * x(t)
+y(t) = C * h(t)</pre>
+
+    <ul>
+      <li>\(x(t)\): El token o palabra de entrada actual.</li>
+      <li>\(h(t)\): El estado interno (la "taza de té") que condensa la memoria del pasado.</li>
+      <li>\(y(t)\): La predicción o salida resultante.</li>
+      <li>\(A, B, C\): Matrices de transición que determinan cuánta memoria retener y qué ignorar. En **Mamba**, estas matrices cambian dinámicamente según la palabra de entrada (mecanismo de selección).</li>
+    </ul>
+
+    <h3>5.3 Arquitecturas Híbridas: Lo mejor de dos mundos</h3>
+    <p>Modelos recientes de código abierto (como *Jamba* de AI21 o *RecurrentGemma* de Google) demuestran que no es necesario elegir uno. Se pueden intercalar capas de ambos en un solo modelo:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Capa</th>
+          <th>Función</th>
+          <th>Ventaja que aporta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Capas Mamba (SSM)</strong></td>
+          <td>Procesan la gran mayoría del texto en tiempo lineal \(O(N)\).</td>
+          <td>Permite digerir contextos gigantescos a velocidades extremadamente altas.</td>
+        </tr>
+        <tr>
+          <td><strong>Capas Transformer (Atención)</strong></td>
+          <td>Se activan ocasionalmente (ej: cada 4 u 8 capas).</td>
+          <td>Aporta capacidad de recuperación exacta y razonamiento complejo (como recordar un número específico en la página 500).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 Simulación conceptual: El bucle lineal vs. cuadrático</h3>
+    <p>Este código en Python simula conceptualmente la diferencia en operaciones necesarias para procesar un documento a medida que se hace más largo:</p>
+
+    <pre class="code-block reveal-element"># Simulación del incremento de costo computacional
+# N = número de tokens en el documento
+
+def procesar_transformer(N):
+    # Cuadrático: cada token se compara con todos los anteriores
+    operaciones = 0
+    for i in range(N):
+        operaciones += i  # Comparación con tokens pasados
+    return operaciones
+
+def procesar_mamba(N, d_state=128):
+    # Lineal: cada token solo actualiza el estado interno de tamaño fijo
+    operaciones = 0
+    for i in range(N):
+        operaciones += d_state  # Multiplicación por matriz de estado fijo
+    return operaciones
+
+# Simulación con un libro de 5,000 palabras
+tokens = 5000
+ops_trans = procesar_transformer(tokens)
+ops_mamba = procesar_mamba(tokens)
+
+print(f"Costo de Atención (Transformer): {ops_trans:,} operaciones")
+print(f"Costo de Estado (Mamba/SSM):    {ops_mamba:,} operaciones")
+print(f"Mamba es ~{ops_trans / ops_mamba:.1f} veces más eficiente en computación")</pre>
+
+    <h3>5.5 Estado actual</h3>
+    <p>El diseño híbrido se está convirtiendo en el estándar para modelos de contexto masivo de nueva generación. Al comprimir la información histórica en un estado oculto de tamaño constante, estos modelos reducen drásticamente el consumo de memoria RAM de video (VRAM) en inferencia, haciendo viable correr modelos potentes localmente en computadoras portátiles o teléfonos móviles.</p>
+
+    <!-- ============================================================ -->
+    <!-- NAVEGACIÓN FINAL                                              -->
+    <!-- ============================================================ -->
+    <hr class="section-divider">
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/entrenamiento/index.html" class="btn btn-primary">Siguiente: Entrenamiento →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperación y Contexto: RAG y Vectores — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para embeddings y bases vectoriales */
+    .embedding-space {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .embedding-point {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+    .embedding-point:hover {
+      transform: scale(1.05);
+      border-color: var(--color-accent);
+    }
+    .embedding-point.cluster-a {
+      border-left: 3px solid var(--color-accent);
+    }
+    .embedding-point.cluster-b {
+      border-left: 3px solid #366A9C;
+    }
+    .embedding-point.cluster-c {
+      border-left: 3px solid #3E8453;
+    }
+    .embedding-point .word {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: var(--space-1);
+      display: block;
+    }
+    .embedding-point .vector {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      display: block;
+    }
+    .similarity-matrix {
+      display: grid;
+      grid-template-columns: 120px repeat(4, 1fr);
+      gap: 2px;
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .matrix-cell {
+      padding: var(--space-2);
+      text-align: center;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .matrix-header {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      background: var(--color-bg);
+    }
+    .matrix-high {
+      background: rgba(62, 132, 83, 0.12);
+      color: #3E8453;
+      font-weight: 600;
+    }
+    .matrix-medium {
+      background: rgba(178, 94, 53, 0.08);
+    }
+    .matrix-low {
+      background: var(--color-surface);
+      color: var(--color-text-muted);
+    }
+    .vector-db-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .vector-db-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .vector-db-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+      color: var(--color-accent);
+    }
+    .vector-db-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .index-comparison {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .index-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .index-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--color-text);
+    }
+    .index-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    @media (max-width: 600px) {
+      .embedding-space {
+        grid-template-columns: 1fr;
+      }
+      .vector-db-grid {
+        grid-template-columns: 1fr;
+      }
+      .index-comparison {
+        grid-template-columns: 1fr;
+      }
+      .similarity-matrix {
+        grid-template-columns: 80px repeat(4, 1fr);
+        font-size: 0.65rem;
+      }
+    }
+    /* Estilos locales para la lección de RAG */
+    .rag-pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .rag-stage {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      transition: border-color var(--transition-fast);
+    }
+    .rag-stage:hover {
+      border-color: var(--color-accent);
+    }
+    .rag-stage-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+    }
+    .rag-stage-content {
+      flex: 1;
+    }
+    .rag-stage-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-1);
+    }
+    .rag-stage-desc {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .rag-stage-arrow {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-text-muted);
+      padding-left: 18px;
+    }
+    .chunking-visual {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+    }
+    .chunk-block {
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--color-surface);
+      position: relative;
+    }
+    .chunk-block::before {
+      content: attr(data-chunk);
+      position: absolute;
+      top: -10px;
+      left: var(--space-3);
+      background: var(--color-bg);
+      padding: 0 var(--space-1);
+      font-size: 0.7rem;
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+    .chunk-block.chunk-1 { border-left: 3px solid var(--color-accent); }
+    .chunk-block.chunk-2 { border-left: 3px solid #366A9C; }
+    .chunk-block.chunk-3 { border-left: 3px solid #3E8453; }
+    .chunk-block.chunk-4 { border-left: 3px solid #A34E78; }
+    .hallucination-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .hallucination-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      background: var(--color-surface);
+    }
+    .hallucination-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+    .hallucination-card.without h4 { color: var(--color-accent); }
+    .hallucination-card.with h4 { color: #3E8453; }
+    .hallucination-card p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .hybrid-search-visual {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-2);
+      margin: var(--space-4) 0;
+      text-align: center;
+    }
+    .hybrid-column {
+      padding: var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+    }
+    .hybrid-column h5 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+      color: var(--color-text-muted);
+    }
+    .hybrid-column .result {
+      font-size: 0.8rem;
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .hybrid-column .result:last-child { border-bottom: none; }
+    .hybrid-merge {
+      grid-column: 1 / -1;
+      padding: var(--space-2);
+      background: rgba(154, 42, 42, 0.04);
+      border: 1px dashed var(--color-accent);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-accent);
+    }
+    @media (max-width: 600px) {
+      .hallucination-box {
+        grid-template-columns: 1fr;
+      }
+      .hybrid-search-visual {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Estilos para mega-página */
+    .mega-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0 var(--space-6);
+    }
+    .mega-toc h2 {
+      font-size: 1rem;
+      margin-bottom: var(--space-3);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .mega-toc ol {
+      margin: 0;
+      padding-left: var(--space-5);
+    }
+    .mega-toc li {
+      margin-bottom: var(--space-2);
+    }
+    .mega-toc a {
+      text-decoration: none;
+      color: var(--color-text);
+      font-weight: 600;
+    }
+    .mega-toc a:hover {
+      color: var(--color-accent);
+    }
+    .section-divider {
+      margin: var(--space-8) 0 var(--space-6);
+      padding-top: var(--space-6);
+      border-top: 2px solid var(--color-border);
+    }
+    .section-divider h2 {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">RAG & Vectores</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Recuperación y Contexto: RAG y Vectores</h1>
+    
+    <p>¿Cómo pueden las máquinas recordar, buscar y razonar sobre información específica? Esta mega-página combina dos pilares fundamentales de los sistemas de IA modernos: los embeddings y bases de datos vectoriales — que permiten representar y buscar significado en espacio numérico — y el RAG (Retrieval-Augmented Generation), que conecta la recuperación de documentos con la generación de respuestas fundamentadas. Juntos, forman la columna vertebral de chatbots con memoria, motores de búsqueda semántica y asistentes que no alucinan.</p>
+
+    <div class="mega-toc reveal-element">
+      <h2>Contenido</h2>
+      <ol>
+        <li><a href="#embeddings">Embeddings y Bases de Datos Vectoriales</a></li>
+        <li><a href="#rag">RAG: Retrieval-Augmented Generation</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SUBTOPIC 4.1: Embeddings y Bases de Datos Vectoriales     -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-divider reveal-element" id="embeddings">
+      <h2>4.1 Embeddings y Bases de Datos Vectoriales</h2>
+    </div>
+
+    <p>Imagina que entras a una biblioteca donde los libros no están ordenados alfabéticamente, sino por tema y similitud conceptual. Los libros sobre astronomía están junto a los de astrofísica, los de cocina mexicana con los de cocina latinoamericana, y un libro de "inteligencia artificial para médicos" aparecería cerca tanto de libros de IA como de libros de medicina. Eso es exactamente lo que hacen los embeddings: transforman texto en números de manera que la similitud semántica se convierte en cercanía matemática.</p>
+
+    <h2>1. ¿Qué son los embeddings?</h2>
+    <p>Un embedding es un vector numérico de alta dimensión (típicamente 384 a 3072 números) que captura el significado de una palabra, frase o documento. A diferencia de las representaciones simples (como one-hot encoding, donde cada palabra es un vector con un solo 1), los embeddings comprimen el significado semántico en un espacio continuo donde:</p>
+
+    <ul>
+      <li>Palabras con significados similares quedan cerca entre sí.</li>
+      <li>Las relaciones semánticas se preservan matemáticamente.</li>
+      <li>Se pueden calcular distancias y similitudes.</li>
+    </ul>
+
+    <div class="embedding-space reveal-element">
+      <div class="embedding-point cluster-a">
+        <span class="word">gato</span>
+        <span class="vector">[0.82, 0.15, -0.34, ...]</span>
+      </div>
+      <div class="embedding-point cluster-a">
+        <span class="word">felino</span>
+        <span class="vector">[0.79, 0.18, -0.31, ...]</span>
+      </div>
+      <div class="embedding-point cluster-a">
+        <span class="word">gatito</span>
+        <span class="vector">[0.84, 0.12, -0.36, ...]</span>
+      </div>
+      <div class="embedding-point cluster-b">
+        <span class="word">perro</span>
+        <span class="vector">[0.71, 0.22, -0.45, ...]</span>
+      </div>
+      <div class="embedding-point cluster-b">
+        <span class="word">can</span>
+        <span class="vector">[0.68, 0.25, -0.42, ...]</span>
+      </div>
+      <div class="embedding-point cluster-c">
+        <span class="word">coche</span>
+        <span class="vector">[-0.12, 0.88, 0.56, ...]</span>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía de la biblioteca temática:</strong> Un embedding es como asignar a cada libro una direcciónGPS tridimensional en una biblioteca infinita. Los libros sobre "cooking Italian pasta" y "recetas de pizza napolitana" tendrían coordenadas muy cercanas. Un lector que busca "comida mediterránea" encontrará ambos. Un libro sobre "astrofísica cuántica" estaría en una zona completamente diferente. Los embeddings permiten a las computadoras navegar esta "biblioteca del significado" usando matemática en lugar de reglas escritas.</p>
+    </div>
+
+    <h2>2. ¿Cómo se entrenan?</h2>
+    <p>Los embeddings modernos se entrenan con redes neuronales que procesan enormes cantidades de texto. El modelo aprende a predecir el contexto de una palabra a partir de sus vecinas (como Word2Vec y GloVe originalmente) o a distinguir textos similares de textos diferentes (como los modelos contrastivos modernos).</p>
+
+    <p>La arquitectura dominante hoy son los <strong>transformers</strong> bidireccionales. Modelos como <code>text-embedding-3-small</code> (OpenAI), <code>sentence-transformers</code> (Hugging Face), y <code>embed-v3</code> (Cohere) se entrenan con:</p>
+
+    <ol>
+      <li><strong>Datos masivos:</strong> Billones de tokens de internet, libros, código, etc.</li>
+      <li><strong>Tarea contrastiva:</strong> Emparejar documentos que son semánticamente similares y alejar los que no lo son.</li>
+      <li><strong>Instrucciones:</strong> Los modelos más recientes (como GTE-Qwen2 o E5-Mistral) se entrenan para responder a instrucciones específicas del usuario.</li>
+    </ol>
+
+    <div class="callout reveal-element" style="border-left-color: #366A9C;">
+      <p><strong>El truco del entrenamiento contrastivo:</strong> Piensa en un estudiante que ve miles de pares de pregunta-respuesta. Algunos pares son correctos (el estudiante aprende a asociarlos), otros son incorrectos (aprende a distinguirlos). Con el tiempo, desarrolla una intuición de qué respuestas van con qué preguntas. Los modelos de embedding hacen exactamente esto: aprenden un espacio donde preguntas similares quedan cerca de sus respuestas correspondientes.</p>
+    </div>
+
+    <h2>3. Similitud semántica: Medir qué tan parecidos son dos textos</h2>
+    <p>Una vez que tenemos los embeddings, la pregunta clave es: ¿cómo medimos la similitud entre dos vectores? La métrica más común es la <strong>similitud coseno</strong>, que mide el ángulo entre dos vectores (no su magnitud).</p>
+
+    <p>La fórmula es simple: cos(θ) = (A · B) / (||A|| × ||B||). Un resultado de 1.0 significa idénticos, 0.0 significa ortogonales (sin relación), y -1.0 significa opuestos. En la práctica, embeddings de textos similares suelen tener similitudes coseno de 0.7 a 0.95.</p>
+
+    <div class="similarity-matrix reveal-element">
+      <div class="matrix-cell matrix-header">Término</div>
+      <div class="matrix-cell matrix-header">gato</div>
+      <div class="matrix-cell matrix-header">felino</div>
+      <div class="matrix-cell matrix-header">perro</div>
+      <div class="matrix-cell matrix-header">coche</div>
+
+      <div class="matrix-cell matrix-header">gato</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-high">0.91</div>
+      <div class="matrix-cell matrix-medium">0.72</div>
+      <div class="matrix-cell matrix-low">0.15</div>
+
+      <div class="matrix-cell matrix-header">felino</div>
+      <div class="matrix-cell matrix-high">0.91</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-medium">0.68</div>
+      <div class="matrix-cell matrix-low">0.12</div>
+
+      <div class="matrix-cell matrix-header">perro</div>
+      <div class="matrix-cell matrix-medium">0.72</div>
+      <div class="matrix-cell matrix-medium">0.68</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+      <div class="matrix-cell matrix-low">0.22</div>
+
+      <div class="matrix-cell matrix-header">coche</div>
+      <div class="matrix-cell matrix-low">0.15</div>
+      <div class="matrix-cell matrix-low">0.12</div>
+      <div class="matrix-cell matrix-low">0.22</div>
+      <div class="matrix-cell matrix-high">1.00</div>
+    </div>
+
+    <p>Observa que "gato" y "felino" tienen una similitud muy alta (0.91) porque son casi sinónimos. "Gato" y "perro" son ambos mascotas (0.72), pero "coche" está lejos de todos (0.15). Esta estructura refleja el significado real de las palabras.</p>
+
+    <h2>4. Bases de datos vectoriales: Buscar en milisegundos</h2>
+    <p>Si tienes millones de documentos, cada uno representado como un vector de 1536 dimensiones, y quieres encontrar los más similares a una consulta, no puedes comparar uno por uno (sería demasiado lento). Las bases de datos vectoriales resuelven este problema con indexación inteligente.</p>
+
+    <div class="vector-db-grid reveal-element">
+      <div class="vector-db-card">
+        <h4>Pinecone</h4>
+        <p>Base de datos vectorial gestionada (cloud). Optimizada para producción. Soporta filtros por metadata, namespaces, y escala horizontal automática.</p>
+      </div>
+      <div class="vector-db-card">
+        <h4>Weaviate</h4>
+        <p>Open source, soporta búsqueda híbrida (vectorial + keyword). Módulos integrados para embeddings de OpenAI, Cohere, etc. GraphQL API.</p>
+      </div>
+      <div class="vector-db-card">
+        <h4>Chroma</h4>
+        <p>Liviano y fácil de integrar. Ideal para desarrollo local y prototipos. Se ejecuta como librería Python sin servidor separado.</p>
+      </div>
+    </div>
+
+    <p>Otras opciones importantes incluyen <strong>Qdrant</strong> (alto rendimiento en Rust), <strong>Milvus</strong> (diseñado para escala masiva), <strong>pgvector</strong> (extensión de PostgreSQL), y <strong>LanceDB</strong> (basado en formato Lance, serverless).</p>
+
+    <h2>5. Métodos de indexación: HNSW, IVF y más</h2>
+    <p>Las bases vectoriales no hacen búsqueda exhaustiva (brute force). Usan estructuras de datos inteligentes para aproximaciones cercanas a la búsqueda exacta, pero mucho más rápidas.</p>
+
+    <div class="index-comparison reveal-element">
+      <div class="index-card">
+        <h4>HNSW (Hierarchical Navigable Small World)</h4>
+        <p>Crea un grafo jerárquico donde cada punto está conectado a sus vecinos más cercanos en múltiples capas. La búsqueda empieza en la capa superior (puntos muy dispersos) y desciende gradualmente. Excelente precisión, alto uso de memoria.</p>
+      </div>
+      <div class="index-card">
+        <h4>IVF (Inverted File Index)</h4>
+        <p>Divide el espacio en clusters usando k-means. Solo busca en los clusters más cercanos al query, no en todos los datos. Más rápido que HNSW para conjuntos masivos, pero puede perder resultados en los bordes de los clusters.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía de la búsqueda:</strong> HNSW es como tener un mapa de carreteras con autopistas (capas altas) y calles locales (capas bajas). Para llegar a un destino, primero tomas la autopista más cercana, luego bajas a carreteras secundarias, y finalmente a calles locales. IVF es como tener un directorio telefónico organizado por ciudad: no buscas en todas las ciudades, solo en la más cercana a tu consulta.</p>
+    </div>
+
+    <p>Otros métodos incluyen:</p>
+    <ul>
+      <li><strong>PQ (Product Quantization):</strong> Comprime los vectores para ahorrar memoria, agrupando dimensiones en centroides. Útil cuando la memoria es limitada.</li>
+      <li><strong>ScaNN (Google):</strong> Usa cuantización anisotrópica para máxima eficiencia con alta precisión.</li>
+      <li><strong>LSH (Locality-Sensitive Hashing):</strong> Usa funciones hash que preservan la cercanía para agrupar vectores similares.</li>
+    </ul>
+
+    <h2>6. La maldición de la dimensionalidad</h2>
+    <p>A medida que aumentan las dimensiones de los embeddings, algo contraintuitivo sucede: todos los puntos empiezan a parecer igual de lejos entre sí. Esto se llama la "maldición de la dimensionalidad". En 1536 dimensiones, la distancia entre el par más cercano y el par más lejano puede ser muy similar.</p>
+
+    <p>Para contrarrestar esto, las bases vectoriales usan técnicas como:</p>
+    <ul>
+      <li><strong>Reducción de dimensionalidad:</strong> PCA o truncamiento para reducir de 1536 a 256 dimensiones sin perder demasiada información.</li>
+      <li><strong>Cuantización:</strong> Convertir floats de 32 bits a 8 bits o usar códigos de producto para comprimir.</li>
+      <li><strong>Re-ranking:</strong> Buscar rápidamente con vectores comprimidos, luego re-rankear los top-K con los vectores originales completos.</li>
+    </ul>
+
+    <h2>7. Simulación: Búsqueda de similitud en código</h2>
+    <p>El siguiente código simula el proceso completo: crear embeddings de documentos, almacenarlos, y buscar los más similares a una consulta:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación de un sistema de embeddings y búsqueda vectorial
+import numpy as np
+
+def crear_embedding(palabras_clave):
+    """Simula crear un embedding a partir de palabras clave"""
+    vocab = {"gato": 0, "perro": 1, "coche": 2, "ciencia": 3,
+             "física": 4, "programación": 5, "comida": 6, "receta": 7}
+    vector = np.zeros(len(vocab))
+    for palabra in palabras_clave:
+        if palabra in vocab:
+            vector[vocab[palabra]] = np.random.uniform(0.6, 1.0)
+    ruido = np.random.randn(len(vocab)) * 0.05
+    vector = vector + ruido
+    return vector / np.linalg.norm(vector)
+
+def similitud_coseno(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+# Base de datos de documentos
+documentos = {
+    "doc1": {"texto": "Cómo entrenar a tu gato", "embedding": crear_embedding(["gato", "comida"])},
+    "doc2": {"texto": "Guía de cuidado canino", "embedding": crear_embedding(["perro", "comida"])},
+    "doc3": {"texto": "Introducción a la física cuántica", "embedding": crear_embedding(["ciencia", "física"])},
+    "doc4": {"texto": "Receta de paella valenciana", "embedding": crear_embedding(["receta", "comida"])},
+    "doc5": {"texto": "Programación en Python", "embedding": crear_embedding(["programación", "ciencia"])},
+}
+
+# Consulta del usuario
+consulta = crear_embedding(["gato", "comida"])
+print("Consulta: 'alimentación para gatos'\n")
+
+# Búsqueda por similitud
+resultados = []
+for doc_id, doc in documentos.items():
+    sim = similitud_coseno(consulta, doc["embedding"])
+    resultados.append((doc_id, doc["texto"], sim))
+
+# Ordenar por similitud descendente
+resultados.sort(key=lambda x: x[2], reverse=True)
+
+print("Resultados ordenados por relevancia:")
+print("-" * 50)
+for i, (doc_id, texto, sim) in enumerate(resultados, 1):
+    barra = "█" * int(sim * 30)
+    print(f"  {i}. [{sim:.3f}] {barra} {texto}")
+
+print(f"\nDocumento más relevante: {resultados[0][1]}")
+    </pre>
+
+    <div class="callout reveal-element">
+      <p><strong>En producción real:</strong> Los embeddings se calculan con modelos como <code>text-embedding-3-small</code> de OpenAI (1536 dims), <code>all-MiniLM-L6-v2</code> de Sentence Transformers (384 dims), o <code>embed-v3</code> de Cohere (1024 dims). La búsqueda vectorial en bases como Pinecone o Weaviate puede encontrar los 10 más relevantes entre millones de vectores en menos de 10 milisegundos.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- SUBTOPIC 4.2: RAG: Retrieval-Augmented Generation        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-divider reveal-element" id="rag">
+      <h2>4.2 RAG: Retrieval-Augmented Generation</h2>
+    </div>
+
+    <p>Imagina que te presentan a un examen. En un caso, es examen cerrado: todo lo que sabes es lo que memorizaste. En el otro caso, es examen abierto con apuntes: puedes consultar tus notas, libros y referencias mientras respondes. Los LLMs puros razonan con examen cerrado — su conocimiento está congelado en el momento de su entrenamiento. RAG (Retrieval-Augmented Generation) convierte ese examen en uno abierto, permitiendo al modelo consultar fuentes externas antes de generar su respuesta.</p>
+
+    <h2>1. El problema: Alucinaciones y conocimiento obsoleto</h2>
+    <p>Los grandes modelos de lenguaje (LLMs) tienen dos problemas fundamentales:</p>
+
+    <div class="hallucination-box reveal-element">
+      <div class="hallucination-card without">
+        <h4>Sin RAG (Alucinaciones)</h4>
+        <p>"¿Cuál es la población de Buenos Aires en 2026?" → El modelo genera un número que suena plausible pero puede estar completamente inventado. No tiene acceso a datos en tiempo real.</p>
+      </div>
+      <div class="hallucination-card with">
+        <h4>Con RAG (Respuesta verificable)</h4>
+        <p>El modelo consulta fuentes actualizadas (censos, artículos, bases de datos) y genera una respuesta respaldada por documentos reales, citando sus fuentes.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía del examen:</strong> Un LLM puro es como un estudiante muy inteligente que estudió hace dos años. Sabe mucho, pero su información puede estar desactualizada y a veces inventa datos que suenan convincentes. RAG le da acceso a una biblioteca actualizada: antes de responder, busca en libros recientes, artículos y documentos relevantes. Su respuesta se basa en evidencia real, no solo en memoria.</p>
+    </div>
+
+    <p>Además, los LLMs tienen una ventana de contexto limitada (aunque creciente: 128k-1M tokens). No puedes meterles toda una base de conocimiento de una empresa. RAG resuelve esto retrieved selectivamente solo los documentos relevantes para cada consulta específica.</p>
+
+    <h2>2. La pipeline de RAG: Del documento al conocimiento</h2>
+    <p>RAG se compone de dos grandes fases: indexación (preparar el conocimiento) y generación (consultar y responder). Veamos el pipeline completo:</p>
+
+    <div class="rag-pipeline reveal-element">
+      <div class="rag-stage">
+        <div class="rag-stage-icon">📄</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">1. Ingesta de documentos</div>
+          <p class="rag-stage-desc">PDFs, HTMLs, Word, Markdown, emails, bases de datos... Se extrae el texto crudo de todas las fuentes.</p>
+        </div>
+      </div>
+      <div class="rag-stage-arrow">↓</div>
+      <div class="rag-stage">
+        <div class="rag-stage-icon">✂️</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">2. Chunking (fragmentación)</div>
+          <p class="rag-stage-desc">Se divide cada documento en chunks (fragmentos) de tamaño fijo o semántico, con superposición para preservar contexto.</p>
+        </div>
+      </div>
+      <div class="rag-stage-arrow">↓</div>
+      <div class="rag-stage">
+        <div class="rag-stage-icon">🔢</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">3. Embedding</div>
+          <p class="rag-stage-desc">Cada chunk se convierte en un vector numérico usando un modelo de embeddings (text-embedding-3-small, etc.).</p>
+        </div>
+      </div>
+      <div class="rag-stage-arrow">↓</div>
+      <div class="rag-stage">
+        <div class="rag-stage-icon">🗄️</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">4. Almacenamiento vectorial</div>
+          <p class="rag-stage-desc">Los vectores se indexan en una base de datos vectorial (Pinecone, Weaviate, Chroma, Qdrant).</p>
+        </div>
+      </div>
+      <div class="rag-stage-arrow">↓</div>
+      <div class="rag-stage">
+        <div class="rag-stage-icon">🔍</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">5. Retrieval (búsqueda)</div>
+          <p class="rag-stage-desc">El usuario hace una pregunta. Se embedifica y se buscan los K chunks más similares en la base vectorial.</p>
+        </div>
+      </div>
+      <div class="rag-stage-arrow">↓</div>
+      <div class="rag-stage">
+        <div class="rag-stage-icon">🤖</div>
+        <div class="rag-stage-content">
+          <div class="rag-stage-title">6. Generación con contexto</div>
+          <p class="rag-stage-desc">Los chunks recuperados se inyectan en el prompt del LLM junto con la pregunta. El modelo responde basándose en la evidencia.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Estrategias de chunking: Cómo dividir el conocimiento</h2>
+    <p>El chunking es uno de los aspectos más críticos de RAG. Un chunk demasiado grande diluye la información relevante; uno demasiado pequeño pierde contexto.</p>
+
+    <div class="chunking-visual reveal-element">
+      <div class="chunk-block chunk-1" data-chunk="Chunk 1 (512 tokens)">
+        Los Transformers fueron introducidos en 2017 por Google en el paper "Attention is All You Need". La arquitectura se basa en el mecanismo de autoatención...
+      </div>
+      <div class="chunk-block chunk-2" data-chunk="Chunk 2 (512 tokens, overlap 50)">
+        ...de autoatención, que permite que cada token de la secuencia "mire" a todos los demás. Esto elimina la necesidad de procesamiento secuencial como en las RNNs...
+      </div>
+      <div class="chunk-block chunk-3" data-chunk="Chunk 3 (512 tokens, overlap 50)">
+        ...RNNs. Las variantes principales son el Encoder (BERT), el Decoder (GPT), y el Encoder-Decoder (T5). Cada uno tiene ventajas según la tarea...
+      </div>
+      <div class="chunk-block chunk-4" data-chunk="Chunk 4 (512 tokens, overlap 50)">
+        ...según la tarea. La atención escalada por raíz cuadrada (Scaled Dot-Product Attention) es la base del mecanismo...
+      </div>
+    </div>
+
+    <p>Las estrategias principales de chunking:</p>
+    <ul>
+      <li><strong>Fixed-size:</strong> Dividir en chunks de N tokens con overlap de M tokens. Simple pero puede cortar oraciones.</li>
+      <li><strong>Semántico:</strong> Usar un modelo de embeddings para detectar cambios de tema y cortar ahí. Más coherente.</li>
+      <li><strong>Por estructura:</strong> Respetar headings, párrafos, o secciones del documento. Ideal para markdown o HTML.</li>
+      <li><strong>Recursive:</strong> Dividir por separadores jerárquicos (párrafo → oración → palabra) hasta alcanzar el tamaño deseado.</li>
+      <li><strong>Parent-child:</strong> Buscar en chunks pequeños pero devolver chunks padres más grandes para dar contexto.</li>
+    </ul>
+
+    <div class="callout reveal-element" style="border-left-color: #366A9C;">
+      <p><strong>El sweet spot:</strong> La mayoría de sistemas de producción usan chunks de 256-1024 tokens con overlap del 10-20%. Chunks de 512 tokens con overlap de 50 tokens son un punto de partida sólido. La clave es que cada chunk contenga información suficiente para responder una pregunta por sí solo, pero no tanta que se diluya la relevancia.</p>
+    </div>
+
+    <h2>4. Búsqueda híbrida y reranking</h2>
+    <p>La búsqueda puramente vectorial no siempre es la mejor. A veces el usuario busca un término específico (nombre propio, número de serie, código) que se captura mejor con búsqueda por palabras clave. La búsqueda híbrida combina ambos enfoques.</p>
+
+    <div class="hybrid-search-visual reveal-element">
+      <div class="hybrid-column">
+        <h5>Búsqueda Vectorial</h5>
+        <div class="result">doc1: "seguros automotrices" (0.89)</div>
+        <div class="result">doc3: "pólizas de coche" (0.84)</div>
+        <div class="result">doc7: "cobertura vehicular" (0.81)</div>
+      </div>
+      <div class="hybrid-column">
+        <h5>Búsqueda BM25 (Keyword)</h5>
+        <div class="result">doc2: "BMW serie 3 seguro" (12.4)</div>
+        <div class="result">doc5: "BMW M3 póliza" (10.8)</div>
+        <div class="result">doc1: "seguros automotrices" (8.2)</div>
+      </div>
+      <div class="hybrid-column">
+        <h5>Resultado Combinado (RRF)</h5>
+        <div class="result">doc1: "seguros automotrices" (0.032)</div>
+        <div class="result">doc2: "BMW serie 3 seguro" (0.028)</div>
+        <div class="result">doc3: "pólizas de coche" (0.022)</div>
+      </div>
+    </div>
+
+    <p>El <strong>Reranking</strong> es la segunda fase: después de obtener los top-K candidatos (típicamente 20-50), un modelo de reranking (como Cohere Rerank, bge-reranker, o cross-encoders de Sentence Transformers) re-evalúa cada par (query, documento) con mucha más precisión y devuelve los top-3 o top-5 realmente relevantes.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Analogía del reclutador:</strong> La búsqueda vectorial y BM25 son como los filtros automáticos de un ATS (sistema de seguimiento de candidatos): rápido pero impreciso, devuelven muchos candidatos potencialmente relevantes. El reranking es como el reclutador humano que revisa cada CV detalladamente y selecciona a los 3 mejores. Lento pero preciso. Usar ambos en cascada es el estándar de la industria.</p>
+    </div>
+
+    <h2>5. El paso de generación: Dar contexto al LLM</h2>
+    <p>Una vez recuperados los chunks más relevantes, se construye un prompt que incluye:</p>
+
+    <ol>
+      <li><strong>System prompt:</strong> Instrucciones sobre cómo usar la información recuperada (ser fiel a las fuentes, citar, admitir incertidumbre).</li>
+      <li><strong>Contexto:</strong> Los chunks recuperados, claramente delimitados y numerados.</li>
+      <li><strong>Query del usuario:</strong> La pregunta original.</li>
+      <li><strong>Instrucciones de formato:</strong> Cómo estructurar la respuesta.</li>
+    </ol>
+
+    <pre class="code-block reveal-element">
+# Ejemplo de prompt RAG construido
+system_prompt = """
+Eres un asistente experto en el reglamento de la empresa.
+Responde ÚNICAMENTE basándote en el contexto proporcionado.
+Si la información no está en el contexto, di "No tengo información suficiente".
+Cita las fuentes usando [1], [2], etc.
+"""
+
+contexto_rag = """
+[Fuente 1 - Política de vacaciones, §3.2]
+Los empleados tienen derecho a 20 días de vacaciones anuales.
+Las vacaciones deben solicitarse con 30 días de anticipación.
+
+[Fuente 2 - Contrato colectivo, §7.1]
+El permiso por enfermedad es de hasta 15 días al año.
+Se requiere certificado médico a partir del tercer día.
+"""
+
+usuario = "¿Cuántos días de vacaciones me corresponden?"
+
+prompt_completo = f"""
+{system_prompt}
+
+CONTEXTO:
+{contexto_rag}
+
+PREGUNTA: {usuario}
+
+RESPUESTA:
+"""
+    </pre>
+
+    <div class="callout reveal-element" style="border-left-color: #3E8453;">
+      <p><strong>El patrón clave:</strong> El LLM no necesita "saber" la respuesta. Solo necesita razonar sobre la información que se le proporciona. Esto reduce drásticamente las alucinaciones porque el modelo tiene evidencia concreta a la que atenerse. Es como la diferencia entre responder de memoria y responder leyendo el párrafo correcto de un libro.</p>
+    </div>
+
+    <h2>6. Simulación completa de RAG en código</h2>
+    <p>El siguiente código simula una pipeline RAG simplificada: indexar documentos, buscar los relevantes, y construir el prompt para el LLM:</p>
+
+    <pre class="code-block reveal-element">
+# Simulación de una pipeline RAG completa
+import numpy as np
+
+# 1. Documentos de la empresa (base de conocimiento)
+documentos = [
+    {"id": "doc1", "fuente": "Reglamento §3.2", 
+     "texto": "Los empleados tienen derecho a 20 días de vacaciones anuales."},
+    {"id": "doc2", "fuente": "Reglamento §7.1", 
+     "texto": "El permiso por enfermedad es de hasta 15 días al año."},
+    {"id": "doc3", "fuente": "Política de trabajo §2.4", 
+     "texto": "El trabajo remoto está permitido 3 días a la semana."},
+    {"id": "doc4", "fuente": "Contrato colectivo §5.3", 
+     "texto": "La jornada laboral es de 8 horas diarias, 40 semanales."},
+    {"id": "doc5", "fuente": "Guía de beneficios §1.1", 
+     "texto": "La empresa ofrece seguro médico privado a todos los empleados."},
+]
+
+def simular_embedding(texto):
+    """Simula un embedding basado en palabras clave"""
+    keywords = {
+        "vacaciones": [0.9, 0.1, 0.2], "enfermedad": [0.1, 0.9, 0.2],
+        "remoto": [0.1, 0.2, 0.9], "jornada": [0.2, 0.3, 0.7],
+        "seguro": [0.8, 0.6, 0.3], "días": [0.7, 0.5, 0.4],
+    }
+    vec = np.zeros(3)
+    for palabra, v in keywords.items():
+        if palabra in texto.lower():
+            vec += np.array(v)
+    return vec / (np.linalg.norm(vec) + 1e-8)
+
+# 2. Indexar documentos (crear embeddings)
+for doc in documentos:
+    doc["embedding"] = simular_embedding(doc["texto"])
+
+# 3. Consulta del usuario
+consulta = "¿Cuántos días de vacaciones tengo al año?"
+embedding_consulta = simular_embedding(consulta)
+print(f"Pregunta: {consulta}\n")
+
+# 4. Retrieval: buscar los top-2 documentos más relevantes
+resultados = []
+for doc in documentos:
+    sim = np.dot(embedding_consulta, doc["embedding"])
+    resultados.append((doc, sim))
+
+resultados.sort(key=lambda x: x[1], reverse=True)
+top_k = resultados[:2]
+
+# 5. Construir prompt RAG
+print("Documentos recuperados:")
+for doc, sim in top_k:
+    print(f"  [{sim:.3f}] {doc['fuente']}: {doc['texto']}")
+
+contexto = "\n".join([f"[Fuente {i+1} - {d['fuente']}] {d['texto']}" 
+                      for i, (d, _) in enumerate(top_k)])
+
+prompt = f"""CONTEXTO recuperado:
+{contexto}
+
+PREGUNTA: {consulta}
+
+Responde basándote ÚNICAMENTE en el contexto anterior."""
+
+print(f"\nPrompt generado para el LLM:")
+print("-" * 50)
+print(prompt)
+    </pre>
+
+    <h2>7. Avances recientes: GraphRAG, agentic RAG y más</h2>
+    <p>El campo de RAG evoluciona rápidamente. Algunas tendencias importantes:</p>
+
+    <ul>
+      <li><strong>GraphRAG:</strong> En lugar de solo buscar chunks similares, construye un grafo de conocimiento que conecta entidades y relaciones. Microsoft lanzó GraphRAG que puede responder preguntas que requieren razonamiento sobre múltiples documentos.</li>
+      <li><strong>Agentic RAG:</strong> El agente decide dinámicamente cuándo buscar, qué buscar, y si la respuesta es suficiente. Puede hacer múltiples rondas de retrieval y reformular consultas.</li>
+      <li><strong>Multi-modal RAG:</strong> Busca no solo en texto sino también en tablas, imágenes, gráficos y diagramas. Modelos como GPT-4V permiten procesar documentos visuales.</li>
+      <li><strong>Self-RAG:</strong> El modelo aprende a evaluar cuándo necesita buscar, si el retrieved es relevante, y si su respuesta está respaldada por la evidencia.</li>
+      <li><strong>Corrective RAG (CRAG):</strong> Evalúa la calidad del retrieval y si es insuficiente, busca de nuevo o consulta fuentes web externas.</li>
+    </ul>
+
+    <div class="callout reveal-element">
+      <p><strong>El futuro del RAG:</strong> Estamos pasando de sistemas RAG estáticos (pipeline predefinido) a sistemas RAG autónomos que razonan sobre su propio proceso de búsqueda. El agente decide: "¿Necesito buscar?", "¿Encontré lo suficiente?", "¿Debo buscar de nuevo con otras palabras?", "¿Mi respuesta es consistente con las fuentes?". Es la diferencia entre un sistema de búsqueda y un investigador experto.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/agentes-protocolos/index.html" class="btn btn-primary">Siguiente: Agentes & Protocolos →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

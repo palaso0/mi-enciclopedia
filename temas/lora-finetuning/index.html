@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoRA: Fine-tuning eficiente — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para LoRA */
+    .lora-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 600px) {
+      .lora-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+    .lora-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+    }
+    .lora-card-header {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lora-card-header.full { color: #B25E35; }
+    .lora-card-header.lora { color: #2d7d46; }
+    .lora-stat {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lora-stat:last-child { border-bottom: none; }
+    .lora-stat-label { color: var(--color-text-muted); }
+    .lora-stat-value { font-weight: 600; }
+    .matrix-visual {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+    }
+    .matrix-row {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+      margin-bottom: var(--space-2);
+    }
+    .matrix-cell {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      font-size: 0.7rem;
+      border-radius: var(--radius-sm);
+    }
+    .matrix-cell.frozen {
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+    }
+    .matrix-cell.trained {
+      background: rgba(45, 125, 70, 0.1);
+      border-color: #2d7d46;
+      color: #2d7d46;
+      font-weight: 600;
+    }
+    .matrix-label {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .matrix-operator {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--color-accent);
+      margin: var(--space-2) 0;
+    }
+    .analogy-box {
+      background: var(--color-surface);
+      border-left: 4px solid #A34E78;
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .analogy-box strong {
+      color: #A34E78;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Entrenamiento</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>LoRA: Fine-tuning eficiente</h1>
+
+    <p>Entrenar un modelo de lenguaje desde cero cuesta millones de dólares. Pero una vez que tienes un modelo base potente, ¿y si solo necesitas adaptarlo a una tarea específica? El fine-tuning tradicional requiere actualizar <strong>todos</strong> los parámetros del modelo, lo cual sigue siendo extremadamente costoso. LoRA (Low-Rank Adaptation) resuelve esto con una idea elegante: <strong>no reconstruyas el motor, agrega un plugin</strong>.</p>
+
+    <h2>1. El problema: Fine-tuning completo es desperdiciar recursos</h2>
+
+    <p>Cuando haces fine-tuning completo (full fine-tuning) de un modelo como Llama 3 de 70B parámetros, necesitas:</p>
+
+    <div class="lora-comparison reveal-element">
+      <div class="lora-card">
+        <div class="lora-card-header full">Fine-tuning Completo</div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Parámetros a entrenar</span>
+          <span class="lora-stat-value">70,000M (100%)</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">VRAM necesaria</span>
+          <span class="lora-stat-value">~280 GB+</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Tiempo estimado</span>
+          <span class="lora-stat-value">Días/semanas</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Riesgo de olvido</span>
+          <span class="lora-stat-value" style="color: #B25E35;">Alto</span>
+        </div>
+      </div>
+      <div class="lora-card">
+        <div class="lora-card-header lora">Fine-tuning con LoRA</div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Parámetros a entrenar</span>
+          <span class="lora-stat-value">~200M (0.3%)</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">VRAM necesaria</span>
+          <span class="lora-stat-value">~24 GB</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Tiempo estimado</span>
+          <span class="lora-stat-value">Horas</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Riesgo de olvido</span>
+          <span class="lora-stat-value" style="color: #2d7d46;">Bajo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>El truco de LoRA:</strong> En lugar de actualizar los 70B parámetros, LoRA <strong>congela</strong> todos los pesos originales del modelo y entrena únicamente unas matrices pequeñas de rango bajo que se suman a las capas originales. El modelo base no cambia; solo se le añade un "adaptador" ligero.</p>
+    </div>
+
+    <h2>2. La analogía: Plugin vs. reconstrucción</h2>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Imagina que tienes un auto de alta gama (el modelo base) y quieres que también pueda conducir por terreno off-road. La opciones son: (A) desarmar el motor y reconstruirlo para off-road, o (B) instalar un <strong>kit de elevación y neumáticos todoterreno</strong> (el adaptador LoRA). La opción B es más barata, reversible, y no destruye las capacidades originales del auto. Si quieres volver al asfalto, solo quitas el kit.</p>
+    </div>
+
+    <p>En términos técnicos, LoRA observa que los cambios necesarios para adaptar un modelo a una nueva tarea tienen una <strong>baja dimensión intrínseca</strong>. No necesitas cambiar todos los parámetros; solo necesitas ajustar unas cuantas direcciones en el espacio de pesos.</p>
+
+    <h2>3. Cómo funciona: Matrices de bajo rango</h2>
+
+    <p>En una capa Transformer, los pesos de atención son matrices grandes (por ejemplo, 4096 x 4096). LoRA no modifica estas matrices. En su lugar, introduce dos matrices pequeñas, <strong>A</strong> y <strong>B</strong>, y calcula la adaptación como una suma:</p>
+
+    <div class="matrix-visual reveal-element">
+      <p style="text-align: center; font-size: 0.9rem; margin-bottom: var(--space-3);">W' = W + B × A</p>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₁₁</span>
+        <span class="matrix-cell frozen">w₁₂</span>
+        <span class="matrix-cell frozen">w₁₃</span>
+        <span class="matrix-cell frozen">w₁₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₂₁</span>
+        <span class="matrix-cell frozen">w₂₂</span>
+        <span class="matrix-cell frozen">w₂₃</span>
+        <span class="matrix-cell frozen">w₂₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₃₁</span>
+        <span class="matrix-cell frozen">w₃₂</span>
+        <span class="matrix-cell frozen">w₃₃</span>
+        <span class="matrix-cell frozen">w₃₄</span>
+      </div>
+      <div class="matrix-label">W original (4096 × 4096) — CONGELADA, no se entrena</div>
+
+      <div class="matrix-operator">+</div>
+
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₁₁</span>
+        <span class="matrix-cell trained">b₁₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₂₁</span>
+        <span class="matrix-cell trained">b₂₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₃₁</span>
+        <span class="matrix-cell trained">b₃₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₄₁</span>
+        <span class="matrix-cell trained">b₄₂</span>
+      </div>
+      <div class="matrix-label">B (4096 × r) — ENTRENABLE, r = 8 típicamente</div>
+
+      <div class="matrix-operator">×</div>
+
+      <div class="matrix-row">
+        <span class="matrix-cell trained">a₁₁</span>
+        <span class="matrix-cell trained">a₁₂</span>
+        <span class="matrix-cell trained">a₁₃</span>
+        <span class="matrix-cell trained">a₁₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">a₂₁</span>
+        <span class="matrix-cell trained">a₂₂</span>
+        <span class="matrix-cell trained">a₂₃</span>
+        <span class="matrix-cell trained">a₂₄</span>
+      </div>
+      <div class="matrix-label">A (r × 4096) — ENTRENABLE, r = 8 típicamente</div>
+
+      <p style="text-align: center; font-size: 0.8rem; color: var(--color-text-muted); margin-top: var(--space-3);">Con r=8: Parámetros entrenados = 4096×8 + 8×4096 = 65,536 vs. 4096×4096 = 16,777,212 originales</p>
+    </div>
+
+    <p>Las matrices A y B son <strong>muy pequeñas</strong> comparadas con W. Mientras W tiene millones de parámetros, A y B tienen solo miles. El rango <code>r</code> (típicamente 8, 16 o 64) controla cuánta capacidad de adaptación tiene el adaptador.</p>
+
+    <h2>4. Implementación práctica con PEFT</h2>
+
+    <p>La biblioteca PEFT (Parameter-Efficient Fine-Tuning) de Hugging Face hace que aplicar LoRA sea casi trivial. Solo necesitas definir qué capas adaptar y el rango deseado:</p>
+
+    <pre class="code-block reveal-element">
+# Ejemplo de fine-tuning con LoRA usando PEFT + transformers
+from peft import LoraConfig, get_peft_model, TaskType
+from transformers import AutoModelForCausalLM
+
+# 1. Cargar el modelo base (congelado)
+modelo_base = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B",
+    load_in_4bit=True  # Carga quantizado para ahorrar VRAM
+)
+
+# 2. Configurar LoRA: qué capas adaptar y con qué rango
+config_lora = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=16,                          # Rango de las matrices A y B
+    lora_alpha=32,                 # Factor de escala (alpha/r = 2)
+    lora_dropout=0.05,             # Regularización
+    target_modules=[               # Capas del Transformer a adaptar
+        "q_proj", "k_proj",        # Proyecciones de atención
+        "v_proj", "o_proj",
+        "gate_proj", "up_proj",    # Capas FFN
+        "down_proj"
+    ],
+    bias="none"
+)
+
+# 3. Aplicar LoRA al modelo base
+modelo_lora = get_peft_model(modelo_base, config_lora)
+
+# 4. Ver cuántos parámetros se entrenan vs. el total
+modelo_lora.print_trainable_parameters()
+# Salida: trainable params: 41,943,040 || all params: 8,071,319,552 || 0.52%
+
+# 5. Entrenar normalmente con un dataset de tu tarea
+# El modelo solo ajustará los ~42M parámetros de LoRA,
+# manteniendo los 8B originales completamente intactos.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Ventaja clave:</strong> Como el modelo base no se modifica, puedes tener <strong>múltiples adaptadores LoRA</strong> para diferentes tareas (uno para español, otro para código, otro para resúmenes) e intercambiarlos instantáneamente sin recargar el modelo completo.</p>
+    </div>
+
+    <h2>5. Cuándo usar LoRA vs. fine-tuning completo</h2>
+
+    <p>LoRA no siempre es la mejor opción. Aquí está la guía de decisión:</p>
+
+    <ul>
+      <li><strong>Usa LoRA cuando:</strong> Tienes un modelo base potente y quieres adaptarlo a una tarea específica (clasificación, generación en un dominio, estilo particular). El dataset es pequeño o moderado.</li>
+      <li><strong>Usa fine-tuning completo cuando:</strong> Necesitas cambiar fundamentalmente el comportamiento del modelo, o estás pre-entrenando desde un checkpoint muy pequeño.</li>
+      <li><strong>Combina ambos:</strong> Muchos equipos hacen first pre-entrenamiento completo en datos genéricos, luego LoRA para adaptación específica.</li>
+    </ul>
+
+    <p>LoRA también se puede <strong>combinar con quantización</strong> (QLoRA), lo que permite fine-tuning de modelos de 70B parámetros en una sola GPU de 24GB. Esta combinación democratizó el fine-tuning: antes era algo solo accesible para grandes empresas, ahora cualquier persona con una GPU decente puede adaptar modelos de última generación.</p>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/rlhf/index.html" class="btn btn-primary">Siguiente: RLHF →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

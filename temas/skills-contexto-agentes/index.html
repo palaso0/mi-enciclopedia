@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills: Contexto reutilizable para agentes — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    .recipe-book {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+    }
+    .recipe-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      border-top: 3px solid var(--color-accent);
+    }
+    .recipe-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .recipe-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .skill-vs-prompt {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin: var(--space-5) 0;
+    }
+    @media (max-width: 600px) {
+      .skill-vs-prompt {
+        grid-template-columns: 1fr;
+      }
+    }
+    .compare-box {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .compare-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-3);
+    }
+    .compare-box ul {
+      list-style: none;
+      padding: 0;
+    }
+    .compare-box li {
+      font-size: 0.9rem;
+      padding: var(--space-1) 0;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+    }
+    .compare-box li:last-child {
+      border-bottom: none;
+    }
+    .compare-box li strong {
+      color: var(--color-text);
+    }
+    .composition-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+      margin: var(--space-4) 0;
+    }
+    .comp-block {
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .comp-block.skill {
+      border-color: var(--color-accent);
+      background: rgba(154, 42, 42, 0.04);
+    }
+    .comp-plus {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+    .comp-equals {
+      font-family: var(--font-mono);
+      color: var(--color-accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .platform-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .platform-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .platform-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .dynamic-load-visual {
+      margin: var(--space-5) 0;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .load-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .load-step:last-child {
+      border-bottom: none;
+    }
+    .load-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .load-content {
+      font-size: 0.95rem;
+    }
+    .load-content code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: var(--color-bg);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta reveal-element">
+      <span class="topic-badge">Agentes &amp; Protocolos</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1 class="reveal-element">Skills: Contexto reutilizable para agentes</h1>
+    
+    <p class="reveal-element">Un chef experimentado no memoriza cada receta desde cero cada vez que cocina. Tiene un libro de recetas: cada receta es un conjunto de instrucciones que puede consultar, adaptar y ejecutar en cualquier momento. Las skills en agentes de IA funcionan igual: son paquetes reutilizables de instrucciones, contexto y herramientas que un agente puede cargar dinámicamente según la tarea que necesite resolver.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía del chef:</strong> Un chef sin libro de recetas tendría que reinventar cada platillo desde cero cada vez. Un chef con un libro puede preparar cualquier receta que conozca, combinar sabores de diferentes recetas, e incluso crear nuevas variantes a partir de las que ya tiene. Las skills son ese libro de recetas para agentes de IA: cada skill encapsula un conjunto de conocimientos e instrucciones que el agente puede activar bajo demanda.</p>
+    </div>
+
+    <h2 class="reveal-element">1. ¿Qué es una skill exactamente?</h2>
+    <p class="reveal-element">Una skill es un módulo reutilizable que contiene tres componentes esenciales:</p>
+
+    <div class="recipe-book reveal-element">
+      <div class="recipe-card">
+        <h4>Instrucciones</h4>
+        <p>Prompt o conjunto de directrices que definen cómo el agente debe abordar un tipo específico de tarea. Incluye formato de salida, restricciones y mejores prácticas.</p>
+      </div>
+      <div class="recipe-card">
+        <h4>Herramientas</h4>
+        <p>Funciones o APIs específicas que el agente puede invocar cuando esta skill está activa. No todas las skills necesitan herramientas, pero la mayoría sí.</p>
+      </div>
+      <div class="recipe-card">
+        <h4>Contexto</h4>
+        <p>Ejemplos, plantillas, datos de referencia y conocimiento especializado que el agente necesita para ejecutar la skill correctamente.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">Una skill no es solo un prompt más largo. Es una estructura modular que encapsula todo lo que un agente necesita para realizar un dominio específico de tareas. Cuando el agente detecta que una tarea coincide con una skill disponible, carga esa skill y la usa como marco de referencia.</p>
+
+    <h2 class="reveal-element">2. Skills vs. Prompts: La diferencia clave</h2>
+    <p class="reveal-element">Es fácil confundir skills con prompts, pero son conceptos distintos con propósitos diferentes:</p>
+
+    <div class="skill-vs-prompt reveal-element">
+      <div class="compare-box">
+        <h4>Prompt simple</h4>
+        <ul>
+          <li><strong>Estático:</strong> Se define una vez y no cambia</li>
+          <li><strong>Genérico:</strong> Funciona para muchas tareas del mismo tipo</li>
+          <li><strong>Sin estado:</strong> No recuerda interacciones anteriores</li>
+          <li><strong>Sin herramientas:</strong> Solo genera texto</li>
+          <li><strong>Sin composición:</strong> No se combina con otros prompts</li>
+        </ul>
+      </div>
+      <div class="compare-box">
+        <h4>Skill</h4>
+        <ul>
+          <li><strong>Dinámico:</strong> Se carga y descarga bajo demanda</li>
+          <li><strong>Especializado:</strong> Optimizado para un dominio específico</li>
+          <li><strong>Con estado:</strong> Puede mantener contexto entre pasos</li>
+          <li><strong>Con herramientas:</strong> Integra funciones ejecutables</li>
+          <li><strong>Componible:</strong> Se combina con otras skills</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Ejemplo práctico:</strong> Un prompt diría "Sos un asistente de atención al cliente". Una skill de atención al cliente incluiría: las instrucciones de tono y protocolo, acceso a la base de conocimiento de productos, funciones para consultar el estado de pedidos, plantillas de respuestas para problemas comunes, y reglas de escalamiento a un humano.</p>
+    </div>
+
+    <h2 class="reveal-element">3. Composición de skills</h2>
+    <p class="reveal-element">Una de las ventajas más poderosas de las skills es que se pueden combinar. Un agente puede cargar múltiples skills simultáneamente para resolver tareas que requieren conocimiento de varios dominios:</p>
+
+    <div class="composition-flow reveal-element">
+      <div class="comp-block skill">Skill: Análisis de datos</div>
+      <span class="comp-plus">+</span>
+      <div class="comp-block skill">Skill: Visualización</div>
+      <span class="comp-plus">+</span>
+      <div class="comp-block skill">Skill: Escritura técnica</div>
+      <span class="comp-equals">=</span>
+      <div class="comp-block">Agente que genera informes con gráficos</div>
+    </div>
+
+    <p class="reveal-element">La composición permite crear agentes versátiles sin necesidad de entrenar un modelo gigantesco para todo. En lugar de eso, se arma un "set de habilidades" según la tarea. Es como darle a un empleado diferentes herramientas según el proyecto: para uno necesita un destornillador, para otro una sierra, y para otro ambas.</p>
+
+    <h2 class="reveal-element">4. Carga dinámica de skills</h2>
+    <p class="reveal-element">El proceso de carga dinámica permite al agente seleccionar y activar skills en tiempo de ejecución, sin necesidad de reiniciar o reconfigurar el modelo:</p>
+
+    <div class="dynamic-load-visual reveal-element">
+      <div class="load-step">
+        <div class="load-num">1</div>
+        <div class="load-content">El usuario envía una tarea: <code>"Genera un informe de ventas del Q1 con gráficos"</code></div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">2</div>
+        <div class="load-content">El enrutador analiza la intención y detecta que necesita: análisis de datos + visualización + escritura</div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">3</div>
+        <div class="load-content">Se cargan las skills relevantes al contexto: <code>skill_analisis</code>, <code>skill_graficos</code>, <code>skill_informes</code></div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">4</div>
+        <div class="load-content">El agente ejecuta la tarea usando las instrucciones y herramientas de cada skill activa</div>
+      </div>
+      <div class="load-step">
+        <div class="load-num">5</div>
+        <div class="load-content">Al completar, las skills se descargan del contexto para liberar espacio de tokens</div>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">5. Plataformas y su implementación de skills</h2>
+    <p class="reveal-element">Diversas plataformas han implementado variantes del concepto de skills para sus agentes:</p>
+
+    <div class="platform-grid reveal-element">
+      <div class="platform-card">
+        <h4>OpenAI (Custom GPTs)</h4>
+        <p>Permite crear "Custom GPTs" con instrucciones, archivos y acciones (APIs). Cada Custom GPT es esencialmente una skill empaquetada que se puede compartir y reutilizar.</p>
+      </div>
+      <div class="platform-card">
+        <h4>Anthropic (Claude Projects)</h4>
+        <p>Projects permite definir instrucciones de sistema, archivos de referencia y personalización. Funciona como un workspace con skills pre-cargadas para un dominio específico.</p>
+      </div>
+      <div class="platform-card">
+        <h4>LangChain (Tools + Agents)</h4>
+        <p>Tools en LangChain son equivalentes a skills atómicas. Se combinan en agents que pueden usar múltiples tools según la necesidad de cada paso.</p>
+      </div>
+      <div class="platform-card">
+        <h4>OpenAI (Assistants API)</h4>
+        <p>Los Assistants permiten definir "instructions" (skill base) + "tools" (herramientas) + "file_search" (contexto). Es la implementación más cercana a una skill completa.</p>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">6. Simulación: Sistema de skills en acción</h2>
+    <p class="reveal-element">Veamos una implementación simplificada de cómo un sistema de skills funciona en la práctica:</p>
+
+    <pre class="code-block reveal-element">class Skill:
+    def __init__(self, nombre, instrucciones, herramientas=None, contexto=None):
+        self.nombre = nombre
+        self.instrucciones = instrucciones   # Prompt especializado
+        self.herramientas = herramientas or []  # Funciones disponibles
+        self.contexto = contexto or ""        # Datos de referencia
+
+class AgenteConSkills:
+    def __init__(self, llm, biblioteca_skills):
+        self.llm = llm
+        self.biblioteca = biblioteca_skills  # Dict de skills disponibles
+        self.skills_activas = []
+    
+    def cargar_skill(self, nombre_skill):
+        """Carga una skill al contexto activo del agente"""
+        if nombre_skill in self.biblioteca:
+            skill = self.biblioteca[nombre_skill]
+            self.skills_activas.append(skill)
+            print(f"  Skill cargada: {skill.nombre}")
+    
+    def resolver_tarea(self, tarea):
+        # 1. Analizar qué skills necesita la tarea
+        skills_necesarias = self.analizar_necesidades(tarea)
+        
+        # 2. Cargar las skills relevantes
+        for nombre in skills_necesarias:
+            self.cargar_skill(nombre)
+        
+        # 3. Construir el contexto combinado
+        contexto_total = self.construir_contexto()
+        
+        # 4. Ejecutar con el LLM usando las skills activas
+        return self.llm.predict(f"""
+            {contexto_total}
+            
+            Tarea: {tarea}
+            
+            Resuelve la tarea usando las instrucciones
+            y herramientas de las skills cargadas.
+        """)
+    
+    def construir_contexto(self):
+        """Combina instrucciones y contexto de todas las skills activas"""
+        partes = []
+        for skill in self.skills_activas:
+            partes.append(f"--- Skill: {skill.nombre} ---")
+            partes.append(skill.instrucciones)
+            if skill.contexto:
+                partes.append(f"Contexto: {skill.contexto}")
+            if skill.herramientas:
+                nombres = [h.__name__ for h in skill.herramientas]
+                partes.append(f"Herramientas: {', '.join(nombres)}")
+        return "\n".join(partes)
+
+# Ejemplo de uso
+biblioteca = {
+    "analisis_datos": Skill(
+        nombre="Análisis de datos",
+        instrucciones="Analiza datasets y genera estadísticas descriptivas.",
+        herramientas=[calcular_promedio, generar_estadisticas],
+        contexto="Usa métricas estándar: media, mediana, desviación."
+    ),
+    "visualizacion": Skill(
+        nombre="Visualización",
+        instrucciones="Crea gráficos claros y informativos.",
+        herramientas=[crear_grafico_barras, crear_grafico_lineas],
+        contexto="Formato: SVG, colores accesibles, leyendas claras."
+    )
+}
+
+agente = AgenteConSkills(llm=modelo, biblioteca_skills=biblioteca)
+resultado = agente.resolver_tarea(
+    "Genera un informe de ventas del Q1 con gráficos de tendencia"
+)</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>El poder de las skills:</strong> En lugar de tener un prompt gigantesco que intente cubrir todas las posibles tareas, las skills permiten un enfoque modular. El agente carga solo lo que necesita, lo que reduce el consumo de tokens, mejora la precisión de las respuestas, y permite que la biblioteca de skills crezca sin degradar el rendimiento.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/mcp-protocol/index.html" class="btn btn-primary">Siguiente: MCP →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

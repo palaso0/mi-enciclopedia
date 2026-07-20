@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mixture-of-Experts (MoE) — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para visual de MoE */
+    .moe-pipeline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      padding: var(--space-4);
+      border-radius: var(--radius-sm);
+    }
+    .token-box {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .router-box {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    .experts-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 480px;
+    }
+    .expert-card {
+      border: 2px solid var(--color-border);
+      padding: var(--space-3);
+      text-align: center;
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      opacity: 0.4;
+      transition: all var(--transition-fast);
+    }
+    .expert-card.active {
+      opacity: 1;
+      border-color: #2d7d46;
+      background: rgba(45, 125, 70, 0.03);
+      color: #2d7d46;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Deep Learning</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Mixture-of-Experts (MoE)</h1>
+    
+    <p>Modelos como Mixtral 8x7B o el propio GPT-4 no son un solo bloque de redes masivas. Utilizan una arquitectura **Mixture-of-Experts (MoE)**, un diseño en el que se dividen las capas del modelo en múltiples "expertos" especializados, y un enrutador inteligente decide qué expertos deben procesar cada palabra. Esto permite tener modelos gigantescos pero consumiendo una fracción del costo de cómputo.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>Dato clave:</strong> MoE implementa un tipo de **activación dispersa (sparse)**. A diferencia de un modelo denso tradicional, en el cual se activan todos los parámetros para cada palabra, MoE solo activa un porcentaje pequeño (ej: 10-20%).</p>
+    </div>
+
+    <h2>1. La intuición: La clínica médica</h2>
+    <p>Compara el procesamiento de una consulta en estas dos estructuras:</p>
+
+    <ul>
+      <li><strong>Modelo Denso:</strong> Entras a una clínica y para darte un diagnóstico, te atienden **todos** los médicos del hospital (el cardiólogo, el dermatólogo, el pediatra, etc.) al mismo tiempo. Es sumamente ineficiente y caro.</li>
+      <li><strong>Modelo Mixture-of-Experts (MoE):</strong> Llegas a recepción (el **Router**). El recepcionista evalúa tu síntoma y te deriva únicamente con el traumatólogo y el radiólogo (los **Expertos**). El resto de médicos siguen descansando.</li>
+    </ul>
+
+    <h2>2. El Flujo de Trabajo de un Token en MoE</h2>
+
+    <div class="moe-pipeline reveal-element">
+      <div class="token-box">Token: "código"</div>
+      <div style="font-family: var(--font-mono); color: var(--color-text-muted);">↓</div>
+      <div class="router-box">Gating Network (Router)</div>
+      <div style="font-family: var(--font-mono); color: var(--color-text-muted);">↓ (Top-2 Experts Selected)</div>
+      <div class="experts-container">
+        <div class="expert-card active">Experto 1<br>(Programación)</div>
+        <div class="expert-card">Experto 2<br>(Finanzas)</div>
+        <div class="expert-card active">Experto 3<br>(Gramática)</div>
+      </div>
+    </div>
+
+    <p>Por cada capa MoE de la red:</p>
+    <ol>
+      <li>El token de entrada llega a la red de enrutamiento (**Gating Network**).</li>
+      <li>El Router calcula una distribución de probabilidad sobre los \(N\) expertos usando una función Softmax.</li>
+      <li>Se seleccionan los **Top-K expertos** con mayor puntuación (típicamente \(K=1\) o \(K=2\)).</li>
+      <li>El token se envía y procesa únicamente por los expertos seleccionados.</li>
+      <li>Las salidas de los expertos se combinan multiplicándose por la probabilidad que les asignó el Router.</li>
+    </ol>
+
+    <h2>3. Parámetros Totales vs. Parámetros Activos</h2>
+    <p>Esta es la magia matemática que permite hacer viables los modelos de billones de parámetros:</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Tipo</th>
+          <th>Parámetros Totales</th>
+          <th>Parámetros Activos por Token</th>
+          <th>Costo de Cómputo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Llama 3 70B</td>
+          <td>Denso</td>
+          <td>70 Billones</td>
+          <td>70 Billones (100%)</td>
+          <td>Muy Alto</td>
+        </tr>
+        <tr>
+          <td>Mixtral 8x7B</td>
+          <td>MoE (Sparse)</td>
+          <td>47 Billones</td>
+          <td>13 Billones (~27%)</td>
+          <td>Equivalente a un modelo de 13B</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Beneficio:</strong> Mixtral tiene la capacidad y el conocimiento de un modelo de 47B de parámetros, pero su velocidad de generación (latencia) y requisitos de cómputo en inferencia son los de un modelo pequeño de 13B.</p>
+
+    <h2>4. Simulación conceptual: El Router MoE</h2>
+    <p>Este fragmento de Python simula la toma de decisiones del Router para asignar un token a los mejores 2 expertos de un pool de 4:</p>
+
+    <div class="code-block reveal-element">
+# Simulación del Router (Gating Network) en una capa MoE
+import numpy as np
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
+# 1. Definir nombres de expertos en nuestro pool
+expertos = ["Experto Matemático", "Experto Programación", "Experto Creativo", "Experto Tradductor"]
+
+# 2. Simular un token de entrada (vector) y los pesos del Router
+# Digamos que el token tiene que ver con escribir código de Python
+vector_token = np.array([0.1, 0.9, 0.2, 0.4]) 
+pesos_router = np.random.rand(4, 4)  # Pesos entrenados del Router
+
+# 3. Calcular afinidad del token con cada experto
+logits = np.dot(vector_token, pesos_router)
+probabilidades = softmax(logits)
+
+# 4. Seleccionar los mejores K=2 expertos (Top-2 Routing)
+top_k_indices = np.argsort(probabilidades)[::-1][:2]
+
+print("Probabilidades asignadas por el Router:")
+for idx, prob in enumerate(probabilidades):
+    print(f" - {expertos[idx]}: {prob:.2%}")
+
+print("\nExpertos ACTIVADOS para este token:")
+for idx in top_k_indices:
+    print(f" -> {expertos[idx]} (Prob: {probabilidades[idx]:.2%})")
+    </div>
+
+    <h2>5. Los desafíos de MoE</h2>
+    <ul>
+      <li><strong>Memoria RAM / VRAM:</strong> Aunque solo actives 13B de parámetros por token, **tienes que cargar los 47B de parámetros en la memoria de la tarjeta de video**. Por tanto, MoE requiere tanta o más memoria RAM/VRAM de hardware que un modelo denso de su tamaño total.</li>
+      <li><strong>Inestabilidad en el entrenamiento:</strong> Si no se cuida, el Router puede aprender a enviar todos los tokens a un solo experto ("experto favorito"), dejando al resto sin entrenar. Se requieren pérdidas matemáticas de "balanceo" para forzar al Router a distribuir la carga uniformemente.</li>
+    </ul>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/arquitecturas-hibridas/index.html" class="btn btn-primary">Siguiente: Arquitecturas híbridas →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

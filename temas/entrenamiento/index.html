@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrenamiento y Fine-Tuning — Códice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    /* Estilos locales para Scaling Laws */
+    .scaling-curve-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .scaling-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .scaling-bar-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      width: 120px;
+      text-align: right;
+      color: var(--color-text-muted);
+    }
+    .scaling-bar-track {
+      flex: 1;
+      height: 24px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+    }
+    .scaling-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      transition: width 0.6s ease;
+    }
+    .scaling-bar-fill.bar-small {
+      width: 15%;
+      background: var(--color-accent);
+    }
+    .scaling-bar-fill.bar-medium {
+      width: 45%;
+      background: #2d7d46;
+    }
+    .scaling-bar-fill.bar-large {
+      width: 80%;
+      background: #366A9C;
+    }
+    .scaling-bar-fill.bar-massive {
+      width: 98%;
+      background: #A34E78;
+    }
+    .scaling-bar-value {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      width: 60px;
+    }
+    .few-shot-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .shot-example {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .shot-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .shot-content {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .shot-prompt {
+      color: var(--color-text-muted);
+    }
+    .shot-response {
+      color: #2d7d46;
+      font-weight: 600;
+    }
+    .analogy-box {
+      background: var(--color-surface);
+      border-left: 4px solid #366A9C;
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .analogy-box strong {
+      color: #366A9C;
+    }
+    /* Estilos locales para LoRA */
+    .lora-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 600px) {
+      .lora-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+    .lora-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+    }
+    .lora-card-header {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lora-card-header.full { color: #B25E35; }
+    .lora-card-header.lora { color: #2d7d46; }
+    .lora-stat {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lora-stat:last-child { border-bottom: none; }
+    .lora-stat-label { color: var(--color-text-muted); }
+    .lora-stat-value { font-weight: 600; }
+    .matrix-visual {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+    }
+    .matrix-row {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+      margin-bottom: var(--space-2);
+    }
+    .matrix-cell {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      font-size: 0.7rem;
+      border-radius: var(--radius-sm);
+    }
+    .matrix-cell.frozen {
+      background: var(--color-bg);
+      color: var(--color-text-muted);
+    }
+    .matrix-cell.trained {
+      background: rgba(45, 125, 70, 0.1);
+      border-color: #2d7d46;
+      color: #2d7d46;
+      font-weight: 600;
+    }
+    .matrix-label {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .matrix-operator {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--color-accent);
+      margin: var(--space-2) 0;
+    }
+    /* Estilos locales para RLHF */
+    .rlhf-pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .rlhf-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      position: relative;
+    }
+    .rlhf-step-number {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-2);
+    }
+    .rlhf-step-number.step-sft { color: #366A9C; }
+    .rlhf-step-number.step-reward { color: #B25E35; }
+    .rlhf-step-number.step-ppo { color: #2d7d46; }
+    .rlhf-step-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+    .rlhf-step-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+    }
+    .rlhf-arrow {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--color-accent);
+    }
+    .reward-viz {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .reward-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .reward-row:last-child { margin-bottom: 0; }
+    .reward-text {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: var(--space-2);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .reward-score {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      min-width: 48px;
+      text-align: center;
+    }
+    .reward-high {
+      background: rgba(45, 125, 70, 0.1);
+      color: #2d7d46;
+      border: 1px solid #2d7d46;
+    }
+    .reward-low {
+      background: rgba(178, 94, 53, 0.1);
+      color: #B25E35;
+      border: 1px solid #B25E35;
+    }
+    .reward-mid {
+      background: rgba(163, 78, 120, 0.1);
+      color: #A34E78;
+      border: 1px solid #A34E78;
+    }
+    .constitutonal-box {
+      background: var(--color-surface);
+      border: 1px dashed var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    /* Estilos para mega-page */
+    .section-divider {
+      border: none;
+      border-top: 2px solid var(--color-border);
+      margin: var(--space-6) 0;
+    }
+    .section-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+    }
+    .section-toc h3 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+    }
+    .section-toc ol {
+      margin: 0;
+      padding-left: var(--space-4);
+    }
+    .section-toc li {
+      margin-bottom: var(--space-2);
+      font-size: 0.95rem;
+    }
+    .section-toc a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .section-toc a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Entrenamiento</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+
+    <h1>Entrenamiento y Fine-Tuning</h1>
+
+    <p>El entrenamiento de modelos de lenguaje es el proceso que transforma arquitecturas matemáticas en sistemas capaces de comprender, generar y razonar con texto. Desde las leyes que gobiernan el escalado de modelos, hasta las técnicas eficientes para adaptarlos a tareas específicas, y los métodos que alinean sus respuestas con las preferencias humanas — este recorrido cubre los tres pilares fundamentales del entrenamiento moderno de IA.</p>
+
+    <div class="section-toc reveal-element">
+      <h3>Contenidos</h3>
+      <ol>
+        <li><a href="#scaling-laws">Scaling Laws y el aprendizaje few-shot</a></li>
+        <li><a href="#lora">LoRA: Fine-tuning eficiente</a></li>
+        <li><a href="#rlhf">RLHF: Aprendizaje por refuerzo con retroalimentación humana</a></li>
+      </ol>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 1: Scaling Laws y el aprendizaje few-shot             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <hr class="section-divider">
+
+    <h2 id="scaling-laws">2.1 Scaling Laws y el aprendizaje few-shot</h2>
+
+    <p>Imagina una escuela. En una clase con 10 alumnos y un profesor decente, los resultados son aceptables. Pero si multiplicas la clase a 10,000 alumnos con el mismo profesor, la calidad no mejora mucho. Ahora bien, si en vez de más alumnos contratas a un <strong>mejor profesor</strong>, los resultados se disparan. Este es, en esencia, el descubrimiento que cambió la carrera por la inteligencia artificial: el rendimiento de los modelos de lenguaje no escala linealmente con más datos o más parámetros, sino que sigue <strong>leyes de potencia predecibles</strong>.</p>
+
+    <h3>1. Las leyes de potencia: Más no es mejor, sino más inteligente</h3>
+
+    <p>En 2020, el equipo de OpenAI liderado por Jared Kaplan publicó un paper titulado <em>"Scaling Laws for Neural Language Models"</em>. Su conclusión fue elegante y demoledora: el rendimiento de un modelo de lenguaje (medido en pérdida de predicción) mejora de forma predecible cuando escalas tres factores: <strong>el cómputo total (C)</strong>, <strong>el tamaño del dataset (D)</strong> y <strong>el número de parámetros (N)</strong>.</p>
+
+    <p>La relación es una <strong>ley de potencia</strong> (power law): cuando duplicas el cómputo, la pérdida baja un porcentaje fijo. No es lineal, no es exponencial, sino que sigue una curva de potencia suave y consistente.</p>
+
+    <div class="scaling-curve-box reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-3);">Ley de potencia: Pérdida ∝ C^(-0.05)</p>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^18 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-small"></div></div>
+        <span class="scaling-bar-value">Pérdida: 3.12</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^19 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-medium"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.87</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^20 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-large"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.65</span>
+      </div>
+      <div class="scaling-bar-row">
+        <span class="scaling-bar-label">10^21 FLOPS</span>
+        <div class="scaling-bar-track"><div class="scaling-bar-fill bar-massive"></div></div>
+        <span class="scaling-bar-value">Pérdida: 2.45</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: var(--space-3);">Cada incremento de 10x en cómputo reduce la pérdida de manera consistente. La curva nunca se estanca.</p>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Descubrimiento clave:</strong> Kaplan et al. encontraron que la arquitectura específica (número de capas, cabezas de atención, etc.) importa mucho menos que el simple hecho de tener <strong>más parámetros, más datos y más cómputo</strong>. Esto simplificó radicalmente el diseño de modelos: basta con escalar.</p>
+    </div>
+
+    <h3>2. La analogía del estudiante vs. el profesor</h3>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Piensa en dos estrategias para mejorar las notas de un colegio. La <strong>estrategia A</strong> es meter más alumnos en cada salón (más datos). La <strong>estrategia B</strong> es contratar profesores con doctorados y metodologías innovadoras (más parámetros y más cómputo). Los Scaling Laws demostraron que la estrategia B escala de manera mucho más predecible y poderosa. Un modelo más grande con el mismo dataset <em>siempre</em> rendirá mejor que un modelo pequeño con más datos.</p>
+    </div>
+
+    <p>Esto fue revolucionario porque antes se creía que el diseño de la arquitectura era lo más importante. Los Scaling Laws dijeron: no, lo que importa es <strong>escalar de manera inteligente</strong>. Los investigadores dejaron de buscar la arquitectura perfecta y empezaron a buscar la manera de hacer modelos más grandes, con más datos, durante más tiempo.</p>
+
+    <h3>3. GPT-3 y el aprendizaje few-shot</h3>
+
+    <p>Con esta nueva filosofía de escalado, OpenAI construyó GPT-3 en 2020: un modelo con <strong>175 mil millones de parámetros</strong>, entrenado con cientos de miles de millones de tokens de texto de internet. Pero lo verdaderamente revolucionario no fue el tamaño, sino lo que este tamaño <strong>habilitó</strong>: el <strong>aprendizaje few-shot</strong>.</p>
+
+    <p>En lugar de necesitar miles de ejemplos etiquetados para cada tarea (como los modelos anteriores), GPT-3 podía aprender a realizar una tarea con tan solo <strong>3 a 5 ejemplos</strong> incluidos en el prompt. Sin cambiar un solo parámetro del modelo.</p>
+
+    <div class="few-shot-demo reveal-element">
+      <div class="shot-example">
+        <div class="shot-label">1-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Traduce al inglés: "El gato duerme en el sofá"</p>
+          <p class="shot-response">→ "The cat sleeps on the sofa"</p>
+        </div>
+      </div>
+      <div class="shot-example">
+        <div class="shot-label">3-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Feliz → Happy</p>
+          <p class="shot-prompt">Triste → Sad</p>
+          <p class="shot-prompt">Cansado →</p>
+          <p class="shot-response">→ "Tired"</p>
+        </div>
+      </div>
+      <div class="shot-example">
+        <div class="shot-label">Zero-shot prompting</div>
+        <div class="shot-content">
+          <p class="shot-prompt">Clasifica el sentimiento: "Me encanta este producto"</p>
+          <p class="shot-response">→ Positivo</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>¿Por qué funciona?</strong> El modelo tan grande ha visto tantos patrones en su entrenamiento que puede <strong>inferir la tarea</strong> a partir de la estructura del prompt. No "aprende" en el sentido tradicional; más bien, <strong>activa conocimientos latentes</strong> que ya adquirió durante el preentrenamiento masivo.</p>
+    </div>
+
+    <h3>4. La relación entre tamaño y capacidad de generalización</h3>
+
+    <p>Un hallazgo sorprendente de GPT-3 fue que los modelos más grandes no solo eran mejores en las tareas en las que fueron evaluados, sino que mostraban habilidades que <strong>nadie entrenó explícitamente</strong>: sumar números, escribir código, traducir entre idiomas, y hasta razonar con sentido común.</p>
+
+    <p>Esta propiedad se conoce como <strong>emergencia</strong> (emergence): habilidades que aparecen solo cuando el modelo alcanza cierto umbral de tamaño. Un modelo de 10 millones de parámetros no puede sumar. Un modelo de 175 mil millones de parámetros sí puede. No se entrenó para eso; la capacidad <strong>emergió</strong> del escalado.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Parámetros</th>
+          <th>Año</th>
+          <th>Capacidad few-shot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GPT-2</td>
+          <td>1.5B</td>
+          <td>2019</td>
+          <td>Limitada, inestable</td>
+        </tr>
+        <tr>
+          <td>GPT-3</td>
+          <td>175B</td>
+          <td>2020</td>
+          <td>Sólida, generaliza bien</td>
+        </tr>
+        <tr>
+          <td>GPT-4</td>
+          <td>~1.8T (estimado)</td>
+          <td>2023</td>
+          <td>Excepcional en múltiples dominios</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Los Scaling Laws predicen que este patrón continuará: con suficiente cómputo y datos, los modelos seguirán mejorando de manera predecible. La pregunta ya no es <em>"¿mejorará?"</em> sino <em>"¿cuánto costará llegar al siguiente nivel?"</em></p>
+
+    <h3>5. El costo del escalado: La paradoja de la eficiencia</h3>
+
+    <p>Los Scaling Laws también revelaron un problema práctico: <strong>escalar es caro</strong>. GPT-3 costó aproximadamente $12 millones en cómputo. GPT-4 costó estimadamente $100 millones. Cada salto de rendimiento requiere una inversión exponencialmente mayor.</p>
+
+    <p>Esto creó una tensión fundamental en la industria: las leyes de potencia dicen que más cómputo siempre ayuda, pero el costo crece rápido. La solución fue una segunda ola de investigación centrada en la <strong>eficiencia</strong>: modelos más pequeños pero mejor entrenados, técnicas como LoRA para fine-tuning eficiente, y arquitecturas sparse como Mixture-of-Experts.</p>
+
+    <pre class="code-block reveal-element">
+# Simulación del concepto de few-shot learning con GPT-3
+# El modelo NO se re-entrena; solo recibe ejemplos en el prompt
+
+def few_shot_classify(prompt_ejemplos, texto_nuevo):
+    """
+    Simula cómo GPT-3 clasifica texto usando few-shot prompting.
+    El modelo ya 'sabe' clasificar gracias a su entrenamiento masivo.
+    Solo necesita ver 3-5 ejemplos para activar esa capacidad.
+    """
+    prompt_completo = prompt_ejemplos + "\n" + texto_nuevo
+    # En la realidad, esto sería una llamada a la API de OpenAI
+    # respuesta = openai.Completion.create(
+    #     model="gpt-3.5-turbo",
+    #     prompt=prompt_completo,
+    #     temperature=0
+    # )
+    return respuesta_gpt3
+
+# Ejemplo con 3-shot (3 ejemplos de entrenamiento)
+ejemplos = """
+Texto: 'El producto es excelente, lo recomiendo' → Positivo
+Texto: 'Terrible experiencia, nunca más' → Negativo
+Texto: 'El envío llegó a tiempo' → Neutro
+"""
+
+nuevo_texto = "Texto: 'No estoy nada satisfecho con el servicio' →"
+resultado = few_shot_classify(ejemplos, nuevo_texto)
+print(resultado)  # Salida: "Negativo"
+
+# El modelo clasificó correctamente sin haber visto
+# este ejemplo específico durante el entrenamiento.
+# Solo necesitó 3 ejemplos para entender la tarea.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Legado de los Scaling Laws:</strong> Establecieron la filosofía de diseño que dominó la industria del 2020 al 2024: construye el modelo más grande posible con los mejores datos disponibles. Este paradigma solo comenzó a cuestionarse con la llegada de modelos como Phi-2 y Gemma, que demostraron que datos de alta calidad pueden compensar parámetros faltantes.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 2: LoRA: Fine-tuning eficiente                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <hr class="section-divider">
+
+    <h2 id="lora">2.2 LoRA: Fine-tuning eficiente</h2>
+
+    <p>Entrenar un modelo de lenguaje desde cero cuesta millones de dólares. Pero una vez que tienes un modelo base potente, ¿y si solo necesitas adaptarlo a una tarea específica? El fine-tuning tradicional requiere actualizar <strong>todos</strong> los parámetros del modelo, lo cual sigue siendo extremadamente costoso. LoRA (Low-Rank Adaptation) resuelve esto con una idea elegante: <strong>no reconstruyas el motor, agrega un plugin</strong>.</p>
+
+    <h3>1. El problema: Fine-tuning completo es desperdiciar recursos</h3>
+
+    <p>Cuando haces fine-tuning completo (full fine-tuning) de un modelo como Llama 3 de 70B parámetros, necesitas:</p>
+
+    <div class="lora-comparison reveal-element">
+      <div class="lora-card">
+        <div class="lora-card-header full">Fine-tuning Completo</div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Parámetros a entrenar</span>
+          <span class="lora-stat-value">70,000M (100%)</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">VRAM necesaria</span>
+          <span class="lora-stat-value">~280 GB+</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Tiempo estimado</span>
+          <span class="lora-stat-value">Días/semanas</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Riesgo de olvido</span>
+          <span class="lora-stat-value" style="color: #B25E35;">Alto</span>
+        </div>
+      </div>
+      <div class="lora-card">
+        <div class="lora-card-header lora">Fine-tuning con LoRA</div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Parámetros a entrenar</span>
+          <span class="lora-stat-value">~200M (0.3%)</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">VRAM necesaria</span>
+          <span class="lora-stat-value">~24 GB</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Tiempo estimado</span>
+          <span class="lora-stat-value">Horas</span>
+        </div>
+        <div class="lora-stat">
+          <span class="lora-stat-label">Riesgo de olvido</span>
+          <span class="lora-stat-value" style="color: #2d7d46;">Bajo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>El truco de LoRA:</strong> En lugar de actualizar los 70B parámetros, LoRA <strong>congela</strong> todos los pesos originales del modelo y entrena únicamente unas matrices pequeñas de rango bajo que se suman a las capas originales. El modelo base no cambia; solo se le añade un "adaptador" ligero.</p>
+    </div>
+
+    <h3>2. La analogía: Plugin vs. reconstrucción</h3>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Imagina que tienes un auto de alta gama (el modelo base) y quieres que también pueda conducir por terreno off-road. La opciones son: (A) desarmar el motor y reconstruirlo para off-road, o (B) instalar un <strong>kit de elevación y neumáticos todoterreno</strong> (el adaptador LoRA). La opción B es más barata, reversible, y no destruye las capacidades originales del auto. Si quieres volver al asfalto, solo quitas el kit.</p>
+    </div>
+
+    <p>En términos técnicos, LoRA observa que los cambios necesarios para adaptar un modelo a una nueva tarea tienen una <strong>baja dimensión intrínseca</strong>. No necesitas cambiar todos los parámetros; solo necesitas ajustar unas cuantas direcciones en el espacio de pesos.</p>
+
+    <h3>3. Cómo funciona: Matrices de bajo rango</h3>
+
+    <p>En una capa Transformer, los pesos de atención son matrices grandes (por ejemplo, 4096 x 4096). LoRA no modifica estas matrices. En su lugar, introduce dos matrices pequeñas, <strong>A</strong> y <strong>B</strong>, y calcula la adaptación como una suma:</p>
+
+    <div class="matrix-visual reveal-element">
+      <p style="text-align: center; font-size: 0.9rem; margin-bottom: var(--space-3);">W' = W + B × A</p>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₁₁</span>
+        <span class="matrix-cell frozen">w₁₂</span>
+        <span class="matrix-cell frozen">w₁₃</span>
+        <span class="matrix-cell frozen">w₁₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₂₁</span>
+        <span class="matrix-cell frozen">w₂₂</span>
+        <span class="matrix-cell frozen">w₂₃</span>
+        <span class="matrix-cell frozen">w₂₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell frozen">w₃₁</span>
+        <span class="matrix-cell frozen">w₃₂</span>
+        <span class="matrix-cell frozen">w₃₃</span>
+        <span class="matrix-cell frozen">w₃₄</span>
+      </div>
+      <div class="matrix-label">W original (4096 × 4096) — CONGELADA, no se entrena</div>
+
+      <div class="matrix-operator">+</div>
+
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₁₁</span>
+        <span class="matrix-cell trained">b₁₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₂₁</span>
+        <span class="matrix-cell trained">b₂₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₃₁</span>
+        <span class="matrix-cell trained">b₃₂</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">b₄₁</span>
+        <span class="matrix-cell trained">b₄₂</span>
+      </div>
+      <div class="matrix-label">B (4096 × r) — ENTRENABLE, r = 8 típicamente</div>
+
+      <div class="matrix-operator">×</div>
+
+      <div class="matrix-row">
+        <span class="matrix-cell trained">a₁₁</span>
+        <span class="matrix-cell trained">a₁₂</span>
+        <span class="matrix-cell trained">a₁₃</span>
+        <span class="matrix-cell trained">a₁₄</span>
+      </div>
+      <div class="matrix-row">
+        <span class="matrix-cell trained">a₂₁</span>
+        <span class="matrix-cell trained">a₂₂</span>
+        <span class="matrix-cell trained">a₂₃</span>
+        <span class="matrix-cell trained">a₂₄</span>
+      </div>
+      <div class="matrix-label">A (r × 4096) — ENTRENABLE, r = 8 típicamente</div>
+
+      <p style="text-align: center; font-size: 0.8rem; color: var(--color-text-muted); margin-top: var(--space-3);">Con r=8: Parámetros entrenados = 4096×8 + 8×4096 = 65,536 vs. 4096×4096 = 16,777,212 originales</p>
+    </div>
+
+    <p>Las matrices A y B son <strong>muy pequeñas</strong> comparadas con W. Mientras W tiene millones de parámetros, A y B tienen solo miles. El rango <code>r</code> (típicamente 8, 16 o 64) controla cuánta capacidad de adaptación tiene el adaptador.</p>
+
+    <h3>4. Implementación práctica con PEFT</h3>
+
+    <p>La biblioteca PEFT (Parameter-Efficient Fine-Tuning) de Hugging Face hace que aplicar LoRA sea casi trivial. Solo necesitas definir qué capas adaptar y el rango deseado:</p>
+
+    <pre class="code-block reveal-element">
+# Ejemplo de fine-tuning con LoRA usando PEFT + transformers
+from peft import LoraConfig, get_peft_model, TaskType
+from transformers import AutoModelForCausalLM
+
+# 1. Cargar el modelo base (congelado)
+modelo_base = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B",
+    load_in_4bit=True  # Carga quantizado para ahorrar VRAM
+)
+
+# 2. Configurar LoRA: qué capas adaptar y con qué rango
+config_lora = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=16,                          # Rango de las matrices A y B
+    lora_alpha=32,                 # Factor de escala (alpha/r = 2)
+    lora_dropout=0.05,             # Regularización
+    target_modules=[               # Capas del Transformer a adaptar
+        "q_proj", "k_proj",        # Proyecciones de atención
+        "v_proj", "o_proj",
+        "gate_proj", "up_proj",    # Capas FFN
+        "down_proj"
+    ],
+    bias="none"
+)
+
+# 3. Aplicar LoRA al modelo base
+modelo_lora = get_peft_model(modelo_base, config_lora)
+
+# 4. Ver cuántos parámetros se entrenan vs. el total
+modelo_lora.print_trainable_parameters()
+# Salida: trainable params: 41,943,040 || all params: 8,071,319,552 || 0.52%
+
+# 5. Entrenar normalmente con un dataset de tu tarea
+# El modelo solo ajustará los ~42M parámetros de LoRA,
+# manteniendo los 8B originales completamente intactos.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Ventaja clave:</strong> Como el modelo base no se modifica, puedes tener <strong>múltiples adaptadores LoRA</strong> para diferentes tareas (uno para español, otro para código, otro para resúmenes) e intercambiarlos instantáneamente sin recargar el modelo completo.</p>
+    </div>
+
+    <h3>5. Cuándo usar LoRA vs. fine-tuning completo</h3>
+
+    <p>LoRA no siempre es la mejor opción. Aquí está la guía de decisión:</p>
+
+    <ul>
+      <li><strong>Usa LoRA cuando:</strong> Tienes un modelo base potente y quieres adaptarlo a una tarea específica (clasificación, generación en un dominio, estilo particular). El dataset es pequeño o moderado.</li>
+      <li><strong>Usa fine-tuning completo cuando:</strong> Necesitas cambiar fundamentalmente el comportamiento del modelo, o estás pre-entrenando desde un checkpoint muy pequeño.</li>
+      <li><strong>Combina ambos:</strong> Muchos equipos hacen first pre-entrenamiento completo en datos genéricos, luego LoRA para adaptación específica.</li>
+    </ul>
+
+    <p>LoRA también se puede <strong>combinar con quantización</strong> (QLoRA), lo que permite fine-tuning de modelos de 70B parámetros en una sola GPU de 24GB. Esta combinación democratizó el fine-tuning: antes era algo solo accesible para grandes empresas, ahora cualquier persona con una GPU decente puede adaptar modelos de última generación.</p>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 3: RLHF                                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <hr class="section-divider">
+
+    <h2 id="rlhf">2.3 RLHF: Aprendizaje por refuerzo con retroalimentación humana</h2>
+
+    <p>Un modelo de lenguaje pre-entrenado puede generar texto fluido, pero no sabe si lo que genera es útil, seguro o apropiado. Es como un niño muy leído que ha memorizado millones de libros pero nunca ha recibido una retroalimentación sobre qué comportamientos son aceptables. RLHF (Reinforcement Learning from Human Feedback) es el proceso que enseña al modelo a <strong>generar respuestas que los humanos realmente valoran</strong>.</p>
+
+    <h3>1. La analogía: Niño con calcomanías</h3>
+
+    <div class="analogy-box reveal-element">
+      <p><strong>Analogía:</strong> Imagina un niño que sabe hablar fluidamente pero dice cosas sin filtro. Para enseñarle buen comportamiento, le das <strong>calcomanías doradas</strong> cuando dice algo amable y <strong>quitas calcomanías</strong> cuando dice algo grosero. Con el tiempo, el niño aprende a generar automáticamente frases que le ganan más calcomanías. Eso es RLHF: el modelo aprende a generar respuestas que maximizan la "recompensa" humana.</p>
+    </div>
+
+    <h3>2. Los tres pasos del RLHF</h3>
+
+    <p>RLHF no es un solo proceso; son tres etapas secuenciales, cada una con un objetivo distinto:</p>
+
+    <div class="rlhf-pipeline reveal-element">
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-sft">Paso 1 de 3</div>
+        <div class="rlhf-step-title">SFT — Supervised Fine-Tuning</div>
+        <div class="rlhf-step-desc">Entrenadores humanos crean un dataset de ejemplos de alta calidad (pregunta → respuesta ideal). El modelo pre-entrenado se ajusta con estos ejemplos para aprender el formato y el estilo de una conversación útil.</div>
+      </div>
+
+      <div class="rlhf-arrow">↓</div>
+
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-reward">Paso 2 de 3</div>
+        <div class="rlhf-step-title">Modelo de Recompensa (Reward Model)</div>
+        <div class="rlhf-step-desc">Humanos evalúan múltiples respuestas del modelo para la misma pregunta, ranqueándolas de mejor a peor. Con estos datos se entrena un <strong>modelo separado</strong> que aprende a predecir qué respuesta preferiría un humano. Este modelo de recompensa asigna un puntaje (reward) a cada respuesta.</div>
+      </div>
+
+      <div class="rlhf-arrow">↓</div>
+
+      <div class="rlhf-step">
+        <div class="rlhf-step-number step-ppo">Paso 3 de 3</div>
+        <div class="rlhf-step-title">PPO — Proximal Policy Optimization</div>
+        <div class="rlhf-step-desc">El modelo generador produce respuestas, el modelo de recompensa las puntúa, y el algoritmo PPO ajusta los parámetros del generador para maximizar la recompensa. El truco es que PPO limita cuánto puede cambiar el modelo en cada paso, evitando que "haga trampas" para obtener puntos altos sin realmente mejorar.</div>
+      </div>
+    </div>
+
+    <h3>3. El modelo de recompensa: Cómo aprende a puntuar</h3>
+
+    <p>El corazón del RLHF es el <strong>modelo de recompensa</strong>. Este modelo recibe una pregunta y una respuesta, y genera un número que representa cuán "buena" es esa respuesta según los estándares humanos.</p>
+
+    <div class="reward-viz reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-muted); margin-bottom: var(--space-3);">Modelo de Recompensa — Evaluación de respuestas</p>
+      <div class="reward-row">
+        <div class="reward-text">"La fotosíntesis es el proceso por el cual las plantas convierten la luz solar en energía química..."</div>
+        <div class="reward-score reward-high">+0.92</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"Las plantas comen sol y hacen comida supongo"</div>
+        <div class="reward-score reward-mid">+0.35</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"No sé, pregunta a un biólogo"</div>
+        <div class="reward-score reward-low">+0.08</div>
+      </div>
+      <div class="reward-row">
+        <div class="reward-text">"La fotosíntesis es un mito propagado por los ecologistas"</div>
+        <div class="reward-score reward-low">-0.85</div>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Problema del reward hacking:</strong> Si el modelo de recompensa no es robusto, el generador puede aprender a "engañarlo". Por ejemplo, generar respuestas muy largas y verbosas que el reward model confunda con respuestas completas y útiles. Este fenómeno se llama <strong>reward hacking</strong> y es uno de los mayores desafíos del RLHF.</p>
+    </div>
+
+    <h3>4. PPO: Aprender sin descontrolarse</h3>
+
+    <p>El algoritmo PPO (Proximal Policy Optimization) es el que realmente ajusta los pesos del modelo generador. La idea clave es: <strong>mejora poco a poco</strong>. En cada paso, PPO calcula cuánto cambió el comportamiento del modelo y penaliza los cambios demasiado grandes.</p>
+
+    <p>Esto es importante porque sin esta restricción, el modelo podría encontrar "atajos" para obtener recompensas altas sin realmente aprender a generar mejores respuestas. PPO asegura que cada actualización sea un paso moderado en la dirección correcta.</p>
+
+    <ul>
+      <li><strong>Ratio de probabilidad:</strong> Mide cuánto cambió la probabilidad de generar una respuesta después del ajuste.</li>
+      <li><strong>Clip (recorte):</strong> Si el ratio se desvía demasiado de 1.0, PPO lo recorta, impidiendo cambios drásticos.</li>
+      <li><strong>Coeficiente KL:</strong> Una penalización que mantiene al modelo cerca de su comportamiento original, evitando que se desvíe demasiado del SFT.</li>
+    </ul>
+
+    <h3>5. Constitutional AI: RLHF sin humanos</h3>
+
+    <p>RLHF tiene un problema de escala: necesita humanos evaluando respuestas continuamente, lo cual es caro y lento. <strong>Constitutional AI</strong> (CAI), propuesto por Anthropic, reemplaza parte de la retroalimentación humana con un conjunto de principios escritos (una "constitución") que el propio modelo usa para auto-evaluarse.</p>
+
+    <div class="constitutonal-box reveal-element">
+      <p style="font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-2);">Ejemplo de constitución:</p>
+      <ul style="font-size: 0.95rem;">
+        <li>"Elige la respuesta que sea más útil, honesta e inofensiva."</li>
+        <li>"Evita generar contenido que promueva odio o violencia."</li>
+        <li>"Si no sabes la respuesta, di que no la sabes en vez de inventar."</li>
+        <li>"Respeta la privacidad y no reveles información personal."</li>
+      </ul>
+    </div>
+
+    <p>En CAI, el modelo genera respuestas, luego se auto-critica usando la constitución, y luego genera una versión mejorada. Este ciclo de auto-mejora reduce drásticamente la necesidad de evaluadores humanos, manteniendo resultados de alta calidad.</p>
+
+    <pre class="code-block reveal-element">
+# Simulación simplificada del pipeline de RLHF
+# Paso 1: SFT (Supervised Fine-Tuning) - ya completado
+# Paso 2: Entrenar modelo de recompensa
+# Paso 3: Optimizar con PPO
+
+class RewardModel:
+    def __init__(self):
+        # En la práctica, esto es una red neuronal
+        # Aquí simulamos con una función de puntuación
+        self.peso_utilidad = 0.4
+        self.peso_seguridad = 0.35
+        self.peso_honestidad = 0.25
+
+    def puntuar(self, respuesta, es_util, es_segura, es_honesta):
+        score = (
+            self.peso_utilidad * es_util +
+            self.peso_seguridad * es_segura +
+            self.peso_honestidad * es_honesta
+        )
+        return round(score, 2)
+
+# Simular 3 respuestas a la misma pregunta
+rm = RewardModel()
+
+respuestas = [
+    {"texto": "La Tierra gira alrededor del Sol en ~365 días",
+     "util": 0.95, "segura": 1.0, "honesta": 0.98},
+    {"texto": "Creo que es al revés, el Sol gira alrededor de la Tierra",
+     "util": 0.1, "segura": 1.0, "honesta": 0.05},
+    {"texto": "No estoy seguro, pero déjame inventar algo",
+     "util": 0.3, "segura": 0.8, "honesta": 0.1}
+]
+
+print("Puntuaciones del Modelo de Recompensa:")
+print("-" * 50)
+for i, r in enumerate(respuestas, 1):
+    score = rm.puntuar(r["texto"], r["util"], r["segura"], r["honesta"])
+    print(f"Respuesta {i}: {score:+.2f}")
+    print(f"  → \"{r['texto'][:50]}...\"")
+
+# El modelo de recompensa guía al generador:
+# respuestas precisas y honestas reciben recompensa alta,
+# respuestas incorrectas o deshonestas reciben penalización.</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Impacto:</strong> RLHF fue lo que transformó a GPT-3 en ChatGPT. El modelo base podía generar texto, pero RLHF lo hizo <strong>seguro, útil y conversacional</strong>. Sin este paso, los modelos generan contenido ofensivo, inventan datos, o simplemente no entienden qué se espera de ellos en una interacción real.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- NAVEGACIÓN                                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <hr class="section-divider">
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/modelos-genai/index.html" class="btn btn-primary">Siguiente: Modelos GenAI →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

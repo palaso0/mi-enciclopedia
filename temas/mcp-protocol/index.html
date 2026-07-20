@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP: Model Context Protocol — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    .usb-analogy {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin: var(--space-5) 0;
+      max-width: 560px;
+    }
+    .usb-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .usb-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .usb-text {
+      flex: 1;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .usb-text strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+    .usb-text p {
+      margin-bottom: 0;
+      font-size: 0.95rem;
+    }
+    .usb-connector {
+      text-align: center;
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      padding: var(--space-1) 0;
+    }
+    .arch-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--space-3);
+      align-items: center;
+      margin: var(--space-5) 0;
+    }
+    @media (max-width: 600px) {
+      .arch-diagram {
+        grid-template-columns: 1fr;
+      }
+    }
+    .arch-box {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+    .arch-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+    .arch-box p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .arch-connector {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .feature-item {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .feature-item h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .feature-item p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-4) 0;
+      font-size: 0.9rem;
+    }
+    .comparison-table th {
+      text-align: left;
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .comparison-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .impl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .impl-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .impl-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .impl-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta reveal-element">
+      <span class="topic-badge">Agentes &amp; Protocolos</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1 class="reveal-element">MCP: Model Context Protocol</h1>
+    
+    <p class="reveal-element">Imagina que cada dispositivo electrónico tuviera su propio tipo de puerto de carga: uno para cables redondos, otro para cables planos, otro magnético. Sería un caos. USB unificó todo eso: un solo puerto que funciona con cualquier dispositivo. El Model Context Protocol (MCP), creado por Anthropic, hace lo mismo para los agentes de IA: un estándar universal que permite conectar cualquier modelo con cualquier fuente de datos o herramienta, sin importar quién hizo cada uno.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía USB:</strong> Antes de MCP, cada integración entre un LLM y una herramienta era custom: si querías que tu modelo accediera a Notion, escribías código específico para Notion. Si luego querías Slack, escribías otro código diferente. MCP estandariza esa conexión: el proveedor de datos implementa el protocolo una vez, y cualquier modelo compatible puede conectarse automáticamente. Es un "puerto universal" para la IA.</p>
+    </div>
+
+    <h2 class="reveal-element">1. ¿Qué es MCP exactamente?</h2>
+    <p class="reveal-element">MCP es un protocolo de comunicación abiño que define cómo los modelos de IA (clientes) se conectan con fuentes de datos y herramientas externas (servidores). No es una API, no es un SDK, no es un framework: es un protocolo, como HTTP lo es para la web. Cualquier plataforma puede implementarlo.</p>
+
+    <div class="feature-list reveal-element">
+      <div class="feature-item">
+        <h4>Estándar abierto</h4>
+        <p>Cualquier desarrollador puede implementar un servidor MCP o un cliente MCP. No hay vendor lock-in ni licencias restrictivas.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Transporte flexible</h4>
+        <p>Funciona sobre stdio (para procesos locales), HTTP/SSE (para servicios remotos) y potencialmente WebSocket. Se adapta al entorno de ejecución.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Descubrimiento automático</h4>
+        <p>El cliente puede preguntar al servidor qué herramientas, recursos y prompts tiene disponibles, sin configuración previa.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Seguridad integrada</h4>
+        <p>El protocolo define mecanismos de autenticación y control de acceso para proteger los datos del servidor.</p>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">2. Arquitectura cliente-servidor</h2>
+    <p class="reveal-element">MCP utiliza una arquitectura cliente-servidor donde el cliente es la aplicación de IA (como Claude Desktop o un agente custom) y el servidor es la fuente de datos o herramienta que se conecta:</p>
+
+    <div class="arch-diagram reveal-element">
+      <div class="arch-box">
+        <h4>Cliente MCP</h4>
+        <p>La aplicación de IA que necesita acceder a datos y herramientas. Ej: Claude Desktop, VS Code con Copilot, un agente personalizado.</p>
+      </div>
+      <div class="arch-connector">⇄</div>
+      <div class="arch-box">
+        <h4>Servidor MCP</h4>
+        <p>El proveedor de datos o herramientas. Ej: un servidor de Notion, de GitHub, de una base de datos, de un sistema de archivos.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">La comunicación entre cliente y servidor se realiza mediante mensajes JSON-RPC 2.0. El cliente envía solicitudes y el servidor responde con resultados. También puede enviar notificaciones unidireccionales para actualizaciones en tiempo real.</p>
+
+    <h2 class="reveal-element">3. Los tres pilares: Recursos, Herramientas y Prompts</h2>
+    <p class="reveal-element">MCP define tres tipos de primitives que un servidor puede exponer. Cada una tiene un propósito distinto y se usa de manera diferente:</p>
+
+    <div class="feature-list reveal-element">
+      <div class="feature-item">
+        <h4>Recursos (Resources)</h4>
+        <p>Datos que el servidor pone a disposición del modelo. Son solo lectura. Ej: el contenido de un archivo, datos de una API, registros de una base de datos. El modelo puede leerlos pero no modificarlos directamente.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Herramientas (Tools)</h4>
+        <p>Funciones que el modelo puede invocar para ejecutar acciones. Son ejecutables. Ej: crear un archivo, enviar un mensaje, ejecutar una consulta SQL. Requieren aprobación del usuario en muchos casos.</p>
+      </div>
+      <div class="feature-item">
+        <h4>Prompts</h4>
+        <p>Plantillas predefinidas que el servidor puede ofrecer al modelo. Ayudan a estructurar interacciones comunes. Ej: un prompt para revisar código, otro para resumir documentos, otro para generar tests.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>La diferencia clave:</strong> Las <em>recursos</em> son datos pasivos (como abrir un libro). Las <em>herramientas</em> son acciones activas (como usar un destornillador). Los <em>prompts</em> son plantillas de interacción (como un formulario pre-armado). Un servidor MCP puede exponer las tres cosas o solo una, dependiendo de su diseño.</p>
+    </div>
+
+    <h2 class="reveal-element">4. ¿Por qué importa la estandarización?</h2>
+    <p class="reveal-element">Sin un protocolo estándar, cada integración entre LLMs y herramientas es un proyecto custom. Esto crea un problema de escalabilidad:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Sin MCP (custom)</th>
+          <th>Con MCP (estándar)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>N proveedores × M modelos = N×M integraciones</td>
+          <td>N proveedores + M modelos = N+M implementaciones</td>
+        </tr>
+        <tr>
+          <td>Cada integración es única y frágil</td>
+          <td>Una implementación funciona con todos los clientes</td>
+        </tr>
+        <tr>
+          <td>Actualizar una API rompe la integración</td>
+          <td>El protocolo gestiona compatibilidad</td>
+        </tr>
+        <tr>
+          <td>No hay descubrimiento automático</td>
+          <td>El cliente descubre herramientas al conectarse</td>
+        </tr>
+        <tr>
+          <td>Cada desarrollador resuelve autenticación a su manera</td>
+          <td>Mecanismos de auth estandarizados</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">La estandarización también beneficia a los desarrolladores de herramientas: implementan el protocolo una vez y su herramienta funciona con Claude, GPT, Gemini, y cualquier otro modelo compatible. No necesitan escribir integración separada para cada proveedor de IA.</p>
+
+    <h2 class="reveal-element">5. MCP vs. Function Calling</h2>
+    <p class="reveal-element">MCP y function calling resuelven problemas similares pero en niveles diferentes. No son competidores; son complementarios:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Aspecto</th>
+          <th>Function Calling</th>
+          <th>MCP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Alcance</strong></td>
+          <td>Llamadas a funciones específicas definidas por el desarrollador</td>
+          <td>Protocolo completo para conectar fuentes de datos y herramientas</td>
+        </tr>
+        <tr>
+          <td><strong>Descubrimiento</strong></td>
+          <td>Las funciones se definen estáticamente en el código</td>
+          <td>El cliente descubre automáticamente qué está disponible</td>
+        </tr>
+        <tr>
+          <td><strong>Portabilidad</strong></td>
+          <td>Cada proveedor tiene su propio formato</td>
+          <td>Protocolo universal compatible con múltiples proveedores</td>
+        </tr>
+        <tr>
+          <td><strong>Recursos</strong></td>
+          <td>Solo ejecuta funciones</td>
+          <td>También accede a datos (recursos) y ofrece prompts</td>
+        </tr>
+        <tr>
+          <td><strong>Transporte</strong></td>
+          <td>HTTP directo o SDK del proveedor</td>
+          <td>stdio, HTTP/SSE,WebSocket con handshake definido</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="reveal-element">En la práctica, un agente puede usar MCP para conectarse a un servidor que, internamente, expone sus capacidades como tools. MCP actúa como la capa de transport y descubrimiento, mientras que las tools individuales son las unidades de ejecución.</p>
+
+    <h2 class="reveal-element">6. Implementaciones reales y el ecosistema</h2>
+    <p class="reveal-element">Desde su lanzamiento a finales de 2024, MCP ha generado un ecosistema creciente de implementaciones:</p>
+
+    <div class="impl-grid reveal-element">
+      <div class="impl-card">
+        <h4>Claude Desktop</h4>
+        <p>Fue la primera aplicación en soportar MCP. Permite conectar servidores locales y remotos para que Claude acceda a archivos, bases de datos y APIs.</p>
+      </div>
+      <div class="impl-card">
+        <h4>Servidores comunitarios</h4>
+        <p>Existen servidores MCP para: GitHub, Notion, Slack, PostgreSQL, MySQL, Slack, Google Drive, Filesystem, Puppeteer, y muchos más.</p>
+      </div>
+      <div class="impl-card">
+        <h4>SDK oficial</h4>
+        <p>Anthropic provee SDKs en TypeScript y Python para construir servidores y clientes MCP. Simplifican la implementación del protocolo.</p>
+      </div>
+      <div class="impl-card">
+        <h4>Adopción</h4>
+        <p>OpenAI, Google y otros proveedores han anunciado compatibilidad o interés en MCP, convirtiéndolo en un estándar de facto emergente.</p>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">7. Simulación: Un servidor MCP en acción</h2>
+    <p class="reveal-element">Veamos cómo se ve la interacción entre un cliente MCP y un servidor que expone acceso a una base de datos:</p>
+
+    <pre class="code-block reveal-element">import json
+
+class ServidorMCP:
+    """Simulación de un servidor MCP que expone una base de datos"""
+    
+    def __init__(self):
+        self.herramientas = {
+            "consultar_usuarios": {
+                "descripcion": "Busca usuarios por nombre o email",
+                "parametros": {
+                    "tipo": "object",
+                    "propiedades": {
+                        "nombre": {"tipo": "string"},
+                        "email": {"tipo": "string"}
+                    }
+                }
+            },
+            "crear_pedido": {
+                "descripcion": "Crea un nuevo pedido para un usuario",
+                "parametros": {
+                    "tipo": "object",
+                    "propiedades": {
+                        "usuario_id": {"tipo": "integer"},
+                        "productos": {"tipo": "array"},
+                        "direccion": {"tipo": "string"}
+                    },
+                    "requeridos": ["usuario_id", "productos"]
+                }
+            }
+        }
+        
+        self.recursos = {
+            "file:///docs/catalogo.json": {
+                "nombre": "Catálogo de productos",
+                "tipo": "application/json"
+            },
+            "file:///docs/politicas.md": {
+                "nombre": "Políticas de envío",
+                "tipo": "text/markdown"
+            }
+        }
+    
+    def manejar_solicitud(self, solicitud):
+        """Procesa mensajes JSON-RPC 2.0 del cliente"""
+        metodo = solicitud.get("method")
+        params = solicitud.get("params", {})
+        
+        if metodo == "tools/list":
+            # El cliente pregunta: ¿qué herramientas tenés?
+            return {
+                "tools": [
+                    {"name": k, "description": v["descripcion"],
+                     "inputSchema": v["parametros"]}
+                    for k, v in self.herramientas.items()
+                ]
+            }
+        
+        elif metodo == "tools/call":
+            # El cliente pide ejecutar una herramienta
+            nombre = params.get("name")
+            args = params.get("arguments", {})
+            return self.ejecutar_herramienta(nombre, args)
+        
+        elif metodo == "resources/list":
+            # El cliente pregunta: ¿qué recursos tenés?
+            return {
+                "resources": [
+                    {"uri": uri, "name": r["nombre"], "mimeType": r["tipo"]}
+                    for uri, r in self.recursos.items()
+                ]
+            }
+        
+        elif metodo == "resources/read":
+            # El cliente quiere leer un recurso específico
+            uri = params.get("uri")
+            return self.leer_recurso(uri)
+
+# Flujo de la conversación cliente ↔ servidor
+print("1. Cliente se conecta al servidor MCP")
+print("2. Cliente envía: tools/list → Descubre las herramientas disponibles")
+print("3. Cliente envía: resources/list → Descubre los recursos disponibles")
+print("4. LLM decide usar 'consultar_usuarios' con nombre='Pablo'")
+print("5. Cliente envía: tools/call con los argumentos")
+print("6. Servidor ejecuta la consulta y retorna resultados")
+print("7. LLM integra los resultados en una respuesta natural")</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>El futuro de MCP:</strong> A medida que más proveedores adopten el protocolo, los agentes de IA podrán conectarse a cualquier servicio con un estándar统一. Esto reduce drásticamente la fricción para crear agentes verdaderamente útiles que puedan interactuar con el mundo real sin necesidad de integraciones custom para cada servicio.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentes de IA: El loop de decisión-acción — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <style>
+    .agent-loop-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      margin: var(--space-5) 0;
+    }
+    .loop-step {
+      width: 100%;
+      max-width: 420px;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+    .loop-step.active {
+      border-left-color: var(--color-text);
+      background: rgba(154, 42, 42, 0.05);
+      transform: scale(1.03);
+    }
+    .loop-arrow {
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+      font-size: 1.25rem;
+    }
+    .loop-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .framework-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .framework-card {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .framework-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+    .framework-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .memory-diagram {
+      display: flex;
+      gap: var(--space-4);
+      margin: var(--space-4) 0;
+      flex-wrap: wrap;
+    }
+    .memory-box {
+      flex: 1;
+      min-width: 200px;
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .memory-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-2);
+    }
+    .memory-box p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-4) 0;
+      font-size: 0.95rem;
+    }
+    .comparison-table th {
+      text-align: left;
+      padding: var(--space-3);
+      border-bottom: 2px solid var(--color-border);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+    .comparison-table td {
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: top;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta reveal-element">
+      <span class="topic-badge">Agentes &amp; Protocolos</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1 class="reveal-element">Agentes de IA: El loop de decisión-acción</h1>
+    
+    <p class="reveal-element">Un chatbot te responde. Un agente hace cosas por ti. La diferencia es fundamental: mientras un chatbot genera texto y se detiene, un agente observa su entorno, toma decisiones y ejecuta acciones reales hasta completar un objetivo. Piensa en un asistente personal que no solo conversa, sino que busca información, ejecuta comandos, gestiona tu calendario y coordina con otros servicios para lograr lo que le pediste.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La analogía clave:</strong> Un chatbot es como un diccionario: puedes preguntarle cosas y te da respuestas. Un agente de IA es como un asistente personal competente: le das un objetivo ("organiza mi viaje a Barcelona"), y él coordina reservas, busca vuelos, verifica disponibilidad y te entrega un plan completo. La diferencia no está en la inteligencia, sino en la capacidad de <em>actuar</em>.</p>
+    </div>
+
+    <h2 class="reveal-element">1. La diferencia entre un chatbot y un agente</h2>
+    <p class="reveal-element">Un chatbot tradicional opera en un ciclo simple: recibe una pregunta y genera una respuesta. No tiene acceso a herramientas externas, no mantiene memoria entre interacciones, y no puede ejecutar acciones en el mundo real. Un agente de IA rompe esas limitaciones al integrar tres capacidades adicionales:</p>
+
+    <table class="comparison-table reveal-element">
+      <thead>
+        <tr>
+          <th>Capacidad</th>
+          <th>Chatbot</th>
+          <th>Agente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Generación de texto</strong></td>
+          <td>Sí</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td><strong>Acceso a herramientas</strong></td>
+          <td>No</td>
+          <td>Sí (APIs, bases de datos, código)</td>
+        </tr>
+        <tr>
+          <td><strong>Memoria persistente</strong></td>
+          <td>No (solo ventana actual)</td>
+          <td>Sí (corto y largo plazo)</td>
+        </tr>
+        <tr>
+          <td><strong>Planificación multi-paso</strong></td>
+          <td>No</td>
+          <td>Sí (descompone tareas complejas)</td>
+        </tr>
+        <tr>
+          <td><strong>Ejecución autónoma</strong></td>
+          <td>No (espera input humano)</td>
+          <td>Sí (bucle decisión-acción)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="reveal-element">2. El bucle Observe-Piensa-Actúa</h2>
+    <p class="reveal-element">Todo agente de IA gira alrededor de un ciclo fundamental: observar, pensar y actuar. Este bucle se repite iterativamente hasta que el agente considera que la tarea está completa.</p>
+
+    <div class="agent-loop-visual reveal-element">
+      <div class="loop-label">Paso 1</div>
+      <div class="loop-step active" id="loop-observe">OBSERVAR — Recopilar información del entorno</div>
+      <div class="loop-arrow">↓</div>
+      <div class="loop-label">Paso 2</div>
+      <div class="loop-step" id="loop-think">PENSAR — Analizar, planificar y decidir la siguiente acción</div>
+      <div class="loop-arrow">↓</div>
+      <div class="loop-label">Paso 3</div>
+      <div class="loop-step" id="loop-act">ACTUAR — Ejecutar la acción mediante una herramienta</div>
+      <div class="loop-arrow">↻</div>
+      <div class="loop-label" style="color: var(--color-accent); font-weight: 600;">¿Objetivo completado? Si no → repetir</div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Cada paso del bucle tiene un rol claro:</strong> <strong>Observar</strong> es recopilar datos (leer un archivo, consultar una API, recibir la respuesta del usuario). <strong>Pensar</strong> es razonar sobre qué hacer con esos datos (el LLM decide qué herramienta usar y con qué parámetros). <strong>Actuar</strong> es ejecutar la herramienta seleccionada y obtener un resultado.</p>
+    </div>
+
+    <h2 class="reveal-element">3. Memoria: Corto plazo y largo plazo</h2>
+    <p class="reveal-element">Un agente sin memoria es como un employado que olvida todo lo que le dijiste cada vez que te vas de la habitación. Los agentes modernos manejan dos tipos de memoria que les permiten mantener contexto y aprender:</p>
+
+    <div class="memory-diagram reveal-element">
+      <div class="memory-box">
+        <h4>Memoria a corto plazo</h4>
+        <p>Es el contexto de la conversación actual. Se almacena en la ventana de contexto del LLM (el "buffer" de tokens). Cuando se llena, los datos más antiguos se descartan. Es rápida pero limitada en capacidad.</p>
+      </div>
+      <div class="memory-box">
+        <h4>Memoria a largo plazo</h4>
+        <p>Es información persistente guardada externamente: bases de vectores, archivos, bases de datos. Permite al agente recordar interacciones pasadas, preferencias del usuario y conocimiento acumulado entre sesiones.</p>
+      </div>
+    </div>
+
+    <p class="reveal-element">La memoria a largo plazo funciona de manera similar a un RAG (Retrieval-Augmented Generation): el agente almacena información en un vector store y la recupera por similitud cuando la necesita. Esto le permite mantener contexto sin saturar la ventana de tokens.</p>
+
+    <h2 class="reveal-element">4. Estrategias de planificación</h2>
+    <p class="reveal-element">No todas las tareas se pueden resolver con un solo paso. Los agentes necesitan estrategias para descomponer problemas complejos en pasos manejables:</p>
+
+    <ul class="reveal-element">
+      <li><strong>Planificación reactiva:</strong> El agente toma una acción a la vez, evalúa el resultado y decide el siguiente paso. Es simple pero puede ser lento para tareas complejas.</li>
+      <li><strong>Planificación jerárquica:</strong> El agente genera un plan completo antes de ejecutar, con sub-tareas y dependencias. Más eficiente pero requiere mayor capacidad de razonamiento.</li>
+      <li><strong>Planificación por reflejo:</strong> El agente tiene reglas predefinidas que activan ciertas acciones bajo ciertas condiciones. Rápido pero inflexible.</li>
+      <li><strong>Planificación con herramientas:</strong> El agente delega partes de la planificación a herramientas especializadas (por ejemplo, un planificador que genera un DAG de tareas).</li>
+    </ul>
+
+    <h2 class="reveal-element">5. Sistemas multi-agente y frameworks reales</h2>
+    <p class="reveal-element">Los agentes más poderosos no trabajan solos. Los sistemas multi-agente coordinan varios agentes especializados, cada uno con un rol específico, para resolver problemas que un solo agente no podría abordar eficientemente.</p>
+
+    <div class="framework-grid reveal-element">
+      <div class="framework-card">
+        <h4>LangChain / LangGraph</h4>
+        <p>Framework modular para construir agentes con grafo de estados. Permite definir nodos (acciones) y aristas (transiciones) para crear flujos complejos con control total.</p>
+      </div>
+      <div class="framework-card">
+        <h4>AutoGPT</h4>
+        <p>Uno de los primeros agentes autónomos de código abierto. Genera sus propios prompts y ejecuta tareas de forma iterativa sin intervención humana.</p>
+      </div>
+      <div class="framework-card">
+        <h4>CrewAI</h4>
+        <p>Framework para orquestar equipos de agentes con roles definidos (investigador, escritor, revisor). Cada agente tiene herramientas y objetivos específicos.</p>
+      </div>
+      <div class="framework-card">
+        <h4>OpenAI Assistants</h4>
+        <p>API gestionada que proporciona agentes con herramientas integradas (code interpreter, file search, function calling). Abstracta la complejidad del loop.</p>
+      </div>
+    </div>
+
+    <h2 class="reveal-element">6. Simulación: Un agente en acción</h2>
+    <p class="reveal-element">Veamos cómo se ve el bucle de un agente en pseudocódigo simplificado. Imagina un agente que debe investigar un tema y crear un resumen:</p>
+
+    <pre class="code-block reveal-element">class AgenteIA:
+    def __init__(self, llm, herramientas, memoria):
+        self.llm = llm                # El modelo de lenguaje (cerebro)
+        self.herramientas = herramientas  # Dict de herramientas disponibles
+        self.memoria = memoria        # Almacén de corto y largo plazo
+        self.historial = []           # Registro de acciones tomadas
+
+    def ejecutar(self, objetivo):
+        """Bucle principal: Observe → Piensa → Actúa"""
+        while not self.objetivo_cumplido(objetivo):
+            # 1. OBSERVAR: Recopilar contexto actual
+            contexto = self.construir_contexto(objetivo)
+            
+            # 2. PENSAR: El LLM decide la siguiente acción
+            decision = self.llm.predict(f"""
+                Objetivo: {objetivo}
+                Contexto: {contexto}
+                Historial: {self.historial}
+                ¿Qué herramienta debo usar y con qué parámetros?
+            """)
+            
+            # 3. ACTUAR: Ejecutar la herramienta elegida
+            herramienta = self.herramientas[decision.nombre]
+            resultado = herramienta.ejecutar(decision.parametros)
+            
+            # Guardar en memoria
+            self.historial.append({
+                "accion": decision.nombre,
+                "parametros": decision.parametros,
+                "resultado": resultado
+            })
+            
+            # Evaluar si el objetivo se cumplió
+            if self.es_suficiente(resultado, objetivo):
+                return self.sintetizar_respuesta()
+        
+        return "Se alcanzó el límite de iteraciones"</pre>
+
+    <div class="callout reveal-element">
+      <p><strong>Nota sobre la implementación real:</strong> En la práctica, los frameworks como LangChain ya implementan este bucle internamente. El desarrollador define las herramientas, el objetivo y la estrategia de planificación, y el framework se encarga del ciclo observe-piensa-actúa. Lo importante es entender el patrón subyacente para poder diseñar, depurar y mejorar agentes efectivos.</p>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+        <a href="../../temas/function-calling/index.html" class="btn btn-primary">Siguiente: Function Calling →</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
