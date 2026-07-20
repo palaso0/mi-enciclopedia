@@ -28,6 +28,13 @@
   
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
+  
+  --diagram-1: #9A2A2A;
+  --diagram-2: #2563eb;
+  --diagram-3: #7c3aed;
+  --diagram-4: #6b7280;
+  --diagram-5: #d97706;
+  --diagram-6: #059669;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +49,13 @@
     
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    
+    --diagram-1: #D45B5B;
+    --diagram-2: #60a5fa;
+    --diagram-3: #a78bfa;
+    --diagram-4: #9ca3af;
+    --diagram-5: #fbbf24;
+    --diagram-6: #34d399;
   }
 }
 

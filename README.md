@@ -2,8 +2,6 @@
 
 Archivo personal de aprendizaje y notas.
 
-**Deploy:** [palaso0.github.io/mi-enciclopedia](https://palaso0.github.io/mi-enciclopedia/)
-
 ## Qué es
 
 Un sitio web estático que funciona como enciclopedia personal de apuntes. Cada tema está explicado con analogías, diagramas visuales en CSS, ejemplos de código y tablas comparativas, pensado para aprender desde cero sin fórmulas crípetas.

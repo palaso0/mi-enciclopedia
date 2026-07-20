@@ -54,5 +54,21 @@ window.temasData = [
     "resumen": "23 anti-patrones clásicos que todo desarrollador debe conocer para evitarlos: Golden Hammer, Spaghetti Code, God Object, Copy-Paste y más.",
     "fecha": "2026-07-20",
     "orden": 7
+  },
+  {
+    "slug": "arquitectura-software",
+    "titulo": "Arquitectura de Software",
+    "categoria": "Computer Science",
+    "resumen": "Estilos arquitectónicos, patrones de diseño, principios SOLID, microservicios, CQRS y atributos de calidad — cómo diseñar sistemas que no se caigan solos.",
+    "fecha": "2026-07-20",
+    "orden": 8
+  },
+  {
+    "slug": "patrones-de-diseno",
+    "titulo": "Patrones de Diseño",
+    "categoria": "Computer Science",
+    "resumen": "Los 23 patrones del Gang of Four explicados con analogías cotidianas: creacionales, estructurales y de comportamiento.",
+    "fecha": "2026-07-20",
+    "orden": 9
   }
 ];

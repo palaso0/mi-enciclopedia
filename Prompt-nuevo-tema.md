@@ -4,6 +4,33 @@ Usa este archivo como plantilla y guía cada vez que quieras agregar un nuevo te
 
 ---
 
+## TEMA: [ESCRIBE AQUÍ EL TEMA]
+
+---
+
+## Cómo decidir el enfoque (no me preguntes esto, decidilo vos)
+
+No te voy a dar subtemas, nivel, categoría ni tono. Actuá como un
+profesor experto que diseña el mejor recorrido posible para alguien
+que llega a este tema sin contexto previo:
+
+- Elegí el nivel de entrada más razonable para arrancar desde cero,
+  pero sin subestimar al lector: empezá simple y subí la complejidad
+  a medida que avanza la página.
+- Decidí vos qué subtemas importan y en qué orden tiene sentido
+  presentarlos (de fundamentos a aplicaciones, cronológico, o como
+  mejor se entienda ese tema en particular).
+- Elegí una categoría razonable para clasificarlo y un slug en
+  minúsculas con guiones a partir del título.
+- Tono: directo, claro, sin relleno corporativo. Ni muy académico ni
+  muy casual.
+
+Si tenés dudas genuinas sobre el alcance (ej. el tema es ambiguo o
+podría interpretarse de dos formas muy distintas), preguntame antes de
+generar. Para todo lo demás, decidí vos y avanzá.
+
+---
+
 ## Directrices de Contenido y Pedagogía
 
 1. **Explicación Intuitiva Primero**:
@@ -18,11 +45,14 @@ Usa este archivo como plantilla y guía cada vez que quieras agregar un nuevo te
    - En lugar de presentar fórmulas matemáticas crudas directamente, simula el comportamiento con código legible (pseudocódigo o scripts simples de Python/JavaScript comentados).
    - Explica detalladamente qué representa cada variable dentro de esa simulación.
 
-4. **Tono y Estructura**:
+4. **Diagramas Visuales si es necesario con identidad propia, no "estilo IA"**:
+   - Para conceptos que se beneficien de una representación visual (capas, hexágonos, comparaciones, flujos), crea **SVG inline** directamente en el HTML. Nunca uses imágenes generadas (DALL-E, Midjourney, etc.) ni stock: ese tipo de imagen es lo que más delata que una página fue hecha con IA. Un SVG vectorial, plano, con la paleta propia del sitio, no tiene ese problema.
+
+5. **Tono y Estructura**:
    - Tono directo, claro, sin relleno corporativo ("descubre", "sumérgete en").
    - Alterna anchos de texto, columnas, citas, tablas y bloques de código para que la página sea visualmente atractiva y fácil de leer.
 
-5. **Ortografía y Tildes**:
+6. **Ortografía y Tildes**:
    - Todo el contenido en español **debe** llevar tildes y acentos correctos.
    - Revisa cada palabra aguda, grave y esdrújula. No omitas acentos ni en títulos, ni en párrafos.
 
@@ -34,7 +64,7 @@ Cuando se solicite un nuevo tema:
 1. Crea la página de tema en `/temas/[slug]/index.html` utilizando rutas relativas correctas para el CSS y JS compartidos:
    - `../../assets/css/style.css`
    - `../../assets/js/main.js`
-2. No modifiques las variables CSS globales de `style.css`. Si necesitas estilos específicos para una explicación interactiva o visual, agrégalos en una etiqueta `<style>` local dentro del HTML de la página del tema.
+2. No modifiques las variables CSS globales de `style.css` **salvo** para agregar las variables `--diagram-1` a `--diagram-6` si todavía no existen (ver punto 4 arriba) — esa es la única excepción permitida. Si necesitas estilos específicos para una explicación interactiva o visual puntual, agrégalos en una etiqueta `<style>` local dentro del HTML de la página del tema.
 3. Asegúrate de añadir la clase `.reveal-element` a los bloques principales para que hereden las animaciones de scroll.
 4. **Resaltado de código con PrismJS**: Para cualquier bloque de código en el tema, usa siempre las etiquetas `<pre><code>` con la clase del lenguaje correspondiente. PrismJS ya está disponible en el proyecto — solo hay que enlazarlo en el `<head>` y al final del `<body>`:
    - En el `<head>`: `<link rel="stylesheet" href="../../assets/css/prism.css">`
@@ -59,3 +89,7 @@ Cuando se solicite un nuevo tema:
      "fecha": "[YYYY-MM-DD]"
    }
    ```
+
+Cuando termines, decime en pocas líneas: (1) qué nivel, categoría y
+subtemas elegiste y por qué, y (2) si tuviste que crear las variables
+`--diagram-1` a `--diagram-6` por primera vez o ya existían.

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitectura de Software — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+  <style>
+    .as-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .as-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      border-top: 3px solid var(--color-accent);
+    }
+    .as-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-1);
+    }
+    .as-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+    .as-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 640px) {
+      .as-compare { grid-template-columns: 1fr; }
+    }
+    .as-compare-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .as-compare-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0;
+      margin-bottom: var(--space-2);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .as-compare-box.monolithic h4 { color: #9a2a2a; }
+    .as-compare-box.microservices h4 { color: #2d7d46; }
+    .as-compare-box.sync h4 { color: #9a2a2a; }
+    .as-compare-box.async h4 { color: #2d7d46; }
+    .as-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    .as-layer {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 600;
+    }
+    .as-layer.presentation { background: #2563eb; }
+    .as-layer.business { background: #7c3aed; }
+    .as-layer.persistence { background: #059669; }
+    .as-layer.infrastructure { background: #6b7280; }
+    .as-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      columns: 2;
+      column-gap: var(--space-4);
+    }
+    @media (max-width: 640px) {
+      .as-toc { columns: 1; }
+    }
+    .as-toc h3 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      column-span: all;
+    }
+    .as-toc ol {
+      margin: 0;
+      padding-left: var(--space-4);
+    }
+    .as-toc li {
+      font-size: 0.9rem;
+      margin-bottom: var(--space-1);
+      break-inside: avoid;
+    }
+    .as-toc a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .as-toc a:hover { text-decoration: underline; }
+    .as-pattern {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+    .as-pattern h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-1);
+      color: var(--color-accent);
+    }
+    .as-pattern p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+    .as-pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-3) 0;
+    }
+    @media (max-width: 640px) {
+      .as-pros-cons { grid-template-columns: 1fr; }
+    }
+    .as-pros {
+      background: rgba(45, 125, 70, 0.05);
+      border-left: 3px solid #2d7d46;
+      padding: var(--space-3);
+    }
+    .as-cons {
+      background: rgba(154, 42, 42, 0.05);
+      border-left: 3px solid #9a2a2a;
+      padding: var(--space-3);
+    }
+    .as-scaling {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .as-scaling-item {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      text-align: center;
+    }
+    .as-scaling-item .icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: var(--space-2);
+    }
+    .as-scaling-item h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      margin: 0 0 var(--space-1) 0;
+    }
+    .as-scaling-item p {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+    .as-strategy-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      margin: var(--space-3) 0;
+      border-left: 3px solid var(--color-accent);
+    }
+    .as-strategy-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      margin-top: 0;
+      margin-bottom: var(--space-1);
+    }
+    .as-strategy-box p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header reveal-element">
+    <div>
+      <h1 class="site-title"><a href="../../index.html">Códice</a></h1>
+      <p class="site-subtitle">Archivo personal de aprendizaje y notas</p>
+    </div>
+  </header>
+
+  <main class="container content-wrapper">
+    <div class="topic-card-meta">
+      <span class="topic-badge">Computer Science</span>
+      <time datetime="2026-07-20">20 de julio de 2026</time>
+    </div>
+    
+    <h1>Arquitectura de Software</h1>
+    
+    <p>Piensa en la arquitectura de un edificio: antes de poner un solo ladrillo, hay planos, estructuras, columnas, instalaciones. La arquitectura de software es exactamente eso: el <strong>diseño estructural</strong> de un sistema antes de escribir una línea de código. Define cómo se organizan los componentes, cómo se comunican, y cómo evolucionan con el tiempo.</p>
+
+    <p>No es "cómo escribo esta función", sino "cómo organizo las 500 funciones para que no colapsen entre sí". Es la diferencia entre una choza de palos y un rascacielos: ambos refugian, pero uno aguanta un terremoto y el otro se cae con un estornudo.</p>
+
+    <div class="callout reveal-element">
+      <p><strong>La regla de oro:</strong> Una buena arquitectura retrasa las decisiones. En lugar de elegir tecnología X desde el día uno, diseñas capas que te permitan cambiar de opinión sin reescribir todo el sistema.</p>
+    </div>
+
+    <div class="as-toc reveal-element">
+      <h3>Contenido</h3>
+      <ol>
+        <li><a href="#que-es">¿Qué es Arquitectura de Software?</a></li>
+        <li><a href="#estilos">Estilos Arquitectónicos</a></li>
+        <li><a href="#patrones">Patrones de Arquitectura</a></li>
+        <li><a href="#capas">Arquitectura por Capas</a></li>
+        <li><a href="#monolitico-vs-microservicios">Monolítico vs Microservicios</a></li>
+        <li><a href="#comunicacion">Comunicación entre Componentes</a></li>
+        <li><a href="#principios">Principios SOLID</a></li>
+        <li><a href="#arquitectura-hexagonal">Arquitectura Hexagonal</a></li>
+        <li><a href="#cqrs-event-sourcing">CQRS y Event Sourcing</a></li>
+        <li><a href="#calidad">Atributos de Calidad</a></li>
+      </ol>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 1. QUÉ ES ARQUITECTURA DE SOFTWARE -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="que-es">1. ¿Qué es Arquitectura de Software?</h2>
+
+    <p>La arquitectura de software es el <strong>conjunto de decisiones de diseño</strong> que determinan la estructura de un sistema: sus componentes, sus relaciones, y las reglas que gobiernan su evolución. No es un documento que escribes una vez y olvidas; es una disciplina que guía cada línea de código.</p>
+
+    <p>Imagina que construyes una ciudad. No empiezas por las casas; primero diseñas calles, zonas residenciales, comerciales, industriales, suministro de agua y electricidad. La arquitectura de software hace lo mismo con el código: define los "barrios" (módulos), las "calles" (interfaces), y los "servicios públicos" (infraestructura).</p>
+
+    <div class="as-pros-cons reveal-element">
+      <div class="as-pros">
+        <strong>Con buena arquitectura:</strong>
+        <p style="font-size: 0.85rem; margin-bottom: 0; margin-top: var(--space-1);">
+          ✓ Cambiar una parte no rompe otra<br>
+          ✓ Nuevos desarrolladores entienden rápido<br>
+          ✓ El sistema escala sin reescribirse<br>
+          ✓ Probar es sencillo y automatizable
+        </p>
+      </div>
+      <div class="as-cons">
+        <strong>Sin arquitectura:</strong>
+        <p style="font-size: 0.85rem; margin-bottom: 0; margin-top: var(--space-1);">
+          ✗ Cada cambio es una aventura<br>
+          ✗ Nadie sabe dónde va cada cosa<br>
+          ✗ Escalar es copiar y pegar todo<br>
+          ✗ Probar es manual y agotador
+        </p>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 2. ESTILOS ARQUITECTÓNICOS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="estilos">2. Estilos Arquitectónicos</h2>
+
+    <p>Un <strong>estilo arquitectónico</strong> es una familia de sistemas con un patrón de organización común. Es como los estilos de construcción: gótico, barroco, modernista. Cada uno resuelve problemas distintos de forma distinta.</p>
+
+    <div class="as-grid reveal-element">
+      <div class="as-card">
+        <h4>Monolítico</h4>
+        <p>Todo el sistema en un solo ejecutable. Simple al inicio, complejo al crecer. Ideal para equipos pequeños y productos en fase temprana.</p>
+      </div>
+      <div class="as-card">
+        <h4>Microservicios</h4>
+        <p>Cada funcionalidad es un servicio independiente. Escalan y se despliegan por separado. Requiere coordinación y experiencia en sistemas distribuidos.</p>
+      </div>
+      <div class="as-card">
+        <h4>Orientado a Eventos</h4>
+        <p>Los componentes se comunican mediante eventos asíncronos. Ideal para sistemas que procesan flujos de datos en tiempo real.</p>
+      </div>
+      <div class="as-card">
+        <h4>Orientado a Capas</h4>
+        <p>El sistema se divide en capas verticales (presentación, negocio, datos). Cada capa solo conoce a la inmediatamente inferior.</p>
+      </div>
+      <div class="as-card">
+        <h4>Orientado a Servicios (SOA)</h4>
+        <p>Servicios reutilizables que se comunican a través de un bus empresarial (ESB). Precursor de los microservicios.</p>
+      </div>
+      <div class="as-card">
+        <h4>Arquitectura Hexagonal</h4>
+        <p>El núcleo de la lógica de negocio está aislado del mundo exterior mediante puertos y adaptadores. También llamada Puertos y Adaptadores.</p>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 3. PATRONES DE ARQUITECTURA -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="patrones">3. Patrones de Arquitectura</h2>
+
+    <p>Los patrones arquitectónicos son soluciones probadas a problemas recurrentes de diseño de sistemas. A diferencia de los estilos (que son más amplios), los patrones son recetas específicas para problemas concretos.</p>
+
+    <div class="as-pattern reveal-element">
+      <h4>Modelo-Vista-Controlador (MVC)</h4>
+      <p>Divide la aplicación en tres partes: Modelo (datos y lógica), Vista (interfaz de usuario), y Controlador (mediador entre ambos). El controlador recibe entrada del usuario, actualiza el modelo, y la vista se actualiza automáticamente. Es el patrón más usado en aplicaciones web.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>Repositorio (Repository)</h4>
+      <p>Abstract la capa de persistencia para que la lógica de negocio no dependa de la base de datos concreta. Cambias de SQL a MongoDB sin tocar el código de negocio. Solo cambias la implementación del repositorio.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>Inyección de Dependencias (DI)</h4>
+      <p>En lugar de que una clase cree sus dependencias internamente, estas se las pasan desde fuera. Hace que el código sea más testeable y desacoplado. Es la base de frameworks como Spring, NestJS o Angular.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>Observador (Observer)</h4>
+      <p>Un objeto (sujeto) notifica a múltiples objetos (observadores) cuando cambia su estado. Es la base de los sistemas de eventos, reactividad y pub/sub.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>Estrategia (Strategy)</h4>
+      <p>Define una familia de algoritmos intercambiables. Por ejemplo, un sistema de notificaciones puede usar email, SMS o push según el contexto, sin modificar el código que las envía.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 4. ARQUITECTURA POR CAPAS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="capas">4. Arquitectura por Capas</h2>
+
+    <p>Es el estilo más clásico. Divide la aplicación en capas horizontales donde cada una tiene una responsabilidad específica. La regla fundamental: una capa solo puede comunicarse con la capa inmediatamente inferior.</p>
+
+    <div class="as-layers reveal-element">
+      <svg viewBox="0 0 500 320" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+        <!-- Capa Presentación -->
+        <rect x="60" y="10" width="380" height="55" rx="8" fill="#2563eb" opacity="0.9"/>
+        <text x="250" y="43" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="13" font-weight="600">Capa de Presentación (UI)</text>
+        <text x="250" y="58" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" opacity="0.8">HTML / React / API REST</text>
+        <!-- Flecha -->
+        <line x1="250" y1="65" x2="250" y2="85" stroke="var(--color-border)" stroke-width="2"/>
+        <polygon points="245,83 250,90 255,83" fill="var(--color-border)"/>
+
+        <!-- Capa Negocio -->
+        <rect x="60" y="90" width="380" height="55" rx="8" fill="#7c3aed" opacity="0.9"/>
+        <text x="250" y="123" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="13" font-weight="600">Capa de Negocio (Lógica)</text>
+        <text x="250" y="138" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" opacity="0.8">Servicios / Casos de uso / Reglas</text>
+        <!-- Flecha -->
+        <line x1="250" y1="145" x2="250" y2="165" stroke="var(--color-border)" stroke-width="2"/>
+        <polygon points="245,163 250,170 255,163" fill="var(--color-border)"/>
+
+        <!-- Capa Persistencia -->
+        <rect x="60" y="170" width="380" height="55" rx="8" fill="#059669" opacity="0.9"/>
+        <text x="250" y="203" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="13" font-weight="600">Capa de Persistencia (Datos)</text>
+        <text x="250" y="218" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" opacity="0.8">Repositorios / ORM / SQL</text>
+        <!-- Flecha -->
+        <line x1="250" y1="225" x2="250" y2="245" stroke="var(--color-border)" stroke-width="2"/>
+        <polygon points="245,243 250,250 255,243" fill="var(--color-border)"/>
+
+        <!-- Capa Infraestructura -->
+        <rect x="60" y="250" width="380" height="55" rx="8" fill="#6b7280" opacity="0.9"/>
+        <text x="250" y="283" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="13" font-weight="600">Capa de Infraestructura</text>
+        <text x="250" y="298" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" opacity="0.8">Cloud / Red / Contenedores</text>
+      </svg>
+    </div>
+
+    <p><strong>Ejemplo concreto:</strong> Un sistema de e-commerce donde la capa de presentación muestra productos (HTML/React), la capa de negocio calcula descuentos e impuestos, y la capa de persistencia guarda los pedidos en PostgreSQL. Si cambias de PostgreSQL a MySQL, solo tocas la capa de persistencia.</p>
+
+    <div class="as-pros-cons reveal-element">
+      <div class="as-pros">
+        <strong>Ventajas</strong>
+        <p style="font-size: 0.85rem; margin-bottom: 0; margin-top: var(--space-1);">
+          ✓ Separación clara de responsabilidades<br>
+          ✓ Fácil de entender para equipos nuevos<br>
+          ✓ Cada capa puede probarse por separado<br>
+          ✓ Cambiar una capa no afecta a las demás
+        </p>
+      </div>
+      <div class="as-cons">
+        <strong>Desventajas</strong>
+        <p style="font-size: 0.85rem; margin-bottom: 0; margin-top: var(--space-1);">
+          ✗ Puede volverse rígida con el tiempo<br>
+          ✗ Cambios pequeños requieren tocar todas las capas<br>
+          ✗ El rendimiento sufre por tantas llamadas entre capas<br>
+          ✗ Tiende a crecer horizontalmente (capa de servicios enorme)
+        </p>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5. MONOLÍTICO vs MICROSERVICIOS -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="monolitico-vs-microservicios">5. Monolítico vs Microservicios</h2>
+
+    <p>El debate arquitectónico más famoso. No hay ganador absoluto: cada uno es mejor para contextos distintos.</p>
+
+    <div class="as-layers reveal-element">
+      <svg viewBox="0 0 500 220" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+        <!-- Monolítico -->
+        <rect x="30" y="10" width="190" height="200" rx="10" fill="#9a2a2a" opacity="0.15" stroke="#9a2a2a" stroke-width="2"/>
+        <text x="125" y="35" text-anchor="middle" fill="#9a2a2a" font-family="var(--font-mono)" font-size="12" font-weight="700">MONOLÍTICO</text>
+        <!-- Componentes internos -->
+        <rect x="50" y="50" width="150" height="35" rx="5" fill="#9a2a2a" opacity="0.3"/>
+        <text x="125" y="72" text-anchor="middle" fill="#9a2a2a" font-family="var(--font-mono)" font-size="10">Frontend</text>
+        <rect x="50" y="95" width="150" height="35" rx="5" fill="#9a2a2a" opacity="0.3"/>
+        <text x="125" y="117" text-anchor="middle" fill="#9a2a2a" font-family="var(--font-mono)" font-size="10">Lógica de negocio</text>
+        <rect x="50" y="140" width="150" height="35" rx="5" fill="#9a2a2a" opacity="0.3"/>
+        <text x="125" y="162" text-anchor="middle" fill="#9a2a2a" font-family="var(--font-mono)" font-size="10">Base de datos</text>
+        <text x="125" y="195" text-anchor="middle" fill="#9a2a2a" font-family="var(--font-mono)" font-size="8" opacity="0.6">Un solo deploy</text>
+
+        <!-- vs -->
+        <text x="250" y="120" text-anchor="middle" fill="var(--color-text-muted)" font-family="var(--font-mono)" font-size="20" font-weight="700">VS</text>
+
+        <!-- Microservicios -->
+        <rect x="280" y="10" width="190" height="200" rx="10" fill="#2d7d46" opacity="0.1" stroke="#2d7d46" stroke-width="2"/>
+        <text x="375" y="35" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="12" font-weight="700">MICROSERVICIOS</text>
+        <!-- Servicio 1 -->
+        <rect x="295" y="50" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="335" y="65" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Auth API</text>
+        <text x="335" y="78" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">:8080</text>
+        <!-- Servicio 2 -->
+        <rect x="385" y="50" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="425" y="65" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Catálogo</text>
+        <text x="425" y="78" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">:8081</text>
+        <!-- Servicio 3 -->
+        <rect x="295" y="100" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="335" y="115" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Pedidos</text>
+        <text x="335" y="128" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">:8082</text>
+        <!-- Servicio 4 -->
+        <rect x="385" y="100" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="425" y="115" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Pagos</text>
+        <text x="425" y="128" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">:8083</text>
+        <!-- Servicio 5 -->
+        <rect x="295" y="150" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="335" y="165" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Notif.</text>
+        <text x="335" y="178" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">:8084</text>
+        <!-- Cola mensajes -->
+        <rect x="385" y="150" width="80" height="40" rx="5" fill="#2d7d46" opacity="0.25"/>
+        <text x="425" y="165" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="9" font-weight="600">Cola</text>
+        <text x="425" y="178" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="7">RabbitMQ</text>
+        <text x="375" y="195" text-anchor="middle" fill="#2d7d46" font-family="var(--font-mono)" font-size="8" opacity="0.6">Múltiples deploys independientes</text>
+      </svg>
+    </div>
+
+    <div class="as-compare reveal-element">
+      <div class="as-compare-box monolithic">
+        <h4>Monolítico</h4>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted);">Una sola aplicación que lo hace todo.</p>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>Un solo deploy para todo</li>
+          <li>Comunicación por llamadas a funciones (rápido)</li>
+          <li>Testing end-to-end sencillo</li>
+          <li>Escala vertical (más hardware)</li>
+          <li>Ideal para startups y equipos pequeños</li>
+        </ul>
+      </div>
+      <div class="as-compare-box microservices">
+        <h4>Microservicios</h4>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted);">Muchas aplicaciones pequeñas que colaboran.</p>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>Deploys independientes por servicio</li>
+          <li>Comunicación por red (HTTP, mensajería)</li>
+          <li>Cada servicio se prueba por separado</li>
+          <li>Escala horizontal (más instancias)</li>
+          <li>Ideal para equipos grandes y productos complejos</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Consejo práctico:</strong> Empieza con un monolito bien estructurado. Divide en microservicios solo cuando el monolito demuestre ser un problema real. El 90% de los proyectos no necesitan microservicios desde el día uno.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 6. COMUNICACIÓN ENTRE COMPONENTES -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="comunicacion">6. Comunicación entre Componentes</h2>
+
+    <p>Los componentes necesitan hablar entre sí. Hay dos grandes familias: síncrona y asíncrona. Elegir la correcta es clave para la escalabilidad.</p>
+
+    <div class="as-compare reveal-element">
+      <div class="as-compare-box sync">
+        <h4>Síncrona (HTTP/REST/gRPC)</h4>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>El cliente espera la respuesta</li>
+          <li>Simple de implementar y depurar</li>
+          <li>Problema: si el servidor falla, el cliente falla</li>
+          <li>Problema: latencia acumulativa en cadenas de llamadas</li>
+          <li>Ideal para consultas y operaciones rápidas</li>
+        </ul>
+      </div>
+      <div class="as-compare-box async">
+        <h4>Asíncrona (Colas, Eventos, Pub/Sub)</h4>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>El cliente envía un mensaje y sigue</li>
+          <li>Más complejo de implementar</li>
+          <li>Ventaja: tolerancia a fallos natural</li>
+          <li>Ventaja: el productor no espera al consumidor</li>
+          <li>Ideal para procesos largos y desacoplamiento</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Ejemplo: Cola de Mensajes con Redis</h3>
+
+    <pre><code class="language-python">
+import redis
+import json
+import time
+
+# Conexión a Redis
+cola = redis.Redis(host='localhost', port=6379, db=0)
+
+# --- Productor (Servicio de Pedidos) ---
+def crear_pedido(usuario_id, producto, cantidad):
+    pedido = {
+        "usuario": usuario_id,
+        "producto": producto,
+        "cantidad": cantidad,
+        "timestamp": time.time()
+    }
+    # Enviar pedido a la cola "pedidos_pendientes"
+    cola.lpush("pedidos_pendientes", json.dumps(pedido))
+    print(f"Pedido encolado: {producto} x {cantidad}")
+    return {"status": "en_cola"}
+
+# --- Consumidor (Servicio de Inventario) ---
+def procesar_pedidos():
+    while True:
+        # Esperar por un pedido (bloqueante hasta que llegue)
+        _, dato = cola.brpop("pedidos_pendientes")
+        pedido = json.loads(dato)
+        print(f"Procesando pedido: {pedido['producto']}")
+        # Simular descuento de inventario
+        time.sleep(2)
+        print(f"Inventario actualizado para {pedido['usuario']}")
+
+# El productor y el consumidor corren en procesos separados
+    </code></pre>
+
+    <!-- ============================================ -->
+    <!-- 7. PRINCIPIOS SOLID -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="principios">7. Principios SOLID</h2>
+
+    <p>SOLID son 5 principios de diseño orientado a objetos que te ayudan a escribir código mantenible y escalable. No son reglas, sino guías. Violarlos tiene consecuencias, pero a veces vale la pena.</p>
+
+    <div class="as-pattern reveal-element">
+      <h4>S — Single Responsibility (Responsabilidad Única)</h4>
+      <p>Una clase debe tener una sola razón para cambiar. Si tu clase Pedido calcula impuestos, envía emails y guarda en BD, tienes tres razones para cambiarla. Sepáralo en tres clases.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>O — Open/Closed (Abierto/Cerrado)</h4>
+      <p>Las clases deben estar abiertas para extensión, cerradas para modificación. Agrega funcionalidad nueva con herencia o composición, no modificando el código existente.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>L — Liskov Substitution (Sustitución de Liskov)</h4>
+      <p>Si una clase B extiende a A, deberías poder usar B donde esperas A sin que el programa falle. Una subclase no debe romper el comportamiento de la superclase. Por ejemplo, una clase Rectángulo no debería heredar de Cuadrado solo porque "matemáticamente tiene sentido".</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>I — Interface Segregation (Segregación de Interfaces)</h4>
+      <p>Es mejor tener muchas interfaces pequeñas y específicas que una interfaz grande y general. Si una clase implementa una interfaz con métodos que no usa, la interfaz es demasiado grande.</p>
+    </div>
+
+    <div class="as-pattern reveal-element">
+      <h4>D — Dependency Inversion (Inversión de Dependencias)</h4>
+      <p>Los módulos de alto nivel no deben depender de módulos de bajo nivel. Ambos deben depender de abstracciones. En criollo: programa contra interfaces, no contra implementaciones concretas.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 8. ARQUITECTURA HEXAGONAL -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="arquitectura-hexagonal">8. Arquitectura Hexagonal (Puertos y Adaptadores)</h2>
+
+    <p>También conocida como <strong>Puertos y Adaptadores</strong>, fue propuesta por Alistair Cockburn. La idea central es aislar la lógica de negocio del mundo exterior. Piensa en un timón de barco: el timón (lógica de negocio) no cambia aunque cambies el barco (base de datos, interfaz de usuario, API).</p>
+
+    <p>La arquitectura hexagonal divide el sistema en tres zonas:</p>
+
+    <div class="as-layers reveal-element">
+      <svg viewBox="0 0 500 380" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+        <!-- Adaptador CLI (izquierda arriba) -->
+        <rect x="15" y="20" width="95" height="40" rx="6" fill="#2563eb" opacity="0.7"/>
+        <text x="62" y="45" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" font-weight="600">CLI</text>
+
+        <!-- Adaptador HTTP (izquierda abajo) -->
+        <rect x="15" y="75" width="95" height="40" rx="6" fill="#2563eb" opacity="0.7"/>
+        <text x="62" y="100" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" font-weight="600">HTTP / REST</text>
+
+        <!-- Adaptador MongoDB (derecha arriba) -->
+        <rect x="390" y="20" width="95" height="40" rx="6" fill="#059669" opacity="0.7"/>
+        <text x="437" y="45" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" font-weight="600">MongoDB</text>
+
+        <!-- Adaptador PostgreSQL (derecha abajo) -->
+        <rect x="390" y="75" width="95" height="40" rx="6" fill="#059669" opacity="0.7"/>
+        <text x="437" y="100" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" font-weight="600">PostgreSQL</text>
+
+        <!-- Adaptador Stripe (inferior) -->
+        <rect x="200" y="320" width="100" height="40" rx="6" fill="#7c3aed" opacity="0.7"/>
+        <text x="250" y="345" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9" font-weight="600">Stripe</text>
+
+        <!-- Hexágono exterior (Adaptadores) -->
+        <polygon points="250,50 400,115 400,230 250,295 100,230 100,115" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="6,3" opacity="0.5"/>
+        <text x="420" y="175" text-anchor="middle" fill="#6b7280" font-family="var(--font-mono)" font-size="10" font-weight="600" transform="rotate(90,420,175)">ADAPTADORES</text>
+
+        <!-- Hexágono medio (Puertos) -->
+        <polygon points="250,90 360,138 360,213 250,260 140,213 140,138" fill="none" stroke="#7c3aed" stroke-width="2" opacity="0.6"/>
+        <text x="380" y="178" text-anchor="middle" fill="#7c3aed" font-family="var(--font-mono)" font-size="9" font-weight="600" transform="rotate(90,380,178)">PUERTOS</text>
+
+        <!-- Hexágono interior (Núcleo) -->
+        <polygon points="250,130 320,165 320,200 250,235 180,200 180,165" fill="#7c3aed" opacity="0.15" stroke="#7c3aed" stroke-width="2.5"/>
+        <text x="250" y="177" text-anchor="middle" fill="#7c3aed" font-family="var(--font-mono)" font-size="12" font-weight="700">NÚCLEO</text>
+        <text x="250" y="192" text-anchor="middle" fill="#7c3aed" font-family="var(--font-mono)" font-size="9" opacity="0.7">(Dominio)</text>
+
+        <!-- Flechas: Adaptadores → Núcleo -->
+        <line x1="110" y1="55" x2="170" y2="155" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="110" y1="100" x2="170" y2="175" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="390" y1="55" x2="330" y2="155" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="390" y1="100" x2="330" y2="175" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="250" y1="320" x2="250" y2="240" stroke="var(--color-border)" stroke-width="1.5" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+
+    <div class="as-grid reveal-element">
+      <div class="as-card">
+        <h4>Núcleo (Dominio)</h4>
+        <p>La lógica de negocio pura. No sabe nada de HTTP, bases de datos, ni frameworks. Solo contiene entidades, reglas de negocio y puertos (interfaces).</p>
+      </div>
+      <div class="as-card">
+        <h4>Puertos (Interfaces)</h4>
+        <p>Contratos que definen cómo el núcleo se comunica con el exterior. Por ejemplo: RepositorioUsuario, ServicioNotificaciones.</p>
+      </div>
+      <div class="as-card">
+        <h4>Adaptadores</h4>
+        <p>Implementaciones concretas de los puertos. Un adaptador PostgreSQL, otro para MongoDB, otro para una API REST, otro para una interfaz de línea de comandos.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal-element">
+      <p><strong>Ejemplo real:</strong> Tu sistema de pagos tiene un puerto ProcesadorPagos. Implementas un adaptador para Stripe. Seis meses después quieres agregar PayPal. Creas otro adaptador que implementa el mismo puerto. El núcleo no cambia ni una línea.</p>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 9. CQRS Y EVENT SOURCING -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="cqrs-event-sourcing">9. CQRS y Event Sourcing</h2>
+
+    <p><strong>CQRS</strong> (Command Query Responsibility Segregation) separa las operaciones de lectura de las de escritura. En lugar de un solo modelo para leer y escribir, tienes dos: uno optimizado para consultas (reads) y otro para comandos (writes).</p>
+
+    <p><strong>Event Sourcing</strong> guarda el estado como una secuencia de eventos en lugar de un estado actual. En lugar de "el saldo es 100", guardas "se depositó 50, se retiró 20, se depositó 70". El saldo es la suma de todos los eventos.</p>
+
+    <div class="as-compare reveal-element">
+      <div class="as-compare-box monolithic">
+        <h4>CRUD tradicional</h4>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted);">Un solo modelo para leer y escribir.</p>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>UPDATE reemplaza el estado anterior</li>
+          <li>No hay historial de cambios</li>
+          <li>Simple, pero inflexible</li>
+        </ul>
+      </div>
+      <div class="as-compare-box microservices">
+        <h4>CQRS + Event Sourcing</h4>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted);">Modelos separados, historial completo.</p>
+        <ul style="font-size: 0.85rem; padding-left: var(--space-3);">
+          <li>Cada cambio es un evento inmutable</li>
+          <li>Historial completo de auditoría</li>
+          <li>Puedes reconstruir el estado en cualquier momento</li>
+        </ul>
+      </div>
+    </div>
+
+    <pre><code class="language-python">
+# Event Sourcing: guardamos eventos, no estado
+eventos = []
+
+def depositar(cuenta_id, monto):
+    eventos.append({
+        "tipo": "DEPOSITO",
+        "cuenta": cuenta_id,
+        "monto": monto
+    })
+
+def retirar(cuenta_id, monto):
+    eventos.append({
+        "tipo": "RETIRO",
+        "cuenta": cuenta_id,
+        "monto": monto
+    })
+
+def calcular_saldo(cuenta_id):
+    saldo = 0
+    for e in eventos:
+        if e["cuenta"] == cuenta_id:
+            if e["tipo"] == "DEPOSITO":
+                saldo += e["monto"]
+            elif e["tipo"] == "RETIRO":
+                saldo -= e["monto"]
+    return saldo
+
+# Uso
+depositar("A1", 100)
+retirar("A1", 30)
+depositar("A1", 50)
+print(calcular_saldo("A1"))  # 120
+# Podemos ver el historial completo de la cuenta
+    </code></pre>
+
+    <!-- ============================================ -->
+    <!-- 10. ATRIBUTOS DE CALIDAD -->
+    <!-- ============================================ -->
+    <hr class="section-divider">
+    <h2 id="calidad">10. Atributos de Calidad (No Funcionales)</h2>
+
+    <p>La arquitectura no solo se preocupa de que el software funcione, sino de <strong>cómo</strong> funciona. Estos son los atributos de calidad que toda arquitectura debe considerar:</p>
+
+    <div class="as-grid reveal-element">
+      <div class="as-card">
+        <h4>Rendimiento</h4>
+        <p>Qué tan rápido responde el sistema. Se mide en latencia (tiempo por petición) y throughput (peticiones por segundo).</p>
+      </div>
+      <div class="as-card">
+        <h4>Escalabilidad</h4>
+        <p>Capacidad de manejar más carga agregando recursos. Escalar vertical (más CPU/RAM) vs horizontal (más servidores).</p>
+      </div>
+      <div class="as-card">
+        <h4>Disponibilidad</h4>
+        <p>Porcentaje de tiempo que el sistema está operativo. Un sistema "cinco nueves" (99.999%) tolera ~5 minutos de caída al año.</p>
+      </div>
+      <div class="as-card">
+        <h4>Seguridad</h4>
+        <p>Protección contra accesos no autorizados, fugas de datos y ataques. Autenticación, autorización, cifrado, auditoría.</p>
+      </div>
+      <div class="as-card">
+        <h4>Mantenibilidad</h4>
+        <p>Qué tan fácil es modificar el sistema. Código limpio, pruebas automatizadas, documentación clara, baja deuda técnica.</p>
+      </div>
+      <div class="as-card">
+        <h4>Tolerancia a Fallos</h4>
+        <p>Capacidad de seguir funcionando cuando algo falla. Redundancia, circuit breakers, reintentos, degradación gradual.</p>
+      </div>
+    </div>
+
+    <div class="reveal-element">
+      <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+        <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/prism-python.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

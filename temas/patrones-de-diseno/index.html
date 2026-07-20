@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patrones de Diseño — Códice</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/prism.css">
+  <style>
+    .pd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    .pd-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      border-left: 4px solid var(--diagram-2);
+    }
+    .pd-card.estructural { border-left-color: var(--diagram-3); }
+    .pd-card.comportamiento { border-left-color: var(--diagram-6); }
+    .pd-card h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-top: 0;
+      margin-bottom: var(--space-2);
+    }
+    .pd-card .analogy {
+      font-style: italic;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: var(--space-2);
+      padding: var(--space-2);
+      background: var(--color-bg);
+      border-radius: var(--radius-sm);
+    }
+    .pd-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+    @media (max-width: 640px) {
+      .pd-compare { grid-template-columns: 1fr; }
+    }
+    .pd-compare-box {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+    }
+    .pd-compare-box h4 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0;
+      margin-bottom: var(--space-2);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .pd-compare-box.pros h4 { color: var(--diagram-6); }
+    .pd-compare-box.cons h4 { color: var(--diagram-5); }
+    .pd-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    .pd-layer {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 600;
+    }
+    .pd-toc {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      columns: 3;
+      column-gap: var(--space-4);
+    }
+    @media (max-width: 640px) {
+      .pd-toc { columns: 1; }
+    }
+    .pd-toc h3 {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0;
+      margin-bottom: var(--space-2);
+      break-after: avoid;
+    }
+    .pd-toc ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-3) 0;
+    }
+    .pd-toc li {
+      font-size: 0.85rem;
+      margin-bottom: var(--space-1);
+    }
+    .pd-toc a {
+      color: var(--color-text);
+      text-decoration: none;
+    }
+    .pd-toc a:hover {
+      color: var(--color-accent);
+    }
+    .pd-diagram {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      text-align: center;
+    }
+    .pd-diagram svg {
+      max-width: 100%;
+      height: auto;
+    }
+    .pd-use-cases {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin: var(--space-3) 0;
+    }
+    .pd-use-case {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+    .pd-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      margin-right: var(--space-1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .pd-tag.creacional { background: var(--diagram-2); color: #fff; }
+    .pd-tag.structural { background: var(--diagram-3); color: #fff; }
+    .pd-tag.behavioral { background: var(--diagram-6); color: #fff; }
+    .pd-section-divider {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: var(--space-6) 0 var(--space-4);
+    }
+    .pd-problem {
+      background: var(--color-bg);
+      border-left: 3px solid var(--diagram-5);
+      padding: var(--space-2) var(--space-3);
+      margin: var(--space-3) 0;
+      font-size: 0.9rem;
+    }
+    .pd-solution {
+      background: var(--color-bg);
+      border-left: 3px solid var(--diagram-6);
+      padding: var(--space-2) var(--space-3);
+      margin: var(--space-3) 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="container site-header">
+    <div>
+      <h1 class="site-title">Patrones de Diseño</h1>
+      <p class="site-subtitle">Los 23 patrones del Gang of Four explicados con analogías cotidianas</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="pd-toc reveal-element">
+      <h3>Contenido</h3>
+      <ul>
+        <li><a href="#que-son">1. ¿Qué son los patrones de diseño?</a></li>
+        <li><a href="#creacionales">2. Patrones Creacionales (5)</a></li>
+        <li><a href="#estructurales">3. Patrones Estructurales (7)</a></li>
+        <li><a href="#comportamiento">4. Patrones de Comportamiento (11)</a></li>
+        <li><a href="#cuando-usar">5. ¿Cuándo usar cada uno?</a></li>
+      </ul>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 1. ¿QUÉ SON LOS PATRONES DE DISEÑO? -->
+    <!-- ============================================ -->
+    <hr class="pd-section-divider">
+    <h2 id="que-son">1. ¿Qué son los patrones de diseño?</h2>
+
+    <p>Imaginá que sos carpintero. No inventás la silla cada vez que alguien te pide una: ya sabés que para hacer una silla necesitás cuatro patas, un asiento y un respaldo. El patrón es la receta que funciona siempre, pero que podés adaptar a cada cliente.</p>
+
+    <p>Los <strong>patrones de diseño</strong> son exactamente eso: soluciones reutilizables a problemas comunes que aparecen una y otra vez al diseñar software. No son código copiar-pegar, sino <strong>plantillas conceptuales</strong> que te ayudan a tomar mejores decisiones de arquitectura.</p>
+
+    <div class="pd-diagram reveal-element">
+      <svg viewBox="0 0 500 200" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+        <!-- Creacionales -->
+        <rect x="20" y="30" width="140" height="140" rx="8" fill="var(--diagram-2)" opacity="0.9"/>
+        <text x="90" y="70" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="11" font-weight="600">CREACIONALES</text>
+        <text x="90" y="90" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Cómo crear</text>
+        <text x="90" y="105" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">objetos</text>
+        <text x="90" y="140" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="20">5</text>
+        
+        <!-- Estructurales -->
+        <rect x="180" y="30" width="140" height="140" rx="8" fill="var(--diagram-3)" opacity="0.9"/>
+        <text x="250" y="70" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="11" font-weight="600">ESTRUCTURALES</text>
+        <text x="250" y="90" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Cómo organizar</text>
+        <text x="250" y="105" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">clases y objetos</text>
+        <text x="250" y="140" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="20">7</text>
+        
+        <!-- Comportamiento -->
+        <rect x="340" y="30" width="140" height="140" rx="8" fill="var(--diagram-6)" opacity="0.9"/>
+        <text x="410" y="70" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="11" font-weight="600">COMPORTAMIENTO</text>
+        <text x="410" y="90" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Cómo gestionar</text>
+        <text x="410" y="105" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">interacciones</text>
+        <text x="410" y="140" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="20">11</text>
+      </svg>
+    </div>
+
+    <p>El libro original <em>Design Patterns</em> (1994) de Erich Gamma, Richard Helm, Ralph Johnson y John Vlissides — el "Gang of Four" — documentó 23 patrones que siguen siendo la base del diseño de software moderno.</p>
+
+    <!-- ============================================ -->
+    <!-- 2. PATRONES CREACIONALES -->
+    <!-- ============================================ -->
+    <hr class="pd-section-divider">
+    <h2 id="creacionales">2. Patrones Creacionales</h2>
+
+    <p>Resuelven el problema de <strong>cómo crear objetos</strong> de manera flexible y reutilizable. En lugar de hacer <code>new Clase()</code> por todos lados, encapsulan la lógica de creación.</p>
+
+    <!-- SINGLETON -->
+    <div class="pd-card reveal-element">
+      <h4><span class="pd-tag creacional">Creacional</span> Singleton</h4>
+      <div class="analogy">
+        💡 Es como el director de una escuela: solo puede haber uno. Si necesitás hablar con "el director", siempre es la misma persona, sin importar quién lo pida.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Necesitás exactamente una instancia de una clase en toda la aplicación (una conexión a base de datos, un logger, un configurador).
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> La clase se crea a sí misma y guarda la instancia. Un método estático la devuelve siempre la misma.
+      </div>
+      <pre><code class="language-python">
+class Singleton:
+    _instancia = None
+    
+    def __new__(cls):
+        if cls._instancia is None:
+            cls._instancia = super().__new__(cls)
+        return cls._instancia
+    
+    def configurar(self, db_url):
+        self.db_url = db_url
+
+# Siempre es la misma instancia
+config1 = Singleton()
+config2 = Singleton()
+print(config1 is config2)  # True
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Logger global</span>
+        <span class="pd-use-case">Pool de conexiones</span>
+        <span class="pd-use-case">Configuración de app</span>
+      </div>
+    </div>
+
+    <!-- FACTORY METHOD -->
+    <div class="pd-card reveal-element">
+      <h4><span class="pd-tag creacional">Creacional</span> Factory Method</h4>
+      <div class="analogy">
+        💡 Es como una fábrica de muebles: cada sucursal (subclase) decide qué tipo de mueble crear, pero el proceso de pedido (método) es el mismo.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Querés crear objetos pero no sabés exactamente qué clase necesitás hasta runtime.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Delegás la creación a subclases que implementan un método fábrica.
+      </div>
+      <pre><code class="language-python">
+from abc import ABC, abstractmethod
+
+class Notificacion(ABC):
+    @abstractmethod
+    def enviar(self, mensaje):
+        pass
+
+class NotificacionEmail(Notificacion):
+    def enviar(self, mensaje):
+        return f"Email: {mensaje}"
+
+class NotificacionSMS(Notificacion):
+    def enviar(self, mensaje):
+        return f"SMS: {mensaje}"
+
+class FabricaNotificacion(ABC):
+    @abstractmethod
+    def crear_notificacion(self) -> Notificacion:
+        pass
+
+class FabricaEmail(FabricaNotificacion):
+    def crear_notificacion(self):
+        return NotificacionEmail()
+
+# Uso
+fabrica = FabricaEmail()
+notif = fabrica.crear_notificacion()
+notif.enviar("Hola")  # "Email: Hola"
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Gateways de pago</span>
+        <span class="pd-use-case">Serializadores</span>
+        <span class="pd-use-case">Conexiones a DB</span>
+      </div>
+    </div>
+
+    <!-- ABSTRACT FACTORY -->
+    <div class="pd-card reveal-element">
+      <h4><span class="pd-tag creacional">Creacional</span> Abstract Factory</h4>
+      <div class="analogy">
+        💡 Es como un local de IKEA: entrás a la sección "Cocina" y todo combina (olla, sartén, cuchillos del mismo estilo). La fábrica abstracta crea familias enteras de productos compatibles.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Necesitás crear grupos de objetos relacionados sin especificar sus clases concretas.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Una interfaz define cómo crear cada tipo de producto, y cada implementación concreta crea una familia consistente.
+      </div>
+      <pre><code class="language-python">
+class FactoryUI(ABC):
+    @abstractmethod
+    def crear_boton(self): pass
+    @abstractmethod
+    def crear_input(self): pass
+
+class FactoryMaterial(FactoryUI):
+    def crear_boton(self):
+        return BotonMaterial()
+    def crear_input(self):
+        return InputMaterial()
+
+# La app no sabe qué fábrica usa
+def armar_formulario(factory: FactoryUI):
+    boton = factory.crear_boton()
+    input_ = factory.crear_input()
+    return boton, input_
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Temas de UI</span>
+        <span class="pd-use-case">Multi-plataforma</span>
+        <span class="pd-use-case">GUIs intercambiables</span>
+      </div>
+    </div>
+
+    <!-- BUILDER -->
+    <div class="pd-card reveal-element">
+      <h4><span class="pd-tag creacional">Creacional</span> Builder</h4>
+      <div class="analogy">
+        💡 Es como armar un combo de hamburguesa: primero la carne, después el queso, luego la lechuga... podés personalizar paso a paso sin enredarte con 20 parámetros en el constructor.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Un objeto tiene muchos atributos opcionales y el constructor se vuelve un desastre con 15 parámetros.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Construí el objeto paso a paso con una interfaz fluida (encadenar métodos).
+      </div>
+      <pre><code class="language-python">
+class QueryBuilder:
+    def __init__(self):
+        self._tabla = None
+        self._condiciones = []
+        self._orden = None
+        self._limite = None
+    
+    def tabla(self, nombre):
+        self._tabla = nombre
+        return self  # permite encadenar
+    
+    def donde(self, condicion):
+        self._condiciones.append(condicion)
+        return self
+    
+    def construir(self):
+        sql = f"SELECT * FROM {self._tabla}"
+        if self._condiciones:
+            sql += " WHERE " + " AND ".join(self._condiciones)
+        return sql
+
+# Uso fluido
+query = (QueryBuilder()
+    .tabla("usuarios")
+    .donde("activo = true")
+    .donde("edad > 18")
+    .construir())
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Queries SQL</span>
+        <span class="pd-use-case">HTTP requests</span>
+        <span class="pd-use-case">Documentos complejos</span>
+      </div>
+    </div>
+
+    <!-- PROTOTYPE -->
+    <div class="pd-card reveal-element">
+      <h4><span class="pd-tag creacional">Creacional</span> Prototype</h4>
+      <div class="analogy">
+        💡 Es como un molde de arcilla: en lugar de crear cada escultura desde cero, copiás un molde existente y lo modificás. Es más rápido que empezar de cero.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Crear objetos nuevos es costoso (conexiones, carga de datos) y querés reutilizar existentes.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Cloná objetos existentes en lugar de crear nuevos desde cero.
+      </div>
+      <pre><code class="language-python">
+import copy
+
+class Prototype:
+    def clone(self):
+        return copy.deepcopy(self)
+
+class RobotPrototipo(Prototype):
+    def __init__(self, nombre, armas, color):
+        self.nombre = nombre
+        self.armas = armas
+        self.color = color
+
+# Original caro de crear
+robot_base = RobotPrototipo("RX-78", ["beam", "escudo"], "blanco")
+
+# Clonar es rápido
+robot_rojo = robot_base.clone()
+robot_rojo.nombre = "RX-78-R"
+robot_rojo.color = "rojo"
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Objetos pesados</span>
+        <span class="pd-use-case">Cache de objetos</span>
+        <span class="pd-use-case">Copy-paste de configuraciones</span>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 3. PATRONES ESTRUCTURALES -->
+    <!-- ============================================ -->
+    <hr class="pd-section-divider">
+    <h2 id="estructurales">3. Patrones Estructurales</h2>
+
+    <p>Resuelven cómo <strong>componer objetos</strong> para formar estructuras más grandes y flexibles. Se enfocan en simplificar relaciones entre componentes.</p>
+
+    <!-- ADAPTER -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Adapter</h4>
+      <div class="analogy">
+        💡 Es como un adaptador de enchufe: tenés un enchufe americano y una ficha europea. El adaptador los conecta sin cambiar ninguno de los dos.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés una clase cuya interfaz no es compatible con la que necesitás usar.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Envolvé la clase existente en una que traduzca la interfaz.
+      </div>
+      <pre><code class="language-python">
+class ViejoServicio:
+    def enviar_xml(self, datos):
+        return f"<data>{datos}</data>"
+
+# El adapter convierte la interfaz
+class AdapterServicio:
+    def __init__(self, servicio_viejo):
+        self.servicio = servicio_viejo
+    
+    def enviar_json(self, datos):
+        xml = self.servicio.enviar_xml(datos)
+        return f'{{"raw": "{xml}"}}'
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Integrar APIs viejas</span>
+        <span class="pd-use-case">Librerías de terceros</span>
+        <span class="pd-use-case">Migraciones</span>
+      </div>
+    </div>
+
+    <!-- BRIDGE -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Bridge</h4>
+      <div class="analogy">
+        💡 Es como un control remoto universal: el control funciona igual sin importar si controla un TV Sony, Samsung o LG. Podés cambiar la televisión sin cambiar el control.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés dos dimensiones de variación y no querés crear una clase para cada combinación.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Separá la abstracción de la implementación en dos jerarquías independientes.
+      </div>
+      <pre><code class="language-python">
+from abc import ABC, abstractmethod
+
+class FormaDraw(ABC):
+    @abstractmethod
+    def dibujar(self, x, y): pass
+
+class CirculoDraw(FormaDraw):
+    def dibujar(self, x, y):
+        return f"Círculo en ({x},{y})"
+
+class Forma:
+    def __init__(self, draw: FormaDraw):
+        self.draw = draw
+    
+    def render(self, x, y):
+        return self.draw.dibujar(x, y)
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Plataformas múltiples</span>
+        <span class="pd-use-case">Drivers</span>
+        <span class="pd-use-case">APIs + UI</span>
+      </div>
+    </div>
+
+    <!-- COMPOSITE -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Composite</h4>
+      <div class="analogy">
+        💡 Es como una caja de herramientas: adentro puede haber un martillo (hoja) o otra caja con más herramientas (compuesto). Tratás todo igual.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés objetos individuales y composiciones de objetos, y querés tratarlos de forma uniforme.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Componé objetos en estructuras de árbol y tratá hojas y ramas con la misma interfaz.
+      </div>
+      <pre><code class="language-python">
+class Componente(ABC):
+    @abstractmethod
+    def precio(self): pass
+
+class Producto(Componente):
+    def __init__(self, nombre, precio_):
+        self.nombre = nombre
+        self._precio = precio_
+    
+    def precio(self):
+        return self._precio
+
+class Caja(Componente):
+    def __init__(self, nombre):
+        self.nombre = nombre
+        self.items = []
+    
+    def agregar(self, item):
+        self.items.append(item)
+        return self
+    
+    def precio(self):
+        return sum(item.precio() for item in self.items)
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Sistemas de archivos</span>
+        <span class="pd-use-case">Menús GUI</span>
+        <span class="pd-use-case">Organizaciones</span>
+      </div>
+    </div>
+
+    <!-- DECORATOR -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Decorator</h4>
+      <div class="analogy">
+        💡 Es como vestirte: primero la remera (objeto base), después un saco (decorador), después una bufanda (otro decorador). Cada capa agrega funcionalidad sin cambiar la remera.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Querés agregar responsabilidades a objetos de forma dinámica, sin crear subclases para cada combinación.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Envolvé el objeto en otros objetos que agregan comportamiento.
+      </div>
+      <pre><code class="language-python">
+class Cafetera:
+    def costo(self):
+        return 50
+
+class DecoradorCafetera:
+    def __init__(self, cafetera):
+        self.cafetera = cafetera
+    
+    def costo(self):
+        return self.cafetera.costo()
+
+class Leche(DecoradorCafetera):
+    def costo(self):
+        return self.cafetera.costo() + 20
+
+# Combinar libremente
+cafe = Cafetera()
+cafe_special = Crema(Leche(cafe))
+print(f"${cafe_special.costo()}")  # $100
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Streams de I/O</span>
+        <span class="pd-use-case">Middleware</span>
+        <span class="pd-use-case">Funcionalidad extra</span>
+      </div>
+    </div>
+
+    <!-- FACADE -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Facade</h4>
+      <div class="analogy">
+        💡 Es como un recepcionista de hotel: en lugar de hablar con el chef, el limpieza, el conserje y el portero, le decís todo al recepcionista y él coordina todo por vos.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés un subsistema complejo con muchas clases y querés simplificar la interfaz para el cliente.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Creá una clase simple que delegue las llamadas al subsistema complejo.
+      </div>
+      <pre><code class="language-python">
+class Computadora:
+    def __init__(self):
+        self.cpu = CPU()
+        self.mem = Memoria()
+        self.disco = Disco()
+    
+    def encender(self):
+        pasos = []
+        pasos.append(self.cpu.freeze())
+        pasos.append(self.mem.load("0x00", "bootloader"))
+        pasos.append(self.cpu.execute())
+        return pasos
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">APIs simplificadas</span>
+        <span class="pd-use-case">Librerías complejas</span>
+        <span class="pd-use-case">Servicios legados</span>
+      </div>
+    </div>
+
+    <!-- FLYWEIGHT -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Flyweight</h4>
+      <div class="analogy">
+        💡 Es como un diccionario: en lugar de crear una definición nueva cada vez que alguien dice "gato", reutilizás la misma definición que ya existe.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés millones de objetos similares y se te acaba la memoria por duplicar datos idénticos.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Compartí datos inmutantes entre muchos objetos pequeños.
+      </div>
+      <pre><code class="language-python">
+class FlyweightArbol:
+    _pool = {}
+    
+    def __new__(cls, tipo, color):
+        key = (tipo, color)
+        if key not in cls._pool:
+            obj = super().__new__(cls)
+            obj.tipo = tipo
+            obj.color = color
+            cls._pool[key] = obj
+        return cls._pool[key]
+
+# Solo 3 objetos reales en memoria
+arboles = []
+for i in range(10000):
+    arboles.append(FlyweightArbol("pino", "verde"))
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Procesadores de texto</span>
+        <span class="pd-use-case">Juegos (partículas)</span>
+        <span class="pd-use-case">Editores de imágenes</span>
+      </div>
+    </div>
+
+    <!-- PROXY -->
+    <div class="pd-card estructural reveal-element">
+      <h4><span class="pd-tag structural">Estructural</span> Proxy</h4>
+      <div class="analogy">
+        💡 Es como un asistente personal: en lugar de que el CEO atienda cada llamada, el asistente filtra, valida y solo pasa lo importante.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Querés controlar acceso a un objeto (por seguridad, rendimiento o laziness).
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Poneá un objeto intermedio que controle el acceso al real.
+      </div>
+      <pre><code class="language-python">
+class ProxyServicio:
+    def __init__(self):
+        self._servicio = None
+        self._cache = {}
+    
+    def consultar(self, dni):
+        if dni in self._cache:
+            return self._cache[dni]
+        
+        if self._servicio is None:
+            self._servicio = ServicioReal()
+        
+        resultado = self._servicio.consultar(dni)
+        self._cache[dni] = resultado
+        return resultado
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Caché</span>
+        <span class="pd-use-case">Control de acceso</span>
+        <span class="pd-use-case">Lazy loading</span>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 4. PATRONES DE COMPORTAMIENTO -->
+    <!-- ============================================ -->
+    <hr class="pd-section-divider">
+    <h2 id="comportamiento">4. Patrones de Comportamiento</h2>
+
+    <p>Resuelven cómo los <strong>objetos interactúan</strong> y distribuyen responsabilidades. Se enfocan en la comunicación y el flujo de control.</p>
+
+    <!-- CHAIN OF RESPONSIBILITY -->
+    <div class="pd-card comportamiento reveal-element">
+      <h4><span class="pd-tag behavioral">Comportamiento</span> Chain of Responsibility</h4>
+      <div class="analogy">
+        💡 Es como una cadena de mando en el ejército: un soldado no puede resolver un problema, se lo pasa al sargento; si tampoco puede, al teniente; y así hasta llegar al general.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Varios objetos pueden manejar una petición, pero no sabés cuál al principio.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Pasá la petición por una cadena de manejadores hasta que uno la resuelva.
+      </div>
+      <pre><code class="language-python">
+class Manejador:
+    def __init__(self, siguiente=None):
+        self.siguiente = siguiente
+    
+    def manejar(self, monto):
+        if self.siguiente:
+            return self.siguiente.manejar(monto)
+        return None
+
+class Supervisor(Manejador):
+    def __init__(self, limite, siguiente=None):
+        super().__init__(siguiente)
+        self.limite = limite
+    
+    def manejar(self, monto):
+        if monto <= self.limite:
+            return f"Supervisor aprobó ${monto}"
+        return super().manejar(monto)
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Middleware HTTP</span>
+        <span class="pd-use-case">Filtros de logging</span>
+        <span class="pd-use-case">Aprobaciones</span>
+      </div>
+    </div>
+
+    <!-- COMMAND -->
+    <div class="pd-card comportamiento reveal-element">
+      <h4><span class="pd-tag behavioral">Comportamiento</span> Command</h4>
+      <div class="analogy">
+        💡 Es como un ticket de restaurante: el mesero escribe tu pedido en un papelito. La cocina recibe el papelito y lo ejecuta. Podés guardar el papelito, deshacerlo, o pasarlo a otro cocinero.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Querés desacoplar quién ejecuta una acción de quién la pidió, o necesitá deshacer/rehacer operaciones.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Encapsulá cada acción como un objeto con ejecutar() y deshacer().
+      </div>
+      <pre><code class="language-python">
+class Comando(ABC):
+    @abstractmethod
+    def ejecutar(self): pass
+    @abstractmethod
+    def deshacer(self): pass
+
+class Escribir(Comando):
+    def __init__(self, documento, texto):
+        self.doc = documento
+        self.texto = texto
+    
+    def ejecutar(self):
+        self.doc.contenido += self.texto
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Editores de texto</span>
+        <span class="pd-use-case">Transacciones</span>
+        <span class="pd-use-case">Colas de tareas</span>
+      </div>
+    </div>
+
+    <!-- OBSERVER -->
+    <div class="pd-card comportamiento reveal-element">
+      <h4><span class="pd-tag behavioral">Comportamiento</span> Observer</h4>
+      <div class="analogy">
+        💡 Es como suscribirte a un canal de YouTube: cuando el canal sube un video, todos los suscriptores reciben una notificación automática.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Un objeto cambia y varios otros necesitan enterarse, pero no querés acoplarlos.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Los objetos se suscriben a notificaciones del sujeto y se actualizan cuando algo cambia.
+      </div>
+      <pre><code class="language-python">
+class Sujeto:
+    def __init__(self):
+        self._observadores = []
+        self._estado = None
+    
+    def suscribir(self, observador):
+        self._observadores.append(observador)
+    
+    def notificar(self):
+        for obs in self._observadores:
+            obs.actualizar(self._estado)
+    
+    @estado.setter
+    def estado(self, valor):
+        self._estado = valor
+        self.notificar()
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Event listeners</span>
+        <span class="pd-use-case">Reactividad</span>
+        <span class="pd-use-case">Pub/Sub</span>
+      </div>
+    </div>
+
+    <!-- STRATEGY -->
+    <div class="pd-card comportamiento reveal-element">
+      <h4><span class="pd-tag behavioral">Comportamiento</span> Strategy</h4>
+      <div class="analogy">
+        💡 Es como elegir camino al trabajo: podés ir en auto, en colectivo o caminando. El destino es el mismo, pero la estrategia cambia según el contexto.
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Tenés múltiples algoritmos para resolver un problema y querés intercambiarlos en runtime.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Definí cada algoritmo como una estrategia intercambiable.
+      </div>
+      <pre><code class="language-python">
+class EstrategiaDescuento(ABC):
+    @abstractmethod
+    def calcular(self, total): pass
+
+class DescuentoNormal(EstrategiaDescuento):
+    def calcular(self, total):
+        return total
+
+class DescuentoVIP(EstrategiaDescuento):
+    def calcular(self, total):
+        return total * 0.8
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Algoritmos intercambiables</span>
+        <span class="pd-use-case">Formas de pago</span>
+        <span class="pd-use-case">Compresión de datos</span>
+      </div>
+    </div>
+
+    <!-- ITERATOR -->
+    <div class="pd-card comportamiento reveal-element">
+      <h4><span class="pd-tag behavioral">Comportamiento</span> Iterator</h4>
+      <div class="analogy">
+        💡 Es como recorrer un álbum de fotos: no necesitás sacar todas las fotos a la vez. Vas pasando una por una con la mano (el iterador).
+      </div>
+      <div class="pd-problem">
+        <strong>Problema:</strong> Querés recorrer una colección sin exponer su estructura interna.
+      </div>
+      <div class="pd-solution">
+        <strong>Solución:</strong> Creá un objeto que recorra la colección paso a paso.
+      </div>
+      <pre><code class="language-python">
+class IteradorArbol:
+    def __init__(self, raiz):
+        self._pila = [raiz]
+    
+    def __next__(self):
+        if not self._pila:
+            raise StopIteration
+        nodo = self._pila.pop()
+        for hijo in reversed(nodo.hijos):
+            self._pila.append(hijo)
+        return nodo.valor
+      </code></pre>
+      <div class="pd-use-cases">
+        <span class="pd-use-case">Colecciones</span>
+        <span class="pd-use-case">Bases de datos</span>
+        <span class="pd-use-case">ASTs</span>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- 5. ¿CUÁNDO USAR CADA UNO? -->
+    <!-- ============================================ -->
+    <hr class="pd-section-divider">
+    <h2 id="cuando-usar">5. ¿Cuándo usar cada uno?</h2>
+
+    <p>No todos los patrones son útiles en todos los proyectos. Acá va una guía rápida:</p>
+
+    <div class="pd-diagram reveal-element">
+      <svg viewBox="0 0 500 280" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+        <!-- Encabezados -->
+        <text x="90" y="25" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="10" font-weight="600">PATRÓN</text>
+        <text x="250" y="25" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="10" font-weight="600">CUÁNDO USAR</text>
+        <text x="420" y="25" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="10" font-weight="600">FRECUENCIA</text>
+        
+        <!-- Singleton -->
+        <rect x="10" y="40" width="160" height="28" rx="4" fill="var(--diagram-2)" opacity="0.8"/>
+        <text x="90" y="58" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Singleton</text>
+        <text x="250" y="58" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Logger, config, pool</text>
+        <rect x="360" y="48" width="80" height="12" rx="2" fill="var(--diagram-5)" opacity="0.7"/>
+        <text x="400" y="57" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">MEDIA</text>
+        
+        <!-- Factory -->
+        <rect x="10" y="78" width="160" height="28" rx="4" fill="var(--diagram-2)" opacity="0.8"/>
+        <text x="90" y="96" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Factory</text>
+        <text x="250" y="96" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Objetos dinámicos</text>
+        <rect x="360" y="86" width="120" height="12" rx="2" fill="var(--diagram-6)" opacity="0.7"/>
+        <text x="420" y="95" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">ALTA</text>
+        
+        <!-- Strategy -->
+        <rect x="10" y="116" width="160" height="28" rx="4" fill="var(--diagram-6)" opacity="0.8"/>
+        <text x="90" y="134" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Strategy</text>
+        <text x="250" y="134" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Algoritmos intercambiables</text>
+        <rect x="360" y="124" width="120" height="12" rx="2" fill="var(--diagram-6)" opacity="0.7"/>
+        <text x="420" y="133" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">ALTA</text>
+        
+        <!-- Observer -->
+        <rect x="10" y="154" width="160" height="28" rx="4" fill="var(--diagram-6)" opacity="0.8"/>
+        <text x="90" y="172" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Observer</text>
+        <text x="250" y="172" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Eventos, reactividad</text>
+        <rect x="360" y="162" width="120" height="12" rx="2" fill="var(--diagram-6)" opacity="0.7"/>
+        <text x="420" y="171" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">ALTA</text>
+        
+        <!-- Facade -->
+        <rect x="10" y="192" width="160" height="28" rx="4" fill="var(--diagram-3)" opacity="0.8"/>
+        <text x="90" y="210" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Facade</text>
+        <text x="250" y="210" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Simplificar APIs</text>
+        <rect x="360" y="200" width="120" height="12" rx="2" fill="var(--diagram-6)" opacity="0.7"/>
+        <text x="420" y="209" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">ALTA</text>
+        
+        <!-- Command -->
+        <rect x="10" y="230" width="160" height="28" rx="4" fill="var(--diagram-6)" opacity="0.8"/>
+        <text x="90" y="248" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="9">Command</text>
+        <text x="250" y="248" text-anchor="middle" fill="var(--color-text)" font-family="var(--font-mono)" font-size="8">Undo, colas, transacciones</text>
+        <rect x="360" y="238" width="80" height="12" rx="2" fill="var(--diagram-5)" opacity="0.7"/>
+        <text x="400" y="247" text-anchor="middle" fill="#fff" font-family="var(--font-mono)" font-size="7">MEDIA</text>
+      </svg>
+    </div>
+
+    <div class="pd-compare reveal-element">
+      <div class="pd-compare-box pros">
+        <h4>Usá un patrón cuando...</h4>
+        <p style="font-size: 0.85rem;">
+          ✓ Tenés un problema recurrente que ya tiene solución documentada<br>
+          ✓ El patrón reduce la complejidad en lugar de agregarla<br>
+          • Tu equipo conoce el patrón o está dispuesto a aprenderlo<br>
+          • El beneficio justifica la abstracción adicional
+        </p>
+      </div>
+      <div class="pd-compare-box cons">
+        <h4>NO uses un patrón cuando...</h4>
+        <p style="font-size: 0.85rem;">
+          ✗ Es over-engineering para el problema actual<br>
+          ✗ Nadie del equipo lo entenderá<br>
+          ✗ Agrega complejidad sin beneficio claro<br>
+          ✗ "Porque sí" no es una razón válida
+        </p>
+      </div>
+    </div>
+
+    <div class="pd-diagram reveal-element" style="margin-top: var(--space-6);">
+      <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0;">
+        <strong>Regla de oro:</strong> Primero escribí el código más simple que funcione. Si luego descubrís que necesitás un patrón, refactorizá. No empieces con patrones.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: var(--space-3); margin-top: var(--space-4); flex-wrap: wrap;">
+      <a href="../../index.html" class="btn btn-secondary">← Volver al archivo</a>
+      <a href="../antipatrones-de-software/index.html" class="btn btn-primary">Siguiente: Anti-patrones →</a>
+    </div>
+
+  </main>
+
+  <script src="../../assets/js/prism.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
