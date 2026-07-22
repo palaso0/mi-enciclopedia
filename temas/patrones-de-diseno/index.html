@@ -209,7 +209,7 @@
     <hr class="pd-section-divider">
     <h2 id="que-son">1. ¿Qué son los patrones de diseño?</h2>
 
-    <p>Imaginá que sos carpintero. No inventás la silla cada vez que alguien te pide una: ya sabés que para hacer una silla necesitás cuatro patas, un asiento y un respaldo. El patrón es la receta que funciona siempre, pero que podés adaptar a cada cliente.</p>
+    <p>Imagina que eres carpintero. No inventas la silla cada vez que alguien te pide una: ya sabes que para hacer una silla necesitas cuatro patas, un asiento y un respaldo. El patrón es la receta que funciona siempre, pero que puedes adaptar a cada cliente.</p>
 
     <p>Los <strong>patrones de diseño</strong> son exactamente eso: soluciones reutilizables a problemas comunes que aparecen una y otra vez al diseñar software. No son código copiar-pegar, sino <strong>plantillas conceptuales</strong> que te ayudan a tomar mejores decisiones de arquitectura.</p>
 
@@ -252,10 +252,10 @@
     <div class="pd-card reveal-element">
       <h4><span class="pd-tag creacional">Creacional</span> Singleton</h4>
       <div class="analogy">
-        💡 Es como el director de una escuela: solo puede haber uno. Si necesitás hablar con "el director", siempre es la misma persona, sin importar quién lo pida.
+        💡 Es como el director de una escuela: solo puede haber uno. Si necesitas hablar con "el director", siempre es la misma persona, sin importar quién lo pida.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Necesitás exactamente una instancia de una clase en toda la aplicación (una conexión a base de datos, un logger, un configurador).
+        <strong>Problema:</strong> Necesitas exactamente una instancia de una clase en toda la aplicación (una conexión a base de datos, un logger, un configurador).
       </div>
       <div class="pd-solution">
         <strong>Solución:</strong> La clase se crea a sí misma y guarda la instancia. Un método estático la devuelve siempre la misma.
@@ -291,10 +291,10 @@ print(config1 is config2)  # True
         💡 Es como una fábrica de muebles: cada sucursal (subclase) decide qué tipo de mueble crear, pero el proceso de pedido (método) es el mismo.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Querés crear objetos pero no sabés exactamente qué clase necesitás hasta runtime.
+        <strong>Problema:</strong> Quieres crear objetos pero no sabes exactamente qué clase necesitas hasta runtime.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Delegás la creación a subclases que implementan un método fábrica.
+        <strong>Solución:</strong> Delega la creación a subclases que implementan un método fábrica.
       </div>
       <pre><code class="language-python">
 from abc import ABC, abstractmethod
@@ -340,7 +340,7 @@ notif.enviar("Hola")  # "Email: Hola"
         💡 Es como un local de IKEA: entrás a la sección "Cocina" y todo combina (olla, sartén, cuchillos del mismo estilo). La fábrica abstracta crea familias enteras de productos compatibles.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Necesitás crear grupos de objetos relacionados sin especificar sus clases concretas.
+        <strong>Problema:</strong> Necesitas crear grupos de objetos relacionados sin especificar sus clases concretas.
       </div>
       <div class="pd-solution">
         <strong>Solución:</strong> Una interfaz define cómo crear cada tipo de producto, y cada implementación concreta crea una familia consistente.
@@ -375,7 +375,7 @@ def armar_formulario(factory: FactoryUI):
     <div class="pd-card reveal-element">
       <h4><span class="pd-tag creacional">Creacional</span> Builder</h4>
       <div class="analogy">
-        💡 Es como armar un combo de hamburguesa: primero la carne, después el queso, luego la lechuga... podés personalizar paso a paso sin enredarte con 20 parámetros en el constructor.
+        💡 Es como armar un combo de hamburguesa: primero la carne, después el queso, luego la lechuga... puedes personalizar paso a paso sin enredarte con 20 parámetros en el constructor.
       </div>
       <div class="pd-problem">
         <strong>Problema:</strong> Un objeto tiene muchos atributos opcionales y el constructor se vuelve un desastre con 15 parámetros.
@@ -423,13 +423,13 @@ query = (QueryBuilder()
     <div class="pd-card reveal-element">
       <h4><span class="pd-tag creacional">Creacional</span> Prototype</h4>
       <div class="analogy">
-        💡 Es como un molde de arcilla: en lugar de crear cada escultura desde cero, copiás un molde existente y lo modificás. Es más rápido que empezar de cero.
+        💡 Es como un molde de arcilla: en lugar de crear cada escultura desde cero, copias un molde existente y lo modificas. Es más rápido que empezar de cero.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Crear objetos nuevos es costoso (conexiones, carga de datos) y querés reutilizar existentes.
+        <strong>Problema:</strong> Crear objetos nuevos es costoso (conexiones, carga de datos) y quieres reutilizar existentes.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Cloná objetos existentes en lugar de crear nuevos desde cero.
+        <strong>Solución:</strong> Clona objetos existentes en lugar de crear nuevos desde cero.
       </div>
       <pre><code class="language-python">
 import copy
@@ -471,13 +471,13 @@ robot_rojo.color = "rojo"
     <div class="pd-card estructural reveal-element">
       <h4><span class="pd-tag structural">Estructural</span> Adapter</h4>
       <div class="analogy">
-        💡 Es como un adaptador de enchufe: tenés un enchufe americano y una ficha europea. El adaptador los conecta sin cambiar ninguno de los dos.
+        💡 Es como un adaptador de enchufe: tienes un enchufe americano y una ficha europea. El adaptador los conecta sin cambiar ninguno de los dos.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés una clase cuya interfaz no es compatible con la que necesitás usar.
+        <strong>Problema:</strong> Tienes una clase cuya interfaz no es compatible con la que necesitas usar.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Envolvé la clase existente en una que traduzca la interfaz.
+        <strong>Solución:</strong> Envuelve la clase existente en una que traduzca la interfaz.
       </div>
       <pre><code class="language-python">
 class ViejoServicio:
@@ -507,10 +507,10 @@ class AdapterServicio:
         💡 Es como un control remoto universal: el control funciona igual sin importar si controla un TV Sony, Samsung o LG. Podés cambiar la televisión sin cambiar el control.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés dos dimensiones de variación y no querés crear una clase para cada combinación.
+        <strong>Problema:</strong> Tienes dos dimensiones de variación y no quieres crear una clase para cada combinación.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Separá la abstracción de la implementación en dos jerarquías independientes.
+        <strong>Solución:</strong> Separa la abstracción de la implementación en dos jerarquías independientes.
       </div>
       <pre><code class="language-python">
 from abc import ABC, abstractmethod
@@ -544,10 +544,10 @@ class Forma:
         💡 Es como una caja de herramientas: adentro puede haber un martillo (hoja) o otra caja con más herramientas (compuesto). Tratás todo igual.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés objetos individuales y composiciones de objetos, y querés tratarlos de forma uniforme.
+        <strong>Problema:</strong> Tienes objetos individuales y composiciones de objetos, y quieres tratarlos de forma uniforme.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Componé objetos en estructuras de árbol y tratá hojas y ramas con la misma interfaz.
+        <strong>Solución:</strong> Compón objetos en estructuras de árbol y trata hojas y ramas con la misma interfaz.
       </div>
       <pre><code class="language-python">
 class Componente(ABC):
@@ -588,10 +588,10 @@ class Caja(Componente):
         💡 Es como vestirte: primero la remera (objeto base), después un saco (decorador), después una bufanda (otro decorador). Cada capa agrega funcionalidad sin cambiar la remera.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Querés agregar responsabilidades a objetos de forma dinámica, sin crear subclases para cada combinación.
+        <strong>Problema:</strong> Quieres agregar responsabilidades a objetos de forma dinámica, sin crear subclases para cada combinación.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Envolvé el objeto en otros objetos que agregan comportamiento.
+        <strong>Solución:</strong> Envuelve el objeto en otros objetos que agregan comportamiento.
       </div>
       <pre><code class="language-python">
 class Cafetera:
@@ -625,10 +625,10 @@ print(f"${cafe_special.costo()}")  # $100
     <div class="pd-card estructural reveal-element">
       <h4><span class="pd-tag structural">Estructural</span> Facade</h4>
       <div class="analogy">
-        💡 Es como un recepcionista de hotel: en lugar de hablar con el chef, el limpieza, el conserje y el portero, le decís todo al recepcionista y él coordina todo por vos.
+        💡 Es como un recepcionista de hotel: en lugar de hablar con el chef, el limpieza, el conserje y el portero, le dices todo al recepcionista y él coordina todo por ti.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés un subsistema complejo con muchas clases y querés simplificar la interfaz para el cliente.
+        <strong>Problema:</strong> Tienes un subsistema complejo con muchas clases y quieres simplificar la interfaz para el cliente.
       </div>
       <div class="pd-solution">
         <strong>Solución:</strong> Creá una clase simple que delegue las llamadas al subsistema complejo.
@@ -661,10 +661,10 @@ class Computadora:
         💡 Es como un diccionario: en lugar de crear una definición nueva cada vez que alguien dice "gato", reutilizás la misma definición que ya existe.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés millones de objetos similares y se te acaba la memoria por duplicar datos idénticos.
+        <strong>Problema:</strong> Tienes millones de objetos similares y se te acaba la memoria por duplicar datos idénticos.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Compartí datos inmutantes entre muchos objetos pequeños.
+        <strong>Solución:</strong> Comparte datos inmutables entre muchos objetos pequeños.
       </div>
       <pre><code class="language-python">
 class FlyweightArbol:
@@ -698,10 +698,10 @@ for i in range(10000):
         💡 Es como un asistente personal: en lugar de que el CEO atienda cada llamada, el asistente filtra, valida y solo pasa lo importante.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Querés controlar acceso a un objeto (por seguridad, rendimiento o laziness).
+        <strong>Problema:</strong> Quieres controlar acceso a un objeto (por seguridad, rendimiento o pereza).
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Poneá un objeto intermedio que controle el acceso al real.
+        <strong>Solución:</strong> Pon un objeto intermedio que controle el acceso al real.
       </div>
       <pre><code class="language-python">
 class ProxyServicio:
@@ -742,10 +742,10 @@ class ProxyServicio:
         💡 Es como una cadena de mando en el ejército: un soldado no puede resolver un problema, se lo pasa al sargento; si tampoco puede, al teniente; y así hasta llegar al general.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Varios objetos pueden manejar una petición, pero no sabés cuál al principio.
+        <strong>Problema:</strong> Varios objetos pueden manejar una petición, pero no sabes cuál al principio.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Pasá la petición por una cadena de manejadores hasta que uno la resuelva.
+        <strong>Solución:</strong> Pasa la petición por una cadena de manejadores hasta que uno la resuelva.
       </div>
       <pre><code class="language-python">
 class Manejador:
@@ -781,10 +781,10 @@ class Supervisor(Manejador):
         💡 Es como un ticket de restaurante: el mesero escribe tu pedido en un papelito. La cocina recibe el papelito y lo ejecuta. Podés guardar el papelito, deshacerlo, o pasarlo a otro cocinero.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Querés desacoplar quién ejecuta una acción de quién la pidió, o necesitá deshacer/rehacer operaciones.
+        <strong>Problema:</strong> Quieres desacoplar quién ejecuta una acción de quién la pidió, o necesitas deshacer/rehacer operaciones.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Encapsulá cada acción como un objeto con ejecutar() y deshacer().
+        <strong>Solución:</strong> Encapsula cada acción como un objeto con ejecutar() y deshacer().
       </div>
       <pre><code class="language-python">
 class Comando(ABC):
@@ -815,7 +815,7 @@ class Escribir(Comando):
         💡 Es como suscribirte a un canal de YouTube: cuando el canal sube un video, todos los suscriptores reciben una notificación automática.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Un objeto cambia y varios otros necesitan enterarse, pero no querés acoplarlos.
+        <strong>Problema:</strong> Un objeto cambia y varios otros necesitan enterarse, pero no quieres acoplarlos.
       </div>
       <div class="pd-solution">
         <strong>Solución:</strong> Los objetos se suscriben a notificaciones del sujeto y se actualizan cuando algo cambia.
@@ -849,13 +849,13 @@ class Sujeto:
     <div class="pd-card comportamiento reveal-element">
       <h4><span class="pd-tag behavioral">Comportamiento</span> Strategy</h4>
       <div class="analogy">
-        💡 Es como elegir camino al trabajo: podés ir en auto, en colectivo o caminando. El destino es el mismo, pero la estrategia cambia según el contexto.
+        💡 Es como elegir camino al trabajo: puedes ir en auto, en colectivo o caminando. El destino es el mismo, pero la estrategia cambia según el contexto.
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Tenés múltiples algoritmos para resolver un problema y querés intercambiarlos en runtime.
+        <strong>Problema:</strong> Tienes múltiples algoritmos para resolver un problema y quieres intercambiarlos en runtime.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Definí cada algoritmo como una estrategia intercambiable.
+        <strong>Solución:</strong> Define cada algoritmo como una estrategia intercambiable.
       </div>
       <pre><code class="language-python">
 class EstrategiaDescuento(ABC):
@@ -881,13 +881,13 @@ class DescuentoVIP(EstrategiaDescuento):
     <div class="pd-card comportamiento reveal-element">
       <h4><span class="pd-tag behavioral">Comportamiento</span> Iterator</h4>
       <div class="analogy">
-        💡 Es como recorrer un álbum de fotos: no necesitás sacar todas las fotos a la vez. Vas pasando una por una con la mano (el iterador).
+        💡 Es como recorrer un álbum de fotos: no necesitas sacar todas las fotos a la vez. Vas pasando una por una con la mano (el iterador).
       </div>
       <div class="pd-problem">
-        <strong>Problema:</strong> Querés recorrer una colección sin exponer su estructura interna.
+        <strong>Problema:</strong> Quieres recorrer una colección sin exponer su estructura interna.
       </div>
       <div class="pd-solution">
-        <strong>Solución:</strong> Creá un objeto que recorra la colección paso a paso.
+        <strong>Solución:</strong> Crea un objeto que recorra la colección paso a paso.
       </div>
       <pre><code class="language-python">
 class IteradorArbol:
@@ -970,9 +970,9 @@ class IteradorArbol:
 
     <div class="pd-compare reveal-element">
       <div class="pd-compare-box pros">
-        <h4>Usá un patrón cuando...</h4>
+        <h4>Usa un patrón cuando...</h4>
         <p style="font-size: 0.85rem;">
-          ✓ Tenés un problema recurrente que ya tiene solución documentada<br>
+          ✓ Tienes un problema recurrente que ya tiene solución documentada<br>
           ✓ El patrón reduce la complejidad en lugar de agregarla<br>
           • Tu equipo conoce el patrón o está dispuesto a aprenderlo<br>
           • El beneficio justifica la abstracción adicional
@@ -991,7 +991,7 @@ class IteradorArbol:
 
     <div class="pd-diagram reveal-element" style="margin-top: var(--space-6);">
       <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0;">
-        <strong>Regla de oro:</strong> Primero escribí el código más simple que funcione. Si luego descubrís que necesitás un patrón, refactorizá. No empieces con patrones.
+        <strong>Regla de oro:</strong> Primero escribe el código más simple que funcione. Si luego descubres que necesitas un patrón, refactoriza. No empieces con patrones.
       </p>
     </div>
 

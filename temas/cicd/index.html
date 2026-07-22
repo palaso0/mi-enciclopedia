@@ -126,11 +126,11 @@
 
     <h2>1. El problema que resuelven</h2>
 
-    <p>Imaginá un equipo de 5 desarrolladores trabajando en la misma aplicación. Cada uno escribe código en su branch. Si no hay CI/CD, el día del deploy tenés que:</p>
+    <p>Imagina un equipo de 5 desarrolladores trabajando en la misma aplicación. Cada uno escribe código en su branch. Si no hay CI/CD, el día del deploy tienes que:</p>
     <ul>
       <li>Juntar todos los cambios manualmente</li>
       <li>Resolver conflictos de merge</li>
-      <li>Correr tests (si los tenés)</li>
+      <li>Correr tests (si los tienes)</li>
       <li>Construir el proyecto</li>
       <li>Subirlo al servidor</li>
       <li>Cruzar los dedos para que no se rompa nada</li>
@@ -252,24 +252,24 @@ jobs:
 
     <ul>
       <li><strong>El pipeline debe ser rápido:</strong> Si tarda 30 minutos, los desarrolladores no lo van a esperar. Objetivo: menos de 10 minutos.</li>
-      <li><strong>Fallá rápido:</strong> Poné los checks más baratos primero (lint, tests unitarios) antes de los costosos (build, deploy).</li>
-      <li><strong>No saltés tests:</strong> Si el pipeline falla, arreglá el código. No deshabilites el test para que pase.</li>
-      <li><strong>Versioná tu pipeline:</strong> El archivo de CI/CD debe estar en el repo, no configurado manualmente en la plataforma.</li>
-      <li><strong>Usá cache:</strong> Cacheá dependencias y artefactos entre runs para acelerar el pipeline.</li>
+      <li><strong>Falla rápido:</strong> Pon los checks más baratos primero (lint, tests unitarios) antes de los costosos (build, deploy).</li>
+      <li><strong>No saltees tests:</strong> Si el pipeline falla, arregla el código. No deshabilites el test para que pase.</li>
+      <li><strong>Versiona tu pipeline:</strong> El archivo de CI/CD debe estar en el repo, no configurado manualmente en la plataforma.</li>
+      <li><strong>Usa caché:</strong> Cachea dependencias y artefactos entre runs para acelerar el pipeline.</li>
       <li><strong>Variables de entorno:</strong> Secrets y configuración van en variables de entorno, nunca en el código.</li>
     </ul>
 
     <h2>7. Estrategias de deploy</h2>
 
-    <ul>
-      <li><strong>Rolling update:</strong> Reemplazás instancias viejas por nuevas gradualmente. Sin downtime.</li>
-      <li><strong>Blue-green:</strong> Tenés dos ambientes idénticos. Deployás al nuevo y redirigís el tráfico de golpe. Si algo falla, volvés al anterior.</li>
-      <li><strong>Canary:</strong> Deployás a un porcentaje pequeño de usuarios primero. Si no hay errores, expandís gradualmente.</li>
-      <li><strong>Feature flags:</strong> El código está desplegado pero desactivado. Lo activás con un switch sin necesidad de redeployear.</li>
+<ul>
+      <li><strong>Rolling update:</strong> Reemplazas instancias viejas por nuevas gradualmente. Sin downtime.</li>
+      <li><strong>Blue-green:</strong> Tienes dos ambientes idénticos. Despliegas al nuevo y redirigís el tráfico de golpe. Si algo falla, vuelves al anterior.</li>
+      <li><strong>Canary:</strong> Despliegas a un porcentaje pequeño de usuarios primero. Si no hay errores, expandes gradualmente.</li>
+      <li><strong>Feature flags:</strong> El código está desplegado pero desactivado. Lo activas con un switch sin necesidad de redeployar.</li>
     </ul>
 
     <div class="callout reveal-element">
-      <p><strong>La meta:</strong> Deployear debería ser aburrido. Si deployear te da ansiedad, tu pipeline necesita mejorar. El CI/CD existe para que puedas hacer cambios con confianza.</p>
+      <p><strong>La meta:</strong> Desplegar debería ser aburrido. Si desplegar te da ansiedad, tu pipeline necesita mejorar. El CI/CD existe para que puedas hacer cambios con confianza.</p>
     </div>
 
     <div class="reveal-element">

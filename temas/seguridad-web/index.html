@@ -130,7 +130,7 @@
 
     <p>XSS ocurre cuando un atacante logra que tu sitio ejecute <strong>JavaScript malicioso</strong> en el navegador de otro usuario. No es un ataque al servidor: es un ataque a los usuarios que visitan tu sitio.</p>
 
-    <p>Imaginá un foro donde cualquiera puede escribir comentarios. Si alguien escribe código JavaScript en vez de texto y tu sitio lo muestra tal cual, el navegador de quien lee el comentario ejecuta ese código como si fuera parte de tu página.</p>
+    <p>Imagina un foro donde cualquiera puede escribir comentarios. Si alguien escribe código JavaScript en vez de texto y tu sitio lo muestra tal cual, el navegador de quien lee el comentario ejecuta ese código como si fuera parte de tu página.</p>
 
     <div class="attack-card reveal-element">
       <h3>XSS Reflejado</h3>
@@ -158,7 +158,7 @@ https://tu-sitio.com/buscar?q=&lt;script&gt;steal(cookies)&lt;/script&gt;
     <div class="defense-card reveal-element">
       <h3>Defensa contra XSS</h3>
       <ul>
-        <li><strong>Escaping:</strong> Convertí los caracteres especiales en HTML entities. <code>&lt;</code> se convierte en <code>&amp;lt;</code>.</li>
+        <li><strong>Escaping:</strong> Convierte los caracteres especiales en HTML entities. <code>&lt;</code> se convierte en <code>&amp;lt;</code>.</li>
         <li><strong>Content Security Policy (CSP):</strong> Definí qué scripts puede ejecutar tu página.</li>
         <li><strong>HttpOnly cookies:</strong> JavaScript no puede leerlas, así que un XSS no puede robar la sesión.</li>
         <li><strong>Sanitización:</strong> Limpíá toda entrada del usuario antes de mostrarla.</li>
@@ -248,7 +248,7 @@ Access-Control-Allow-Headers: Content-Type, Authorization
         <li><strong>Nunca uses <code>Access-Control-Allow-Origin: *</code></strong> en producción. Permite que cualquier sitio acceda a tu API.</li>
         <li><strong>Lista blanca explícita:</strong> Especificá exactamente qué dominios pueden acceder.</li>
         <li><strong>Limitá métodos y headers:</strong> Solo permití lo necesario.</li>
-        <li><strong>Credentials:</strong> Si usás cookies o auth headers, configurá <code>Access-Control-Allow-Credentials: true</code> y lista blanca de orígenes específicos.</li>
+        <li><strong>Credentials:</strong> Si usas cookies o auth headers, configura <code>Access-Control-Allow-Credentials: true</code> y lista blanca de orígenes específicos.</li>
       </ul>
     </div>
 
@@ -262,7 +262,7 @@ Access-Control-Allow-Headers: Content-Type, Authorization
     </ul>
 
     <div class="callout reveal-element">
-      <p><strong>Regla de oro:</strong> Nunca confíes en la entrada del usuario. Siempre sanitizá, validá y escapá. El navegador es el primer filtro de seguridad, pero no el único.</p>
+      <p><strong>Regla de oro:</strong> Nunca confíes en la entrada del usuario. Siempre sanitiza, valida y escapa. El navegador es el primer filtro de seguridad, pero no el único.</p>
     </div>
 
     <div class="reveal-element">

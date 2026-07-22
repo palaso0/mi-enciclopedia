@@ -8,7 +8,7 @@ Usa este archivo como plantilla y guía cada vez que quieras agregar un nuevo te
 
 ---
 
-## Cómo decidir el enfoque (no me preguntes esto, decidilo vos)
+## Cómo decidir el enfoque (no me preguntes esto, decídelo tú)
 
 No te voy a dar subtemas, nivel, categoría ni tono. Actúa como un
 profesor experto que diseña el mejor recorrido posible para alguien
@@ -27,7 +27,7 @@ que llega a este tema sin contexto previo:
 
 Si tienes dudas genuinas sobre el alcance (ej. el tema es ambiguo o
 podría interpretarse de dos formas muy distintas), pregúntame antes de
-generar. Para todo lo demás, decidí vos y avanzá.
+generar. Para todo lo demás, decide tú y avanza.
 
 ---
 

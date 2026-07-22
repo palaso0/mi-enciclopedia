@@ -408,7 +408,7 @@ class ServidorMCP:
         params = solicitud.get("params", {})
         
         if metodo == "tools/list":
-            # El cliente pregunta: ¿qué herramientas tenés?
+            # El cliente pregunta: ¿qué herramientas tienes?
             return {
                 "tools": [
                     {"name": k, "description": v["descripcion"],
@@ -424,7 +424,7 @@ class ServidorMCP:
             return self.ejecutar_herramienta(nombre, args)
         
         elif metodo == "resources/list":
-            # El cliente pregunta: ¿qué recursos tenés?
+            # El cliente pregunta: ¿qué recursos tienes?
             return {
                 "resources": [
                     {"uri": uri, "name": r["nombre"], "mimeType": r["tipo"]}

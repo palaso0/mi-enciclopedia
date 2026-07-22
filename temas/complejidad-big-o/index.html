@@ -132,7 +132,7 @@
     </div>
 
     <h2>1. Por qué importa</h2>
-    <p>Imaginá que tenés una lista de 100 números y querés encontrar el mayor. Podés recorrer toda la lista: eso son 100 operaciones. Si tuvieras 1.000 números, serían 1.000 operaciones. Si tuvieras 1.000.000, serían un millón.</p>
+    <p>Imagina que tienes una lista de 100 números y quieres encontrar el mayor. Puedes recorrer toda la lista: eso son 100 operaciones. Si tuvieras 1.000 números, serían 1.000 operaciones. Si tuvieras 1.000.000, serían un millón.</p>
 
     <p>Pero ¿qué pasa si tu algoritmo hace una comparación por cada par de números? Con 100 elementos serían 10.000 comparaciones. Con 1.000 elementos, un millón. Con un millón, un billón. El tiempo crece mucho más rápido que los datos.</p>
 
@@ -154,7 +154,7 @@
       <div class="complexity-box on">
         <div class="notation">O(n)</div>
         <h4>Lineal</h4>
-        <p>Crece proporcionalmente con los datos. Si duplicás los datos, duplicás el tiempo.</p>
+        <p>Crece proporcionalmente con los datos. Si duplicas los datos, duplicas el tiempo.</p>
       </div>
       <div class="complexity-box on2">
         <div class="notation">O(n²)</div>
@@ -391,7 +391,7 @@ function busquedaBinaria(arr, objetivo) {
 
     <h2>5. Cómo optimizar: el poder de cambiar la complejidad</h2>
 
-    <p>La mejora más grande que podés hacer no es optimizar el código existente, sino <strong>cambiar el algoritmo</strong>. Un algoritmo O(n²) optimizado sigue siendo O(n²). Pero si lo cambias a O(n) o O(log n), el cambio es exponencial.</p>
+    <p>La mejora más grande que puedes hacer no es optimizar el código existente, sino <strong>cambiar el algoritmo</strong>. Un algoritmo O(n²) optimizado sigue siendo O(n²). Pero si lo cambias a O(n) o O(log n), el cambio es exponencial.</p>
 
     <h3>Ejemplo: buscar un elemento en una lista ordenada</h3>
 
@@ -620,8 +620,8 @@ function duplicar(arr) {
     <h2>6. Reglas para analizar complejidad</h2>
 
     <ul>
-      <li><strong>Ignorá las constantes:</strong> O(2n) es lo mismo que O(n). Lo que importa es la tendencia, no el factor exacto.</li>
-      <li><strong>Ignorá los términos menores:</strong> O(n² + n) se simplifica a O(n²) porque el cuadrático domina.</li>
+      <li><strong>Ignora las constantes:</strong> O(2n) es lo mismo que O(n). Lo que importa es la tendencia, no el factor exacto.</li>
+      <li><strong>Ignora los términos menores:</strong> O(n² + n) se simplifica a O(n²) porque el cuadrático domina.</li>
       <li><strong>Lo diferente es lo que importa:</strong> Si un algoritmo tiene dos partes, una O(n) y otra O(n²), la complejidad total es O(n²).</li>
       <li><strong>Mejor, peor y promedio:</strong> Big O normalmente describe el peor caso. También existen Omega (mejor caso) y Theta (promedio).</li>
     </ul>

@@ -1009,7 +1009,7 @@ resultado_real = buscar_producto(
 respuesta = "Sí, tenemos dos opciones por debajo de $50.000:
   1. Sony WH-CH520 — $35.000
   2. JBL Tune 510BT — $28.000
-  ¿Querés que verifique el stock de alguno?"</code></pre>
+  ¿Quieres que verifique el stock de alguno?"</code></pre>
 
     <div class="callout reveal-element">
       <p><strong>La ventaja de function calling:</strong> El LLM no "inventa" precios ni inventarios. Consulta datos reales del sistema y genera una respuesta precisa y actualizada. Si no encuentra resultados, simplemente lo informa en lugar de fabricar información.</p>
@@ -1456,7 +1456,7 @@ class ServidorMCP:
         params = solicitud.get("params", {})
         
         if metodo == "tools/list":
-            # El cliente pregunta: ¿qué herramientas tenés?
+            # El cliente pregunta: ¿qué herramientas tienes?
             return {
                 "tools": [
                     {"name": k, "description": v["descripcion"],
@@ -1472,7 +1472,7 @@ class ServidorMCP:
             return self.ejecutar_herramienta(nombre, args)
         
         elif metodo == "resources/list":
-            # El cliente pregunta: ¿qué recursos tenés?
+            # El cliente pregunta: ¿qué recursos tienes?
             return {
                 "resources": [
                     {"uri": uri, "name": r["nombre"], "mimeType": r["tipo"]}
